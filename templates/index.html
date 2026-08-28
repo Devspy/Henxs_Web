@@ -289,9 +289,9 @@
 
                         <div class="camera-overlay">
 
-                            <div class="camera-time">
+                            <div class="camera-time" id="camera-time">
                                 <i class="fa-regular fa-clock"></i>
-                                12:30:42
+                                <span>--:--:--</span>
                             </div>
 
                             <div class="recording">
@@ -302,28 +302,15 @@
                         </div>
 
 
-                        <!-- Camera placeholder -->
-
-                        <div class="camera-placeholder">
-
-                            <i class="fa-solid fa-video"></i>
-
-                            <h4>Live Camera Feed</h4>
-
-                            <p>Camera 01 is streaming</p>
-
-                        </div>
-
-
-                        <!-- Detection boxes -->
-
-                        <div class="detection-box person">
-                            <span>Person 98%</span>
-                        </div>
-
-                        <div class="detection-box object">
-                            <span>Object 94%</span>
-                        </div>
+                        {% if camera_stream_available %}
+                            <img class="camera-stream" src="{{ url_for('video_feed') }}" alt="Live feed from Camera 01">
+                        {% else %}
+                            <div class="camera-placeholder">
+                                <i class="fa-solid fa-video"></i>
+                                <h4>Live Camera Feed</h4>
+                                <p>Configure RTSP_URL to start streaming</p>
+                            </div>
+                        {% endif %}
 
                     </div>
 
@@ -598,67 +585,6 @@
                 </div>
 
 
-                <!-- SYSTEM HEALTH -->
-
-                <div class="card health-card">
-
-                    <div class="card-header">
-
-                        <div>
-                            <h3>System Health</h3>
-                            <p>Current system performance</p>
-                        </div>
-
-                        <span class="health-good">
-                            Healthy
-                        </span>
-
-                    </div>
-
-
-                    <div class="health-item">
-
-                        <div>
-                            <span>CPU Usage</span>
-                            <strong>34%</strong>
-                        </div>
-
-                        <div class="progress">
-                            <span style="width:34%"></span>
-                        </div>
-
-                    </div>
-
-
-                    <div class="health-item">
-
-                        <div>
-                            <span>Memory</span>
-                            <strong>48%</strong>
-                        </div>
-
-                        <div class="progress purple-progress">
-                            <span style="width:48%"></span>
-                        </div>
-
-                    </div>
-
-
-                    <div class="health-item">
-
-                        <div>
-                            <span>Storage</span>
-                            <strong>62%</strong>
-                        </div>
-
-                        <div class="progress orange-progress">
-                            <span style="width:62%"></span>
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
 
 
@@ -682,5 +608,6 @@
 
 </div>
 
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
