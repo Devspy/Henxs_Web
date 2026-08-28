@@ -344,10 +344,18 @@ button {
 
 /* Profile */
 
+.profile-menu {
+    position: relative;
+}
+
 .profile {
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
 }
 
 .avatar {
@@ -380,6 +388,54 @@ button {
     color: #999;
     font-size: 9px;
     margin-left: 4px;
+    transition: transform 0.2s;
+}
+
+.profile[aria-expanded="true"] > i {
+    transform: rotate(180deg);
+}
+
+.account-menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 10;
+    width: 170px;
+    padding: 6px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    box-shadow: 0 12px 30px rgba(23, 35, 31, 0.15);
+}
+
+.account-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 11px;
+    border-radius: 6px;
+    color: var(--dark);
+    font-size: 10px;
+    text-decoration: none;
+}
+
+.account-menu-item:hover {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.account-menu-item i {
+    width: 14px;
+    color: var(--primary);
+    text-align: center;
+}
+
+.account-menu-item.account-logout {
+    color: var(--red);
+}
+
+.account-menu-item.account-logout i {
+    color: var(--red);
 }
 
 
@@ -1520,10 +1576,6 @@ footer a:hover {
 
     .stats-grid {
         grid-template-columns: 1fr;
-    }
-
-    .profile {
-        display: none;
     }
 
     .detection-content {
