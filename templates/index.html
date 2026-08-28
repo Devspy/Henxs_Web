@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Henux | Smart Vision</title>
+
+    <link rel="stylesheet" href="static/css/style.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-eye"></i>
+            </div>
+
+            <div>
+                <h1>Henux</h1>
+                <span>Smart Vision</span>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav class="sidebar-nav">
+
+            <a href="#" class="nav-link active">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-video"></i>
+                <span>Live Camera</span>
+                <span class="live-dot"></span>
+            </a>
+
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-bell"></i>
+                <span>Alerts</span>
+                <span class="badge">4</span>
+            </a>
+
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Activity</span>
+            </a>
+
+        </nav>
+
+        <div class="menu-title">SYSTEM</div>
+
+        <nav class="sidebar-nav">
+
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>Help Center</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="system-status">
+                <span class="status-circle"></span>
+
+                <div>
+                    <strong>System Online</strong>
+                    <small>All systems operational</small>
+                </div>
+            </div>
+
+            <a href="#" class="logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div class="mobile-brand">
+                <i class="fa-solid fa-eye"></i>
+                Henux
+            </div>
+
+            <div class="topbar-left">
+                <h2>Dashboard</h2>
+                <p>Monitor your smart vision system</p>
+            </div>
+
+            <div class="topbar-right">
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+
+                <div class="profile">
+
+                    <div class="avatar">
+                        H
+                    </div>
+
+                    <div class="profile-info">
+                        <strong>Administrator</strong>
+                        <span>System Admin</span>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= CONTENT ================= -->
+
+        <section class="content">
+
+            <!-- WELCOME -->
+
+            <div class="welcome">
+
+                <div>
+                    <h1>Good afternoon, Admin 👋</h1>
+                    <p>Here's what's happening with your vision system today.</p>
+                </div>
+
+                <button class="primary-button">
+                    <i class="fa-solid fa-plus"></i>
+                    Add Camera
+                </button>
+
+            </div>
+
+
+            <!-- ================= STAT CARDS ================= -->
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+                        <span>Total Cameras</span>
+
+                        <div class="stat-icon pink">
+                            <i class="fa-solid fa-video"></i>
+                        </div>
+                    </div>
+
+                    <div class="stat-value">08</div>
+
+                    <div class="stat-footer">
+                        <span class="positive">
+                            <i class="fa-solid fa-arrow-up"></i> 12%
+                        </span>
+                        <span>vs last week</span>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+                        <span>Active Cameras</span>
+
+                        <div class="stat-icon green">
+                            <i class="fa-solid fa-signal"></i>
+                        </div>
+                    </div>
+
+                    <div class="stat-value">06</div>
+
+                    <div class="stat-footer">
+                        <span class="positive">
+                            <i class="fa-solid fa-check"></i> Online
+                        </span>
+                        <span>75% active</span>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+                        <span>Objects Detected</span>
+
+                        <div class="stat-icon purple">
+                            <i class="fa-solid fa-cube"></i>
+                        </div>
+                    </div>
+
+                    <div class="stat-value">1,284</div>
+
+                    <div class="stat-footer">
+                        <span class="positive">
+                            <i class="fa-solid fa-arrow-up"></i> 18.4%
+                        </span>
+                        <span>today</span>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+                        <span>Active Alerts</span>
+
+                        <div class="stat-icon orange">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                    </div>
+
+                    <div class="stat-value">04</div>
+
+                    <div class="stat-footer">
+                        <span class="warning">
+                            Requires attention
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= MAIN GRID ================= -->
+
+            <div class="dashboard-grid">
+
+
+                <!-- LIVE CAMERA -->
+
+                <div class="card camera-card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>Live Camera</h3>
+                            <p>Camera 01 • Main Entrance</p>
+                        </div>
+
+                        <div class="camera-status">
+                            <span></span>
+                            LIVE
+                        </div>
+
+                    </div>
+
+
+                    <div class="camera-view">
+
+                        <div class="camera-overlay">
+
+                            <div class="camera-time">
+                                <i class="fa-regular fa-clock"></i>
+                                12:30:42
+                            </div>
+
+                            <div class="recording">
+                                <span></span>
+                                REC
+                            </div>
+
+                        </div>
+
+
+                        <!-- Camera placeholder -->
+
+                        <div class="camera-placeholder">
+
+                            <i class="fa-solid fa-video"></i>
+
+                            <h4>Live Camera Feed</h4>
+
+                            <p>Camera 01 is streaming</p>
+
+                        </div>
+
+
+                        <!-- Detection boxes -->
+
+                        <div class="detection-box person">
+                            <span>Person 98%</span>
+                        </div>
+
+                        <div class="detection-box object">
+                            <span>Object 94%</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="camera-controls">
+
+                        <button>
+                            <i class="fa-solid fa-expand"></i>
+                        </button>
+
+                        <button>
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+
+                        <button>
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+
+                        <button class="control-end">
+                            <i class="fa-solid fa-gear"></i>
+                            Camera Settings
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RECENT ALERTS -->
+
+                <div class="card alerts-card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>Recent Alerts</h3>
+                            <p>Latest system notifications</p>
+                        </div>
+
+                        <a href="#">View All</a>
+
+                    </div>
+
+
+                    <div class="alerts-list">
+
+                        <div class="alert-item">
+
+                            <div class="alert-icon danger">
+                                <i class="fa-solid fa-person"></i>
+                            </div>
+
+                            <div class="alert-content">
+                                <strong>Unknown Person Detected</strong>
+                                <span>Camera 03 • 2 minutes ago</span>
+                            </div>
+
+                            <i class="fa-solid fa-chevron-right alert-arrow"></i>
+
+                        </div>
+
+
+                        <div class="alert-item">
+
+                            <div class="alert-icon warning">
+                                <i class="fa-solid fa-box"></i>
+                            </div>
+
+                            <div class="alert-content">
+                                <strong>Object Left Behind</strong>
+                                <span>Camera 01 • 8 minutes ago</span>
+                            </div>
+
+                            <i class="fa-solid fa-chevron-right alert-arrow"></i>
+
+                        </div>
+
+
+                        <div class="alert-item">
+
+                            <div class="alert-icon info">
+                                <i class="fa-solid fa-video"></i>
+                            </div>
+
+                            <div class="alert-content">
+                                <strong>Camera Reconnected</strong>
+                                <span>Camera 06 • 14 minutes ago</span>
+                            </div>
+
+                            <i class="fa-solid fa-chevron-right alert-arrow"></i>
+
+                        </div>
+
+
+                        <div class="alert-item">
+
+                            <div class="alert-icon success">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+
+                            <div class="alert-content">
+                                <strong>Security Scan Complete</strong>
+                                <span>System • 22 minutes ago</span>
+                            </div>
+
+                            <i class="fa-solid fa-chevron-right alert-arrow"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= BOTTOM GRID ================= -->
+
+            <div class="bottom-grid">
+
+
+                <!-- CAMERA STATUS -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>Camera Status</h3>
+                            <p>Overview of connected devices</p>
+                        </div>
+
+                        <button class="more-button">
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </button>
+
+                    </div>
+
+
+                    <div class="camera-list">
+
+                        <div class="camera-row">
+
+                            <div class="camera-name">
+                                <div class="mini-camera green-bg">
+                                    <i class="fa-solid fa-video"></i>
+                                </div>
+
+                                <div>
+                                    <strong>Camera 01</strong>
+                                    <span>Main Entrance</span>
+                                </div>
+                            </div>
+
+                            <span class="online">Online</span>
+
+                        </div>
+
+
+                        <div class="camera-row">
+
+                            <div class="camera-name">
+                                <div class="mini-camera green-bg">
+                                    <i class="fa-solid fa-video"></i>
+                                </div>
+
+                                <div>
+                                    <strong>Camera 02</strong>
+                                    <span>Parking Area</span>
+                                </div>
+                            </div>
+
+                            <span class="online">Online</span>
+
+                        </div>
+
+
+                        <div class="camera-row">
+
+                            <div class="camera-name">
+                                <div class="mini-camera green-bg">
+                                    <i class="fa-solid fa-video"></i>
+                                </div>
+
+                                <div>
+                                    <strong>Camera 03</strong>
+                                    <span>Back Entrance</span>
+                                </div>
+                            </div>
+
+                            <span class="online">Online</span>
+
+                        </div>
+
+
+                        <div class="camera-row">
+
+                            <div class="camera-name">
+                                <div class="mini-camera red-bg">
+                                    <i class="fa-solid fa-video-slash"></i>
+                                </div>
+
+                                <div>
+                                    <strong>Camera 04</strong>
+                                    <span>Warehouse</span>
+                                </div>
+                            </div>
+
+                            <span class="offline">Offline</span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AI DETECTION -->
+
+                <div class="card detection-card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>AI Detection</h3>
+                            <p>Today's detection summary</p>
+                        </div>
+
+                        <button class="more-button">
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </button>
+
+                    </div>
+
+
+                    <div class="detection-content">
+
+                        <div class="donut">
+
+                            <div class="donut-inner">
+                                <strong>1,284</strong>
+                                <span>Total</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="detection-legend">
+
+                            <div>
+                                <span class="legend-dot pink-dot"></span>
+                                <span>People</span>
+                                <strong>624</strong>
+                            </div>
+
+                            <div>
+                                <span class="legend-dot purple-dot"></span>
+                                <span>Vehicles</span>
+                                <strong>382</strong>
+                            </div>
+
+                            <div>
+                                <span class="legend-dot blue-dot"></span>
+                                <span>Objects</span>
+                                <strong>278</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SYSTEM HEALTH -->
+
+                <div class="card health-card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>System Health</h3>
+                            <p>Current system performance</p>
+                        </div>
+
+                        <span class="health-good">
+                            Healthy
+                        </span>
+
+                    </div>
+
+
+                    <div class="health-item">
+
+                        <div>
+                            <span>CPU Usage</span>
+                            <strong>34%</strong>
+                        </div>
+
+                        <div class="progress">
+                            <span style="width:34%"></span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="health-item">
+
+                        <div>
+                            <span>Memory</span>
+                            <strong>48%</strong>
+                        </div>
+
+                        <div class="progress purple-progress">
+                            <span style="width:48%"></span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="health-item">
+
+                        <div>
+                            <span>Storage</span>
+                            <strong>62%</strong>
+                        </div>
+
+                        <div class="progress orange-progress">
+                            <span style="width:62%"></span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <footer>
+
+                <span>© 2026 Henux Smart Vision</span>
+
+                <div>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Support</a>
+                </div>
+
+            </footer>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>
