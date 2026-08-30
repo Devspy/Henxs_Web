@@ -56,6 +56,16 @@ def get_primary_camera():
     return cameras[0] if cameras else None
 
 
+def get_camera_stats():
+    cameras = get_cameras()
+    total_cameras = len(cameras)
+    active_cameras = sum(1 for camera in cameras if str(camera.get('rtsp_url', '')).strip())
+    return {
+        'total': total_cameras,
+        'active': active_cameras
+    }
+
+
 def add_camera_record(name, rtsp_url):
     conn = get_db_connection()
     cursor = conn.execute(
@@ -141,10 +151,12 @@ def login():
 def home():
     cameras = get_cameras()
     primary_camera = get_primary_camera()
+    camera_stats = get_camera_stats()
     return render_template(
         'index.html',
         cameras=cameras,
         primary_camera=primary_camera,
+        camera_stats=camera_stats,
         camera_stream_available=bool(primary_camera or cameras)
     )
 

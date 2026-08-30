@@ -176,13 +176,13 @@
                         </div>
                     </div>
 
-                    <div class="stat-value">08</div>
+                    <div class="stat-value">{{ camera_stats.total }}</div>
 
                     <div class="stat-footer">
                         <span class="positive">
-                            <i class="fa-solid fa-arrow-up"></i> 12%
+                            <i class="fa-solid fa-arrow-up"></i> {{ camera_stats.total }}
                         </span>
-                        <span>vs last week</span>
+                        <span>configured</span>
                     </div>
 
                 </div>
@@ -198,13 +198,13 @@
                         </div>
                     </div>
 
-                    <div class="stat-value">06</div>
+                    <div class="stat-value">{{ camera_stats.active }}</div>
 
                     <div class="stat-footer">
                         <span class="positive">
                             <i class="fa-solid fa-check"></i> Online
                         </span>
-                        <span>75% active</span>
+                        <span>{{ camera_stats.active }} active</span>
                     </div>
 
                 </div>
