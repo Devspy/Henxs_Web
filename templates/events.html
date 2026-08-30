@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events | Henux Smart Vision</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <div class="brand">
+            <img class="brand-logo" src="{{ url_for('static', filename='img/logo.webp') }}" alt="Henux Smart Vision">
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('home') }}" class="nav-link">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('camera_overview') }}" class="nav-link">
+                <i class="fa-solid fa-video"></i>
+                <span>Live Camera</span>
+            </a>
+            <a href="{{ url_for('events_page') }}" class="nav-link active">
+                <i class="fa-solid fa-bell"></i>
+                <span>Events</span>
+                <span class="badge">4</span>
+            </a>
+        </nav>
+
+        <div class="menu-title">SYSTEM</div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('settings_page') }}" class="nav-link">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Settings</span>
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>Help Center</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="system-status">
+                <span class="status-circle"></span>
+                <div>
+                    <strong>System Online</strong>
+                    <small>All systems operational</small>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="mobile-brand">
+                <img class="mobile-brand-logo" src="{{ url_for('static', filename='img/logo.webp') }}" alt="Henux Smart Vision">
+            </div>
+            <div class="topbar-left">
+                <h2>Events</h2>
+                <p>ALPR and Face Recognition activity</p>
+            </div>
+            <div class="topbar-right">
+                <button class="icon-button" type="button" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+                <div class="profile-menu">
+                    <button class="profile" id="profile-toggle" type="button" aria-expanded="false" aria-controls="account-menu">
+                        <span class="avatar">A</span>
+                        <span class="profile-info">
+                            <strong>Administrator</strong>
+                            <span>System Admin</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="account-menu" id="account-menu" hidden>
+                        <a href="{{ url_for('settings_page') }}" class="account-menu-item">
+                            <i class="fa-solid fa-sliders"></i>
+                            Settings
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="account-menu-item account-logout">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="page-header-row">
+                <div>
+                    <h1 class="page-title">Security Events</h1>
+                    <p class="page-subtitle">Live ALPR and Face Recognition detections</p>
+                </div>
+            </div>
+
+            <div class="events-list">
+                {% for item in events %}
+                <article class="event-card">
+                    <div class="event-type {{ item.status_class }}">
+                        {{ item.type }}
+                    </div>
+                    <div class="event-main">
+                        <h3>{{ item.title }}</h3>
+                        <div class="event-meta">
+                            <span><i class="fa-solid fa-video"></i> {{ item.camera }}</span>
+                            <span><i class="fa-regular fa-clock"></i> {{ item.time }}</span>
+                        </div>
+                    </div>
+                    <div class="event-status {{ item.status_class }}">{{ item.status }}</div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

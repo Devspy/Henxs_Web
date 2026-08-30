@@ -65,7 +65,35 @@ function setupAccountMenu() {
 	});
 }
 
+function setupCameraEditing() {
+	const editButtons = document.querySelectorAll('.edit-camera-btn');
+	const editPanel = document.getElementById('edit-panel');
+	const cameraIdInput = document.getElementById('edit-camera-id');
+	const cameraNameInput = document.getElementById('edit-camera-name');
+	const cameraUrlInput = document.getElementById('edit-camera-url');
+	const cancelEditButton = document.getElementById('cancel-edit');
+
+	if (!editButtons.length || !editPanel || !cameraIdInput || !cameraNameInput || !cameraUrlInput) {
+		return;
+	}
+
+	editButtons.forEach((button) => {
+		button.addEventListener('click', () => {
+			cameraIdInput.value = button.dataset.id;
+			cameraNameInput.value = button.dataset.name;
+			cameraUrlInput.value = button.dataset.url;
+			editPanel.hidden = false;
+			scrollIntoViewIfNeeded ? editPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }) : editPanel.scrollIntoView();
+		});
+	});
+
+	cancelEditButton?.addEventListener('click', () => {
+		editPanel.hidden = true;
+	});
+}
+
 updateCameraTime();
 updateGreeting();
 setupAccountMenu();
+setupCameraEditing();
 setInterval(updateCameraTime, 1000);

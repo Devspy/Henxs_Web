@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Camera | Henux Smart Vision</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <div class="brand">
+            <img class="brand-logo" src="{{ url_for('static', filename='img/logo.webp') }}" alt="Henux Smart Vision">
+        </div>
+        <div class="menu-title">MAIN MENU</div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('home') }}" class="nav-link">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('camera_overview') }}" class="nav-link">
+                <i class="fa-solid fa-video"></i>
+                <span>Live Camera</span>
+            </a>
+            <a href="{{ url_for('events_page') }}" class="nav-link">
+                <i class="fa-solid fa-bell"></i>
+                <span>Events</span>
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <div class="system-status">
+                <span class="status-circle"></span>
+                <div>
+                    <strong>System Online</strong>
+                    <small>All systems operational</small>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="mobile-brand">
+                <img class="mobile-brand-logo" src="{{ url_for('static', filename='img/logo.webp') }}" alt="Henux Smart Vision">
+            </div>
+            <div class="topbar-left">
+                <h2>Add Camera</h2>
+                <p>Save a new RTSP camera stream</p>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="add-camera-shell">
+                <div class="add-camera-layout">
+                    <div class="add-camera-panel">
+                        <div class="section-heading">
+                            <div>
+                                <span class="eyebrow">Camera Setup</span>
+                                <h1 class="page-title">Register New Camera</h1>
+                            </div>
+                            <a href="{{ url_for('home') }}" class="ghost-button">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+
+                        <p class="page-subtitle">Add a camera name and RTSP stream link. The details are saved locally so they remain available after restart.</p>
+
+                        {% if error %}
+                            <div class="login-error" role="alert">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                {{ error }}
+                            </div>
+                        {% endif %}
+
+                        {% if success %}
+                            <div class="success-banner" role="status">
+                                <i class="fa-solid fa-circle-check"></i>
+                                {{ success }}
+                            </div>
+                        {% endif %}
+
+                        <form method="post" class="camera-form">
+                            <div class="form-field">
+                                <label for="camera_name">Camera Name</label>
+                                <div class="input-wrap">
+                                    <i class="fa-solid fa-video"></i>
+                                    <input id="camera_name" name="camera_name" type="text" placeholder="Main Entrance" required>
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="rtsp_url">RTSP Link</label>
+                                <div class="input-wrap">
+                                    <i class="fa-solid fa-link"></i>
+                                    <input id="rtsp_url" name="rtsp_url" type="text" placeholder="rtsp://admin:password@ip:554/stream" required>
+                                </div>
+                            </div>
+
+                            <div class="helper-row">
+                                <span><i class="fa-solid fa-circle-info"></i> Example format: rtsp://username:password@192.168.1.10:554/stream1</span>
+                            </div>
+
+                            <div class="form-actions">
+                                <button class="login-button" type="submit">
+                                    Save Camera
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                                <button class="secondary-button" type="reset">
+                                    Clear
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <aside class="summary-panel">
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <h3>Camera Coverage</h3>
+                            <p>Keep all entry points, parking gates, and checkpoints in one place.</p>
+                        </div>
+
+                        <div class="mini-list">
+                            <div class="mini-item">
+                                <span class="mini-dot green"></span>
+                                <span>RTSP stream ready for live monitoring</span>
+                            </div>
+                            <div class="mini-item">
+                                <span class="mini-dot blue"></span>
+                                <span>Saved locally on this machine</span>
+                            </div>
+                            <div class="mini-item">
+                                <span class="mini-dot orange"></span>
+                                <span>Loads automatically after restart</span>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

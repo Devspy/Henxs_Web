@@ -34,26 +34,21 @@
 
         <nav class="sidebar-nav">
 
-            <a href="#" class="nav-link active">
+            <a href="{{ url_for('home') }}" class="nav-link active">
                 <i class="fa-solid fa-chart-pie"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('camera_overview') }}" class="nav-link">
                 <i class="fa-solid fa-video"></i>
                 <span>Live Camera</span>
                 <span class="live-dot"></span>
             </a>
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('events_page') }}" class="nav-link">
                 <i class="fa-solid fa-bell"></i>
-                <span>Alerts</span>
+                <span>Events</span>
                 <span class="badge">4</span>
-            </a>
-
-            <a href="#" class="nav-link">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                <span>Activity</span>
             </a>
 
         </nav>
@@ -62,7 +57,7 @@
 
         <nav class="sidebar-nav">
 
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('settings_page') }}" class="nav-link">
                 <i class="fa-solid fa-sliders"></i>
                 <span>Settings</span>
             </a>
@@ -130,7 +125,7 @@
                     </button>
 
                     <div class="account-menu" id="account-menu" hidden>
-                        <a href="#" class="account-menu-item">
+                        <a href="{{ url_for('settings_page') }}" class="account-menu-item">
                             <i class="fa-solid fa-sliders"></i>
                             Settings
                         </a>
@@ -159,10 +154,10 @@
                     <p>Here's what's happening with your vision system today.</p>
                 </div>
 
-                <button class="primary-button">
+                <a href="{{ url_for('add_camera') }}" class="primary-button" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
                     <i class="fa-solid fa-plus"></i>
                     Add Camera
-                </button>
+                </a>
 
             </div>
 
@@ -301,13 +296,13 @@
                         </div>
 
 
-                        {% if camera_stream_available %}
-                            <img class="camera-stream" src="{{ url_for('video_feed') }}" alt="Live feed from Camera 01">
+                        {% if camera_stream_available and primary_camera %}
+                            <img class="camera-stream" src="{{ url_for('video_feed', camera_id=primary_camera.id) }}" alt="Live feed from {{ primary_camera.name }}">
                         {% else %}
                             <div class="camera-placeholder">
                                 <i class="fa-solid fa-video"></i>
                                 <h4>Live Camera Feed</h4>
-                                <p>Configure RTSP_URL to start streaming</p>
+                                <p>Add a camera in Settings to start streaming</p>
                             </div>
                         {% endif %}
 
@@ -430,120 +425,61 @@
 
             <div class="bottom-grid">
 
-
                 <!-- CAMERA STATUS -->
-
                 <div class="card">
-
                     <div class="card-header">
-
                         <div>
                             <h3>Camera Status</h3>
                             <p>Overview of connected devices</p>
                         </div>
-
                         <button class="more-button">
                             <i class="fa-solid fa-ellipsis"></i>
                         </button>
-
                     </div>
-
 
                     <div class="camera-list">
-
-                        <div class="camera-row">
-
-                            <div class="camera-name">
-                                <div class="mini-camera green-bg">
-                                    <i class="fa-solid fa-video"></i>
+                        {% if cameras %}
+                            {% for camera in cameras %}
+                                <div class="camera-row">
+                                    <div class="camera-name">
+                                        <div class="mini-camera {% if loop.index is even %}red-bg{% else %}green-bg{% endif %}">
+                                            <i class="fa-solid fa-video"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ camera.name }}</strong>
+                                            <span>{{ camera.rtsp_url }}</span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ url_for('camera_detail', camera_id=camera.id) }}" class="online">Open</a>
                                 </div>
-
-                                <div>
-                                    <strong>Camera 01</strong>
-                                    <span>Main Entrance</span>
-                                </div>
-                            </div>
-
-                            <span class="online">Online</span>
-
-                        </div>
-
-
-                        <div class="camera-row">
-
-                            <div class="camera-name">
-                                <div class="mini-camera green-bg">
-                                    <i class="fa-solid fa-video"></i>
-                                </div>
-
-                                <div>
-                                    <strong>Camera 02</strong>
-                                    <span>Parking Area</span>
+                            {% endfor %}
+                        {% else %}
+                            <div class="camera-row">
+                                <div class="camera-name">
+                                    <div class="mini-camera red-bg">
+                                        <i class="fa-solid fa-video-slash"></i>
+                                    </div>
+                                    <div>
+                                        <strong>No camera saved</strong>
+                                        <span>Add a camera to start monitoring</span>
+                                    </div>
                                 </div>
                             </div>
-
-                            <span class="online">Online</span>
-
-                        </div>
-
-
-                        <div class="camera-row">
-
-                            <div class="camera-name">
-                                <div class="mini-camera green-bg">
-                                    <i class="fa-solid fa-video"></i>
-                                </div>
-
-                                <div>
-                                    <strong>Camera 03</strong>
-                                    <span>Back Entrance</span>
-                                </div>
-                            </div>
-
-                            <span class="online">Online</span>
-
-                        </div>
-
-
-                        <div class="camera-row">
-
-                            <div class="camera-name">
-                                <div class="mini-camera red-bg">
-                                    <i class="fa-solid fa-video-slash"></i>
-                                </div>
-
-                                <div>
-                                    <strong>Camera 04</strong>
-                                    <span>Warehouse</span>
-                                </div>
-                            </div>
-
-                            <span class="offline">Offline</span>
-
-                        </div>
-
+                        {% endif %}
                     </div>
-
                 </div>
 
-
                 <!-- AI DETECTION -->
-
                 <div class="card detection-card">
-
                     <div class="card-header">
-
                         <div>
                             <h3>AI Detection</h3>
                             <p>Today's detection summary</p>
                         </div>
-
                         <button class="more-button">
                             <i class="fa-solid fa-ellipsis"></i>
                         </button>
-
                     </div>
-
 
                     <div class="detection-content">
 

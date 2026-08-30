@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | Henux Smart Vision</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <div class="brand">
+            <img class="brand-logo" src="{{ url_for('static', filename='img/logo.webp') }}" alt="Henux Smart Vision">
+        </div>
+        <div class="menu-title">MAIN MENU</div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('home') }}" class="nav-link">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('camera_overview') }}" class="nav-link">
+                <i class="fa-solid fa-video"></i>
+                <span>Live Camera</span>
+            </a>
+            <a href="{{ url_for('events_page') }}" class="nav-link">
+                <i class="fa-solid fa-bell"></i>
+                <span>Events</span>
+            </a>
+            <a href="{{ url_for('settings_page') }}" class="nav-link active">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <div class="system-status">
+                <span class="status-circle"></span>
+                <div>
+                    <strong>System Online</strong>
+                    <small>All systems operational</small>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="mobile-brand">
+                <img class="mobile-brand-logo" src="{{ url_for('static', filename='img/logo.webp') }}" alt="Henux Smart Vision">
+            </div>
+            <div class="topbar-left">
+                <h2>Settings</h2>
+                <p>Camera management and configuration</p>
+            </div>
+            <div class="topbar-right">
+                <div class="profile-menu">
+                    <button class="profile" id="profile-toggle" type="button" aria-expanded="false" aria-controls="account-menu">
+                        <span class="avatar">A</span>
+                        <span class="profile-info">
+                            <strong>Administrator</strong>
+                            <span>System Admin</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="account-menu" id="account-menu" hidden>
+                        <a href="{{ url_for('settings_page') }}" class="account-menu-item">
+                            <i class="fa-solid fa-sliders"></i>
+                            Settings
+                        </a>
+                        <a href="{{ url_for('logout') }}" class="account-menu-item account-logout">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="settings-layout">
+                <div class="settings-main-card">
+                    <div class="page-header-row">
+                        <div>
+                            <h1 class="page-title">Camera List</h1>
+                            <p class="page-subtitle">Manage all configured cameras</p>
+                        </div>
+                    </div>
+
+                    {% if message %}
+                        <div class="success-banner" role="status">
+                            <i class="fa-solid fa-circle-check"></i>
+                            {{ message }}
+                        </div>
+                    {% endif %}
+
+                    {% if error %}
+                        <div class="login-error" role="alert">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            {{ error }}
+                        </div>
+                    {% endif %}
+
+                    <div class="camera-settings-list">
+                        {% if cameras %}
+                            {% for camera in cameras %}
+                            <div class="camera-settings-row">
+                                <div class="camera-settings-info">
+                                    <div class="mini-camera green-bg">
+                                        <i class="fa-solid fa-video"></i>
+                                    </div>
+                                    <div>
+                                        <strong>{{ camera.name }}</strong>
+                                        <span>{{ camera.rtsp_url }}</span>
+                                    </div>
+                                </div>
+                                <div class="camera-settings-actions">
+                                    <button type="button" class="edit-camera-btn" data-id="{{ camera.id }}" data-name="{{ camera.name }}" data-url="{{ camera.rtsp_url }}">
+                                        <i class="fa-solid fa-pen"></i>
+                                        Edit
+                                    </button>
+                                    <form method="post" class="inline-form">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="camera_id" value="{{ camera.id }}">
+                                        <button type="submit" class="delete-camera-btn">
+                                            <i class="fa-solid fa-trash"></i>
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-camera-box">
+                                <i class="fa-solid fa-video-slash"></i>
+                                <p>No cameras saved yet.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="settings-side-card">
+                    <h3>Add New Camera</h3>
+                    <form method="post" class="camera-form compact-form">
+                        <input type="hidden" name="action" value="add">
+
+                        <div class="form-field">
+                            <label for="camera_name">Camera Name</label>
+                            <div class="input-wrap">
+                                <i class="fa-solid fa-video"></i>
+                                <input id="camera_name" name="camera_name" type="text" placeholder="Main Entrance" required>
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="rtsp_url">RTSP Link</label>
+                            <div class="input-wrap">
+                                <i class="fa-solid fa-link"></i>
+                                <input id="rtsp_url" name="rtsp_url" type="text" placeholder="rtsp://username:password@ip:554/stream" required>
+                            </div>
+                        </div>
+
+                        <button class="login-button" type="submit">
+                            <i class="fa-solid fa-plus"></i>
+                            Add Camera
+                        </button>
+                    </form>
+
+                    <div class="edit-panel" id="edit-panel" hidden>
+                        <h4>Edit Camera</h4>
+                        <form method="post" class="camera-form compact-form">
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="camera_id" id="edit-camera-id">
+
+                            <div class="form-field">
+                                <label for="edit-camera-name">Camera Name</label>
+                                <div class="input-wrap">
+                                    <i class="fa-solid fa-video"></i>
+                                    <input id="edit-camera-name" name="camera_name" type="text" required>
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="edit-camera-url">RTSP Link</label>
+                                <div class="input-wrap">
+                                    <i class="fa-solid fa-link"></i>
+                                    <input id="edit-camera-url" name="rtsp_url" type="text" required>
+                                </div>
+                            </div>
+
+                            <div class="form-actions compact-actions">
+                                <button class="login-button" type="submit">Save Changes</button>
+                                <button class="secondary-button" type="button" id="cancel-edit">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
