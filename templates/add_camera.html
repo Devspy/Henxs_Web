@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Camera | Henux Smart Vision</title>
+    <title>Add Camera | Henxs AI Vision</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
 <div class="app">
     <aside class="sidebar">
         <div class="brand">
-            <img class="brand-logo" src="{{ url_for('static', filename='img/logo.webp') }}" alt="Henux Smart Vision">
+            <img class="brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Henxs AI Vision">
         </div>
         <div class="menu-title">MAIN MENU</div>
         <nav class="sidebar-nav">
@@ -24,11 +24,11 @@
             </a>
             <a href="{{ url_for('camera_overview') }}" class="nav-link">
                 <i class="fa-solid fa-video"></i>
-                <span>Live Camera</span>
+                <span>Surveillance</span>
             </a>
             <a href="{{ url_for('events_page') }}" class="nav-link">
                 <i class="fa-solid fa-bell"></i>
-                <span>Events</span>
+                <span>Incidents</span>
             </a>
         </nav>
         <div class="sidebar-bottom">
@@ -49,11 +49,11 @@
     <main class="main">
         <header class="topbar">
             <div class="mobile-brand">
-                <img class="mobile-brand-logo" src="{{ url_for('static', filename='img/logo.webp') }}" alt="Henux Smart Vision">
+                <img class="mobile-brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Henxs AI Vision">
             </div>
             <div class="topbar-left">
-                <h2>Add Camera</h2>
-                <p>Save a new RTSP camera stream</p>
+                <h2>Add Surveillance Feed</h2>
+                <p>Connect a new CCTV or RTSP source</p>
             </div>
         </header>
 
@@ -64,7 +64,7 @@
                         <div class="section-heading">
                             <div>
                                 <span class="eyebrow">Camera Setup</span>
-                                <h1 class="page-title">Register New Camera</h1>
+                                <h1 class="page-title">Register New Camera Feed</h1>
                             </div>
                             <a href="{{ url_for('home') }}" class="ghost-button">
                                 <i class="fa-solid fa-arrow-left"></i>
@@ -72,7 +72,7 @@
                             </a>
                         </div>
 
-                        <p class="page-subtitle">Add a camera name and RTSP stream link. The details are saved locally so they remain available after restart.</p>
+                        <p class="page-subtitle">Add a camera name and RTSP stream link to expand your AI-powered monitoring coverage across the site.</p>
 
                         {% if error %}
                             <div class="login-error" role="alert">
@@ -126,8 +126,8 @@
                             <div class="summary-icon">
                                 <i class="fa-solid fa-shield-halved"></i>
                             </div>
-                            <h3>Camera Coverage</h3>
-                            <p>Keep all entry points, parking gates, and checkpoints in one place.</p>
+                            <h3>Site Coverage</h3>
+                            <p>Monitor all entry points, parking gates, and community CCTV nodes from one system.</p>
                         </div>
 
                         <div class="mini-list">

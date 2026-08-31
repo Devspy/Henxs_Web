@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events | Henux Smart Vision</title>
+    <title>Events | Henxs AI Vision</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
 <div class="app">
     <aside class="sidebar">
         <div class="brand">
-            <img class="brand-logo" src="{{ url_for('static', filename='img/logo.webp') }}" alt="Henux Smart Vision">
+            <img class="brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Henxs AI Vision">
         </div>
 
         <div class="menu-title">MAIN MENU</div>
@@ -25,11 +25,11 @@
             </a>
             <a href="{{ url_for('camera_overview') }}" class="nav-link">
                 <i class="fa-solid fa-video"></i>
-                <span>Live Camera</span>
+                <span>Surveillance</span>
             </a>
             <a href="{{ url_for('events_page') }}" class="nav-link active">
                 <i class="fa-solid fa-bell"></i>
-                <span>Events</span>
+                <span>Incidents</span>
                 <span class="badge">4</span>
             </a>
         </nav>
@@ -64,17 +64,17 @@
     <main class="main">
         <header class="topbar">
             <div class="mobile-brand">
-                <img class="mobile-brand-logo" src="{{ url_for('static', filename='img/logo.webp') }}" alt="Henux Smart Vision">
+                <img class="mobile-brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Henxs AI Vision">
             </div>
             <div class="topbar-left">
-                <h2>Events</h2>
-                <p>ALPR and Face Recognition activity</p>
+                <h2>Incidents</h2>
+                <p>FRS, ANPR and automated response activity</p>
             </div>
             <div class="topbar-right">
-                <button class="icon-button" type="button" aria-label="Notifications">
+                <a href="{{ url_for('events_page') }}" class="icon-button" aria-label="View incidents">
                     <i class="fa-regular fa-bell"></i>
                     <span class="notification-dot"></span>
-                </button>
+                </a>
                 <div class="profile-menu">
                     <button class="profile" id="profile-toggle" type="button" aria-expanded="false" aria-controls="account-menu">
                         <span class="avatar">A</span>
@@ -101,8 +101,8 @@
         <section class="content">
             <div class="page-header-row">
                 <div>
-                    <h1 class="page-title">Security Events</h1>
-                    <p class="page-subtitle">Live ALPR and Face Recognition detections</p>
+                    <h1 class="page-title">Security Incidents</h1>
+                    <p class="page-subtitle">Live face recognition and vehicle plate detections</p>
                 </div>
             </div>
 

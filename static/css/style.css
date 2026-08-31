@@ -36,6 +36,8 @@
 
 body {
     font-family: "Inter", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
     background: linear-gradient(135deg, #e7edea 0%, var(--background) 100%);
     color: var(--text);
 }
@@ -267,7 +269,7 @@ button {
 
 .menu-title {
     color: #68696d;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
 
     letter-spacing: 1.5px;
@@ -297,7 +299,7 @@ button {
 
     text-decoration: none;
 
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
 
     border-radius: 9px;
@@ -480,10 +482,21 @@ button {
 
     border-radius: 50%;
 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
     background: #f7f7f8;
     color: #555;
+    text-decoration: none;
 
     font-size: 16px;
+    transition: 0.2s ease;
+}
+
+.icon-button:hover {
+    background: #edf3ef;
+    color: var(--primary-dark);
 }
 
 .notification-dot {
@@ -716,7 +729,7 @@ button {
 
     color: #777;
 
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .stat-icon {
@@ -751,7 +764,7 @@ button {
 }
 
 .stat-value {
-    font-size: 27px;
+    font-size: 32px;
     font-weight: 700;
 
     margin-top: 15px;
@@ -766,7 +779,7 @@ button {
 
     color: #aaa;
 
-    font-size: 9px;
+    font-size: 11px;
 }
 
 .positive {
@@ -807,18 +820,18 @@ button {
 }
 
 .card-header h3 {
-    font-size: 13px;
+    font-size: 16px;
 }
 
 .card-header p {
     color: #999;
-    font-size: 9px;
+    font-size: 11px;
     margin-top: 4px;
 }
 
 .card-header a {
     color: var(--primary);
-    font-size: 10px;
+    font-size: 11px;
     text-decoration: none;
     font-weight: 600;
 }
@@ -1136,7 +1149,7 @@ button {
 .alert-content strong {
     display: block;
 
-    font-size: 10px;
+    font-size: 13px;
 }
 
 .alert-content span {
@@ -1144,14 +1157,14 @@ button {
 
     color: #999;
 
-    font-size: 8px;
+    font-size: 10px;
 
     margin-top: 4px;
 }
 
 .alert-arrow {
     color: #bbb;
-    font-size: 9px;
+    font-size: 11px;
 }
 
 
@@ -1230,19 +1243,19 @@ button {
 
 .camera-name strong {
     display: block;
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .camera-name span {
     display: block;
     color: #999;
-    font-size: 8px;
+    font-size: 10px;
     margin-top: 3px;
 }
 
 .online,
 .offline {
-    font-size: 8px;
+    font-size: 10px;
     font-weight: 600;
 }
 
@@ -1336,11 +1349,11 @@ button {
 .detection-legend > div {
     display: grid;
 
-    grid-template-columns: 10px 70px 40px;
+    grid-template-columns: 10px 90px 50px;
 
     align-items: center;
 
-    font-size: 9px;
+    font-size: 11px;
 
     color: #888;
 }
@@ -1386,7 +1399,7 @@ footer {
 
     color: #999;
 
-    font-size: 9px;
+    font-size: 11px;
 }
 
 footer div {

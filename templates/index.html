@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Henux | Smart Vision</title>
+    <title>Henxs AI Vision | Intelligent Surveillance</title>
 
     <link rel="stylesheet" href="static/css/style.css">
 
@@ -27,7 +27,7 @@
     <aside class="sidebar">
 
         <div class="brand">
-            <img class="brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Henux Smart Vision">
+            <img class="brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Henxs AI Vision">
         </div>
 
         <div class="menu-title">MAIN MENU</div>
@@ -41,13 +41,13 @@
 
             <a href="{{ url_for('camera_overview') }}" class="nav-link">
                 <i class="fa-solid fa-video"></i>
-                <span>Live Camera</span>
+                <span>Surveillance</span>
                 <span class="live-dot"></span>
             </a>
 
             <a href="{{ url_for('events_page') }}" class="nav-link">
                 <i class="fa-solid fa-bell"></i>
-                <span>Events</span>
+                <span>Incidents</span>
                 <span class="badge">4</span>
             </a>
 
@@ -99,20 +99,20 @@
         <header class="topbar">
 
             <div class="mobile-brand">
-                <img class="mobile-brand-logo" src="{{ url_for('static', filename='img/logo.webp') }}" alt="Henux Smart Vision">
+                <img class="mobile-brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Henxs AI Vision">
             </div>
 
             <div class="topbar-left">
-                <h2>Dashboard</h2>
-                <p>Monitor your smart vision system</p>
+                <h2>AI Surveillance Dashboard</h2>
+                <p>AI Video Analytics • FRS • ANPR • Community CCTV Integration</p>
             </div>
 
             <div class="topbar-right">
 
-                <button class="icon-button">
+                <a href="{{ url_for('events_page') }}" class="icon-button" aria-label="View incidents">
                     <i class="fa-regular fa-bell"></i>
                     <span class="notification-dot"></span>
-                </button>
+                </a>
 
                 <div class="profile-menu">
                     <button class="profile" id="profile-toggle" type="button" aria-expanded="false" aria-controls="account-menu">
@@ -150,13 +150,12 @@
             <div class="welcome">
 
                 <div>
-                    <h1 id="greeting">Good afternoon, Admin 👋</h1>
-                    <p>Here's what's happening with your vision system today.</p>
+                    <h1 id="greeting">Good afternoon, Command Center</h1>
                 </div>
 
                 <a href="{{ url_for('add_camera') }}" class="primary-button" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
                     <i class="fa-solid fa-plus"></i>
-                    Add Camera
+                    Add CCTV Feed
                 </a>
 
             </div>
@@ -169,7 +168,7 @@
                 <div class="stat-card">
 
                     <div class="stat-top">
-                        <span>Total Cameras</span>
+                        <span>Connected Cameras</span>
 
                         <div class="stat-icon pink">
                             <i class="fa-solid fa-video"></i>
@@ -191,7 +190,7 @@
                 <div class="stat-card">
 
                     <div class="stat-top">
-                        <span>Active Cameras</span>
+                        <span>Live Streams</span>
 
                         <div class="stat-icon green">
                             <i class="fa-solid fa-signal"></i>
@@ -213,7 +212,7 @@
                 <div class="stat-card">
 
                     <div class="stat-top">
-                        <span>Objects Detected</span>
+                        <span>AI Events Logged</span>
 
                         <div class="stat-icon purple">
                             <i class="fa-solid fa-cube"></i>
@@ -235,7 +234,7 @@
                 <div class="stat-card">
 
                     <div class="stat-top">
-                        <span>Active Alerts</span>
+                        <span>Incident Alerts</span>
 
                         <div class="stat-icon orange">
                             <i class="fa-solid fa-triangle-exclamation"></i>
@@ -267,8 +266,8 @@
                     <div class="card-header">
 
                         <div>
-                            <h3>Live Camera</h3>
-                            <p>Camera 01 • Main Entrance</p>
+                            <h3>Live Surveillance</h3>
+                            <p>Camera 01 • Main Entrance • FRS / ANPR</p>
                         </div>
 
                         <div class="camera-status">
@@ -340,8 +339,8 @@
                     <div class="card-header">
 
                         <div>
-                            <h3>Recent Alerts</h3>
-                            <p>Latest system notifications</p>
+                            <h3>Recent Incidents</h3>
+                            <p>Latest detection and response events</p>
                         </div>
 
                         <a href="#">View All</a>
@@ -358,8 +357,8 @@
                             </div>
 
                             <div class="alert-content">
-                                <strong>Unknown Person Detected</strong>
-                                <span>Camera 03 • 2 minutes ago</span>
+                                <strong>FRS: Unauthorised Face Match</strong>
+                                <span>Lobby Entry • 2 minutes ago</span>
                             </div>
 
                             <i class="fa-solid fa-chevron-right alert-arrow"></i>
@@ -370,12 +369,12 @@
                         <div class="alert-item">
 
                             <div class="alert-icon warning">
-                                <i class="fa-solid fa-box"></i>
+                                <i class="fa-solid fa-car"></i>
                             </div>
 
                             <div class="alert-content">
-                                <strong>Object Left Behind</strong>
-                                <span>Camera 01 • 8 minutes ago</span>
+                                <strong>ANPR: Blacklisted Vehicle Detected</strong>
+                                <span>Main Gate • 8 minutes ago</span>
                             </div>
 
                             <i class="fa-solid fa-chevron-right alert-arrow"></i>
@@ -390,8 +389,8 @@
                             </div>
 
                             <div class="alert-content">
-                                <strong>Camera Reconnected</strong>
-                                <span>Camera 06 • 14 minutes ago</span>
+                                <strong>AI Video Analytics: Suspicious Movement</strong>
+                                <span>Rear Corridor • 14 minutes ago</span>
                             </div>
 
                             <i class="fa-solid fa-chevron-right alert-arrow"></i>
@@ -406,8 +405,8 @@
                             </div>
 
                             <div class="alert-content">
-                                <strong>Security Scan Complete</strong>
-                                <span>System • 22 minutes ago</span>
+                                <strong>Response Automation: Incident Escalated</strong>
+                                <span>Security Center • 22 minutes ago</span>
                             </div>
 
                             <i class="fa-solid fa-chevron-right alert-arrow"></i>
@@ -429,8 +428,8 @@
                 <div class="card">
                     <div class="card-header">
                         <div>
-                            <h3>Camera Status</h3>
-                            <p>Overview of connected devices</p>
+                            <h3>CCTV Coverage</h3>
+                            <p>Overview of connected surveillance devices</p>
                         </div>
                         <button class="more-button">
                             <i class="fa-solid fa-ellipsis"></i>
@@ -473,8 +472,8 @@
                 <div class="card detection-card">
                     <div class="card-header">
                         <div>
-                            <h3>AI Detection</h3>
-                            <p>Today's detection summary</p>
+                            <h3>FRS & ANPR Detection</h3>
+                            <p>Today's recognition summary</p>
                         </div>
                         <button class="more-button">
                             <i class="fa-solid fa-ellipsis"></i>
@@ -497,19 +496,19 @@
 
                             <div>
                                 <span class="legend-dot pink-dot"></span>
-                                <span>People</span>
+                                <span>Faces</span>
                                 <strong>624</strong>
                             </div>
 
                             <div>
                                 <span class="legend-dot purple-dot"></span>
-                                <span>Vehicles</span>
+                                <span>Plates</span>
                                 <strong>382</strong>
                             </div>
 
                             <div>
                                 <span class="legend-dot blue-dot"></span>
-                                <span>Objects</span>
+                                <span>Alerts</span>
                                 <strong>278</strong>
                             </div>
 
@@ -527,7 +526,7 @@
 
             <footer>
 
-                <span>© 2026 Henux Smart Vision</span>
+                <span>© 2026 Henxs AI Vision</span>
 
                 <div>
                     <a href="#">Privacy</a>

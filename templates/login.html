@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Henux Smart Vision</title>
+    <title>Login | Henxs AI Vision</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,11 +14,11 @@
 <body class="login-page">
     <main class="login-shell">
         <section class="login-panel" aria-labelledby="login-title">
-            <img class="login-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Henux Smart Vision">
+            <img class="login-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Henxs AI Vision">
             <div class="login-heading">
-                <p class="login-eyebrow">SMART VISION CONTROL</p>
-                <h1 id="login-title">Welcome back</h1>
-                <p>Sign in to access your dashboard.</p>
+                <p class="login-eyebrow">INTELLIGENT SURVEILLANCE</p>
+                <h1 id="login-title">AI Security Command</h1>
+                <p>Access FRS, ANPR, and community CCTV intelligence.</p>
             </div>
 
             {% if error %}
@@ -29,7 +29,7 @@
             {% endif %}
 
             <form method="post" class="login-form">
-                <label for="username">Login ID</label>
+                <label for="username">Operator ID</label>
                 <div class="login-input">
                     <i class="fa-regular fa-user"></i>
                     <input id="username" name="username" type="text" autocomplete="username" placeholder="Enter login ID" required autofocus>
