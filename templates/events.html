@@ -102,11 +102,33 @@
             <div class="page-header-row">
                 <div>
                     <h1 class="page-title">Security Incidents</h1>
-                    <p class="page-subtitle">Live face recognition and vehicle plate detections</p>
+                    <p class="page-subtitle">Live face recognition, vehicle plate and camera detection events</p>
                 </div>
             </div>
 
             <div class="events-list">
+                <article class="event-card">
+                    <div class="event-type danger">Crowd Detection</div>
+                    <div class="event-main">
+                        <h3>Crowd detected at exit gate</h3>
+                        <div class="event-meta">
+                            <span><i class="fa-solid fa-video"></i> Exit Gate</span>
+                            <span><i class="fa-regular fa-clock"></i> 2026-08-31 09:15:22</span>
+                        </div>
+                    </div>
+                    <div class="event-status danger">Alert</div>
+                </article>
+                <article class="event-card">
+                    <div class="event-type warning">Garbage Detection</div>
+                    <div class="event-main">
+                        <h3>Garbage detected in inspection area</h3>
+                        <div class="event-meta">
+                            <span><i class="fa-solid fa-video"></i> Garbage Inspector</span>
+                            <span><i class="fa-regular fa-clock"></i> 2026-08-31 09:12:08</span>
+                        </div>
+                    </div>
+                    <div class="event-status warning">Review</div>
+                </article>
                 {% for item in events %}
                 <article class="event-card">
                     <div class="event-type {{ item.status_class }}">
