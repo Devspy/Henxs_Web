@@ -1,5 +1,7 @@
 import os
+import queue
 import sqlite3
+import threading
 import time
 
 from functools import wraps
@@ -7,6 +9,7 @@ from functools import wraps
 from flask import Flask, Response, redirect, render_template, request, session, url_for
 
 import cv2
+import numpy as np
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'cameras.db')
@@ -93,29 +96,122 @@ def delete_camera_record(camera_id):
     conn.execute('DELETE FROM cameras WHERE id = ?', (camera_id,))
     conn.commit()
     conn.close()
+    camera_streams.remove(camera_id)
 
 
-def generate_frames(rtsp_url):
-    camera = cv2.VideoCapture(rtsp_url)
+def create_no_signal_frame():
+    frame = np.zeros((480, 854, 3), dtype=np.uint8)
+    frame[:] = (35, 35, 35)
+    cv2.putText(
+        frame,
+        'NO SIGNAL',
+        (300, 250),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        1.5,
+        (220, 220, 220),
+        3,
+        cv2.LINE_AA
+    )
+    success, buffer = cv2.imencode('.jpg', frame)
+    return buffer.tobytes() if success else b''
 
-    try:
-        while True:
-            success, frame = camera.read()
 
-            if not success:
-                time.sleep(1)
+class CameraStream:
+    """Owns one RTSP decoder and shares its latest JPEG with all clients."""
+
+    def __init__(self, rtsp_url):
+        self.rtsp_url = rtsp_url
+        self.frames = queue.Queue(maxsize=1)
+        self.no_signal = create_no_signal_frame()
+        self.latest_frame = self.no_signal
+        self.condition = threading.Condition()
+        self.stop_event = threading.Event()
+        self.worker = threading.Thread(target=self._capture_loop, daemon=True)
+        self.worker.start()
+
+    def _publish(self, frame):
+        try:
+            self.frames.put_nowait(frame)
+        except queue.Full:
+            try:
+                self.frames.get_nowait()
+            except queue.Empty:
+                pass
+            self.frames.put_nowait(frame)
+
+        with self.condition:
+            self.condition.notify_all()
+
+    def _capture_loop(self):
+        while not self.stop_event.is_set():
+            camera = cv2.VideoCapture(self.rtsp_url)
+            if not camera.isOpened():
                 camera.release()
-                camera = cv2.VideoCapture(rtsp_url)
+                self._publish(self.no_signal)
+                self.stop_event.wait(2)
                 continue
 
-            success, buffer = cv2.imencode('.jpg', frame)
+            try:
+                while not self.stop_event.is_set():
+                    success, frame = camera.read()
+                    if not success:
+                        self._publish(self.no_signal)
+                        break
 
-            if success:
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' +
-                       buffer.tobytes() + b'\r\n')
-    finally:
-        camera.release()
+                    success, buffer = cv2.imencode('.jpg', frame)
+                    if success:
+                        self._publish(buffer.tobytes())
+            finally:
+                camera.release()
+
+            if not self.stop_event.is_set():
+                self.stop_event.wait(2)
+
+    def get_frame(self):
+        try:
+            while True:
+                self.latest_frame = self.frames.get_nowait()
+        except queue.Empty:
+            pass
+        return self.latest_frame
+
+    def stop(self):
+        self.stop_event.set()
+
+
+class CameraStreamManager:
+    def __init__(self):
+        self.streams = {}
+        self.lock = threading.Lock()
+
+    def get(self, camera_id, rtsp_url):
+        with self.lock:
+            stream = self.streams.get(camera_id)
+            if stream is None or stream.rtsp_url != rtsp_url:
+                if stream is not None:
+                    stream.stop()
+                stream = CameraStream(rtsp_url)
+                self.streams[camera_id] = stream
+            return stream
+
+    def remove(self, camera_id):
+        with self.lock:
+            stream = self.streams.pop(camera_id, None)
+            if stream is not None:
+                stream.stop()
+
+
+camera_streams = CameraStreamManager()
+
+
+def generate_frames(camera_stream):
+    while True:
+        frame = camera_stream.get_frame()
+        if frame:
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' +
+                   frame + b'\r\n')
+        time.sleep(0.1)
 
 
 def login_required(view):
@@ -232,6 +328,7 @@ def settings_page():
             rtsp_url = request.form.get('rtsp_url', '').strip()
             if camera_id and camera_name and rtsp_url:
                 update_camera_record(camera_id, camera_name, rtsp_url)
+                camera_streams.remove(camera_id)
                 message = 'Camera updated successfully.'
             else:
                 error = 'Camera name and RTSP link are required.'
@@ -269,8 +366,14 @@ def video_feed():
     if not rtsp_url:
         return 'No camera is configured', 503
 
+    if not camera_id:
+        primary_camera = get_primary_camera()
+        camera_id = primary_camera['id']
+
+    camera_stream = camera_streams.get(camera_id, rtsp_url)
+
     return Response(
-        generate_frames(rtsp_url),
+        generate_frames(camera_stream),
         mimetype='multipart/x-mixed-replace; boundary=frame'
     )
 
