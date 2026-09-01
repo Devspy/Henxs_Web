@@ -36,15 +36,38 @@
 
 body {
     font-family: "Inter", sans-serif;
-    font-size: 16px;
+    font-size: 17px;
     line-height: 1.5;
     background: linear-gradient(135deg, #e7edea 0%, var(--background) 100%);
     color: var(--text);
 }
 
+body,
+.main,
+.content,
+.sidebar,
+.topbar,
+.settings-layout,
+.settings-main-card,
+.settings-side-card,
+.add-camera-panel,
+.summary-card,
+.login-panel {
+    font-size: 17px;
+}
+
 button,
-a {
+a,
+label,
+input,
+select,
+textarea,
+small,
+strong,
+span,
+p {
     font-family: inherit;
+    font-size: inherit;
 }
 
 button {
@@ -61,13 +84,13 @@ button {
 }
 
 .page-title {
-    font-size: 26px;
+    font-size: 28px;
     color: var(--dark);
 }
 
 .page-subtitle {
     color: var(--text-light);
-    font-size: 12px;
+    font-size: 14px;
     margin-top: 6px;
 }
 
@@ -95,8 +118,8 @@ button {
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    padding: 7px 12px;
-    font-size: 9px;
+    padding: 8px 14px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.4px;
     width: fit-content;
@@ -121,7 +144,7 @@ button {
 }
 
 .event-main h3 {
-    font-size: 16px;
+    font-size: 20px;
     color: var(--dark);
     margin-bottom: 10px;
 }
@@ -131,7 +154,7 @@ button {
     flex-wrap: wrap;
     gap: 15px;
     color: var(--text-light);
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .event-meta i {
@@ -145,7 +168,7 @@ button {
     justify-content: center;
     border-radius: 999px;
     padding: 8px 12px;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.6px;
     text-transform: uppercase;
@@ -209,7 +232,7 @@ button {
 }
 
 .camera-offline-state p {
-    font-size: 12px;
+    font-size: 14px;
     opacity: 0.8;
 }
 
@@ -269,7 +292,7 @@ button {
 
 .menu-title {
     color: #68696d;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
 
     letter-spacing: 1.5px;
@@ -299,7 +322,7 @@ button {
 
     text-decoration: none;
 
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
 
     border-radius: 9px;
@@ -343,7 +366,7 @@ button {
     align-items: center;
     justify-content: center;
 
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .live-dot {
@@ -393,13 +416,13 @@ button {
 
 .system-status strong {
     display: block;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .system-status small {
     display: block;
     color: #777;
-    font-size: 9px;
+    font-size: 11px;
     margin-top: 3px;
 }
 
@@ -416,7 +439,7 @@ button {
 
     text-decoration: none;
 
-    font-size: 12px;
+    font-size: 14px;
 
     border-radius: 8px;
 
@@ -459,12 +482,12 @@ button {
 }
 
 .topbar-left h2 {
-    font-size: 20px;
+    font-size: 24px;
 }
 
 .topbar-left p {
     color: var(--text-light);
-    font-size: 11px;
+    font-size: 13px;
     margin-top: 4px;
 }
 
@@ -486,8 +509,9 @@ button {
     align-items: center;
     justify-content: center;
 
-    background: #f7f7f8;
-    color: #555;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    border: 1px solid var(--border);
     text-decoration: none;
 
     font-size: 16px;
@@ -526,10 +550,18 @@ button {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0;
-    background: transparent;
+    padding: 8px 12px;
+    background: rgba(24, 134, 83, 0.05);
+    border: 1px solid rgba(24, 134, 83, 0.12);
+    border-radius: 12px;
     color: inherit;
     text-align: left;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.profile:hover {
+    background: rgba(24, 134, 83, 0.08);
+    border-color: rgba(24, 134, 83, 0.18);
 }
 
 .avatar {
@@ -546,21 +578,32 @@ button {
     color: var(--primary-dark);
 
     font-weight: 700;
+    font-size: 14px;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
 }
 
 .profile-info strong {
     display: block;
-    font-size: 11px;
+    font-size: 13px;
+    line-height: 1.2;
+    color: var(--dark);
 }
 
 .profile-info span {
-    color: #999;
-    font-size: 9px;
+    color: #7a7a7a;
+    font-size: 13px;
+    line-height: 1.2;
 }
 
 .profile > i {
     color: #999;
-    font-size: 9px;
+    font-size: 10px;
     margin-left: 4px;
     transition: transform 0.2s;
 }
@@ -574,11 +617,11 @@ button {
     top: calc(100% + 12px);
     right: 0;
     z-index: 10;
-    width: 170px;
-    padding: 6px;
+    width: 190px;
+    padding: 8px;
     background: var(--white);
     border: 1px solid var(--border);
-    border-radius: 9px;
+    border-radius: 12px;
     box-shadow: 0 12px 30px rgba(23, 35, 31, 0.15);
 }
 
@@ -586,10 +629,11 @@ button {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 11px;
-    border-radius: 6px;
+    padding: 11px 12px;
+    border-radius: 8px;
     color: var(--dark);
-    font-size: 10px;
+    font-size: 14px;
+    font-weight: 500;
     text-decoration: none;
 }
 
@@ -729,7 +773,7 @@ button {
 
     color: #777;
 
-    font-size: 12px;
+    font-size: 16px;
 }
 
 .stat-icon {
@@ -764,7 +808,7 @@ button {
 }
 
 .stat-value {
-    font-size: 32px;
+    font-size: 34px;
     font-weight: 700;
 
     margin-top: 15px;
@@ -779,7 +823,7 @@ button {
 
     color: #aaa;
 
-    font-size: 11px;
+    font-size: 15px;
 }
 
 .positive {
@@ -825,13 +869,13 @@ button {
 
 .card-header p {
     color: #999;
-    font-size: 11px;
+    font-size: 13px;
     margin-top: 4px;
 }
 
 .card-header a {
     color: var(--primary);
-    font-size: 11px;
+    font-size: 13px;
     text-decoration: none;
     font-weight: 600;
 }
@@ -908,12 +952,12 @@ button {
 
 .camera-placeholder h4 {
     color: #aaa;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .camera-placeholder p {
     color: #666;
-    font-size: 9px;
+    font-size: 11px;
     margin-top: 5px;
 }
 
@@ -927,7 +971,7 @@ button {
 
     color: #ee657b;
 
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 700;
 }
 
@@ -973,7 +1017,7 @@ button {
 
     color: white;
 
-    font-size: 9px;
+    font-size: 11px;
 }
 
 .recording {
@@ -1017,7 +1061,7 @@ button {
 
     color: white;
 
-    font-size: 8px;
+    font-size: 10px;
 
     white-space: nowrap;
 }
@@ -1082,7 +1126,7 @@ button {
 
     padding: 0 12px;
 
-    font-size: 9px;
+    font-size: 11px;
 }
 
 
@@ -1149,7 +1193,7 @@ button {
 .alert-content strong {
     display: block;
 
-    font-size: 13px;
+    font-size: 15px;
 }
 
 .alert-content span {
@@ -1157,14 +1201,14 @@ button {
 
     color: #999;
 
-    font-size: 10px;
+    font-size: 12px;
 
     margin-top: 4px;
 }
 
 .alert-arrow {
     color: #bbb;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 
@@ -1535,14 +1579,14 @@ footer a:hover {
 
 .camera-settings-info strong {
     display: block;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--dark);
 }
 
 .camera-settings-info span {
     display: block;
     color: var(--text-light);
-    font-size: 9px;
+    font-size: 11px;
     margin-top: 4px;
     max-width: 440px;
     overflow: hidden;
@@ -1565,7 +1609,7 @@ footer a:hover {
     gap: 7px;
     padding: 9px 12px;
     border-radius: 8px;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     cursor: pointer;
 }
@@ -1609,7 +1653,7 @@ footer a:hover {
 
 .settings-side-card h3,
 .edit-panel h4 {
-    font-size: 18px;
+    font-size: 20px;
     color: var(--dark);
     margin-bottom: 18px;
 }
@@ -1663,7 +1707,7 @@ footer a:hover {
 .eyebrow {
     display: inline-block;
     color: var(--primary);
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     font-weight: 700;
@@ -1680,7 +1724,7 @@ footer a:hover {
     background: rgba(255, 255, 255, 0.25);
     color: var(--dark);
     text-decoration: none;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
 }
 
@@ -1703,7 +1747,7 @@ footer a:hover {
 
 .form-field label {
     color: var(--dark);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
 }
 
@@ -1738,7 +1782,7 @@ footer a:hover {
     background: transparent;
     color: var(--dark);
     font: inherit;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .input-wrap input::placeholder {
@@ -1755,11 +1799,11 @@ footer a:hover {
     align-items: center;
     gap: 8px;
     color: var(--text-light);
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .helper-row i {
-    font-size: 9px;
+    font-size: 11px;
     color: var(--primary);
 }
 
@@ -1924,7 +1968,7 @@ footer a:hover {
 .login-heading > p:last-child {
     margin-top: 8px;
     color: var(--text-light);
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .login-form {
@@ -1936,7 +1980,7 @@ footer a:hover {
 
 .login-form label {
     color: var(--dark);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
 }
 
@@ -1972,7 +2016,7 @@ footer a:hover {
     background: transparent;
     color: var(--dark);
     font: inherit;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .login-input input::placeholder {
@@ -1989,7 +2033,7 @@ footer a:hover {
     border-radius: 8px;
     background: var(--primary);
     color: #ffffff;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     transition: background 0.2s, transform 0.2s;
 }

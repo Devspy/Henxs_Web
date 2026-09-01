@@ -21,12 +21,12 @@ function updateGreeting() {
 	}
 
 	const hour = new Date().getHours();
-	let greeting = 'Good evening';
+	let greeting = 'Good Evening';
 
 	if (hour < 12) {
-		greeting = 'Good morning';
+		greeting = 'Good Morning';
 	} else if (hour < 18) {
-		greeting = 'Good afternoon';
+		greeting = 'Good Afternoon';
 	}
 
 	greetingElement.textContent = `${greeting}, Admin 👋`;
