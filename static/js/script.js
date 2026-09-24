@@ -92,8 +92,47 @@ function setupCameraEditing() {
 	});
 }
 
+function setupCameraFullscreen() {
+	const cameraViews = document.querySelectorAll('[data-fullscreen-view]');
+
+	cameraViews.forEach((cameraView) => {
+		const fullscreenButton = cameraView.querySelector('.fullscreen-camera-btn');
+
+		if (!fullscreenButton) {
+			return;
+		}
+
+		const updateFullscreenButton = () => {
+			const isFullscreen = document.fullscreenElement === cameraView;
+			fullscreenButton.setAttribute('aria-label', isFullscreen ? 'Exit fullscreen' : 'View camera in fullscreen');
+			fullscreenButton.setAttribute('title', isFullscreen ? 'Exit fullscreen' : 'View fullscreen');
+			fullscreenButton.innerHTML = `<i class="fa-solid fa-${isFullscreen ? 'compress' : 'expand'}" aria-hidden="true"></i>`;
+		};
+
+		fullscreenButton.addEventListener('click', async (event) => {
+			event.stopPropagation();
+
+			if (document.fullscreenElement) {
+				await document.exitFullscreen();
+				return;
+			}
+
+			await cameraView.requestFullscreen();
+		});
+
+		cameraView.addEventListener('click', async () => {
+			if (document.fullscreenElement === cameraView) {
+				await document.exitFullscreen();
+			}
+		});
+
+		document.addEventListener('fullscreenchange', updateFullscreenButton);
+	});
+}
+
 updateCameraTime();
 updateGreeting();
 setupAccountMenu();
 setupCameraEditing();
+setupCameraFullscreen();
 setInterval(updateCameraTime, 1000);

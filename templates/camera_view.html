@@ -118,8 +118,11 @@
                             <strong>{{ item.name }}</strong>
                             <span class="camera-tile-status live">Live</span>
                         </div>
-                        <div class="camera-tile-view">
+                        <div class="camera-tile-view" data-fullscreen-view>
                             <img src="{{ url_for('video_feed', camera_id=item.id) }}" alt="{{ item.name }} stream">
+                            <button class="fullscreen-camera-btn" type="button" aria-label="View {{ item.name }} in fullscreen" title="View fullscreen">
+                                <i class="fa-solid fa-expand" aria-hidden="true"></i>
+                            </button>
                         </div>
                     </div>
                     {% endfor %}
