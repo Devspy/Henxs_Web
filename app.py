@@ -11,8 +11,15 @@ from flask import Flask, Response, redirect, render_template, request, session, 
 import cv2
 import numpy as np
 
+try:
+    from ultralytics import YOLO
+except ImportError:
+    YOLO = None
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'cameras.db')
+MODEL_PATH = os.path.join(BASE_DIR,'potholes.pt')
+
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'henux-development-secret')
@@ -116,6 +123,88 @@ def create_no_signal_frame():
     return buffer.tobytes() if success else b''
 
 
+class PotholeDetector:
+    """Loads the detector once and annotates frames before they enter the stream queue."""
+
+    def __init__(self, model_path):
+        self.model = None
+        self.model_path = model_path
+        self.lock = threading.Lock()
+
+        if YOLO is None:
+            print('Pothole detection disabled: install ultralytics to enable it.')
+        elif not os.path.isfile(model_path):
+            print(f'Pothole detection disabled: model not found at {model_path}')
+        else:
+            self.model = YOLO(model_path)
+            print(f'Pothole model loaded from {model_path}')
+
+    def annotate(self, frame):
+        if self.model is None:
+            return frame
+
+        with self.lock:
+            results = self.model.predict(
+                source=frame,
+                imgsz=736,
+                conf=0.5,
+                verbose=False
+            )
+        result = results[0]
+        annotated_frame = frame.copy()
+
+        for box in result.boxes:
+            x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
+            class_id = int(box.cls[0])
+            class_name = self.model.names[class_id]
+            confidence = float(box.conf[0])
+            label = f'{class_name} {confidence:.2f}'
+
+            cv2.rectangle(
+                annotated_frame,
+                (x1, y1),
+                (x2, y2),
+                (0, 255, 0),
+                2
+            )
+
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 0.6
+            thickness = 2
+            (text_width, text_height), baseline = cv2.getTextSize(
+                label,
+                font,
+                font_scale,
+                thickness
+            )
+            label_y = y1 - 5
+            if label_y - text_height - baseline < 0:
+                label_y = y1 + text_height + baseline + 5
+
+            cv2.rectangle(
+                annotated_frame,
+                (x1, label_y - text_height - baseline - 5),
+                (x1 + text_width + 5, label_y),
+                (0, 255, 0),
+                -1
+            )
+            cv2.putText(
+                annotated_frame,
+                label,
+                (x1 + 2, label_y - 5),
+                font,
+                font_scale,
+                (0, 0, 0),
+                thickness,
+                cv2.LINE_AA
+            )
+
+        return annotated_frame
+
+
+pothole_detector = PotholeDetector(MODEL_PATH)
+
+
 class CameraStream:
     """Owns one RTSP decoder and shares its latest JPEG with all clients."""
 
@@ -158,6 +247,10 @@ class CameraStream:
                         self._publish(self.no_signal)
                         break
 
+                    try:
+                        frame = pothole_detector.annotate(frame)
+                    except Exception as error:
+                        print(f'Pothole detection failed: {error}')
                     success, buffer = cv2.imencode('.jpg', frame)
                     if success:
                         self._publish(buffer.tobytes())
