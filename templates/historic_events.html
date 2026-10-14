@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historic Events | Bhubaneswar Smart City</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">♙</div><div><strong>Bhubaneswar</strong><b>Smart City</b></div><button class="hamburger" id="menuToggle" aria-label="Toggle menu">☰</button></div>
+    <nav class="nav">
+      <a href="/"><span>⌂</span>Dashboard</a><a href="#"><span class="teal">●</span>Live Map</a><a href="/garbage-detection"><span class="green">▣</span>Garbage Detection</a><a href="/pothole-detection"><span class="red">▲</span>Pothole Detection</a><a href="/analytics"><span class="purple">▥</span>Analytics &amp; Report</a><a href="/"><span>▤</span>Task Management</a><a class="active" href="/historic-events"><span class="pink">◷</span>Historic Events</a><a href="#"><span class="violet">♟</span>User Management</a><a href="#"><span class="lavender">▣</span>Device Management</a><a href="#"><span>⚙</span>Setting &amp; Configuration</a><a href="#"><span>☏</span>HelpDesk</a><a href="#"><span class="red">⇥</span>Logout</a>
+    </nav><div class="sidebar-bottom">☏ &nbsp; Help &amp; Support</div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="crumb">Home <span>›</span> Historic Events</div><div class="top-actions"><label class="global-search">⌕ <input placeholder="Search..." id="globalSearch"></label><button class="bell" title="Notifications">♧<i>5</i></button><div class="avatar">AD</div><div class="admin"><b>Admin</b><small>Administrator</small></div><span>⌄</span></div></header>
+    <section class="content history-content">
+      <div class="history-heading"><div class="heading-icon">◷</div><div class="heading-copy"><h1>Historic Events</h1><p>View and analyze past pothole and garbage detection events.</p></div></div>
+      <div class="history-filters"><label class="date-filter">▦ <span>01 Oct 2026&nbsp; – &nbsp;13 Oct 2026</span>⌃</label><select id="moduleFilter"><option>All Modules</option><option>Pothole</option><option>Garbage</option></select><select id="zoneFilter"><option>All Zones</option><option>North Zone</option><option>East Zone</option><option>South Zone</option><option>West Zone</option></select><select id="statusFilter"><option>All Status</option><option>Assigned</option><option>Resolved</option><option>Pending</option><option>In Progress</option></select><button class="btn primary" id="applyFilters">Apply</button><button class="btn" id="resetFilters">Reset</button><button class="btn outline export-btn" id="exportReport">⇩ &nbsp;Export Report</button></div>
+      <div class="history-stats">
+        <div class="history-stat red-card"><i>⚠</i><div><strong>312</strong><span>Pothole Events</span></div></div><div class="history-stat orange-card"><i>▤</i><div><strong>416</strong><span>Garbage Events</span></div></div><div class="history-stat purple-card"><i>♧</i><div><strong>56</strong><span>Unique Vehicles</span></div></div><div class="history-stat teal-card"><i>◉</i><div><strong>38</strong><span>Cameras</span></div></div><div class="history-stat blue-card"><i>◷</i><div><strong>2.1 Days</strong><span>Average Resolution Time</span></div></div>
+      </div>
+      <div class="history-layout">
+        <section class="event-panel"><div class="event-toolbar"><h2>Event List (<span id="eventCount">728</span>)</h2><div class="table-tools"><label class="table-search">⌕ <input id="eventSearch" placeholder="Search by Issue ID, Vehicle No., Location..."></label><button class="btn filter-btn" id="showFilters">▽ &nbsp;Filters</button></div></div>
+          <div class="table-wrap"><table class="event-table"><thead><tr><th><input type="checkbox" id="selectAll"></th><th>EVENT ID</th><th>IMAGE</th><th>MODULE</th><th>VEHICLE NO.</th><th>LOCATION</th><th>ZONE</th><th>EVENT TIME⌄</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody id="eventRows"></tbody></table></div>
+          <div class="table-footer"><span id="showingText">Showing 1 to 10 of 728 events</span><div class="pagination"><button>«</button><button>‹</button><button class="page-current">1</button><button>2</button><button>3</button><button>4</button><button>5</button><span>…</span><button>73</button><button>›</button><button>»</button></div></div>
+        </section>
+        <aside class="event-detail" id="eventDetail"><button class="close-detail" id="closeDetail" aria-label="Close details">×</button><h2>Event Details</h2><div class="event-preview"><div class="road-art"><div class="road-line"></div><div class="pothole-shape"></div><span>Pothole 0.92</span></div></div><div class="preview-thumbs"><div class="road-art"><div class="pothole-shape"></div></div><div class="road-art second"><div class="pothole-shape"></div></div><button class="video-thumb">▶<small>0:00 / 0:07</small></button></div>
+          <dl class="event-details"><dt>Event ID</dt><dd id="dId">EV-2026-1048</dd><dt>Module</dt><dd id="dModule">⚠ Pothole Detection</dd><dt>Vehicle No.</dt><dd id="dVehicle">OD02AB1234</dd><dt>Location</dt><dd id="dLocation">Chandrasekharpur</dd><dt>Zone</dt><dd><span class="zone north" id="dZone">North Zone</span></dd><dt>Detected On</dt><dd id="dTime">13 Oct 2026, 10:24 AM</dd><dt>Status</dt><dd><span class="status pending" id="dStatus">Assigned</span></dd><dt>Assigned To</dt><dd id="dAssigned">R. Das</dd><dt>Resolved On</dt><dd id="dResolved">—</dd><dt>Camera ID</dt><dd id="dCamera">CAM-01</dd><dt>Confidence</dt><dd id="dConfidence">92%</dd></dl>
+          <div class="event-actions"><button class="btn primary" id="assignBtn">♙ &nbsp;Assign</button><button class="btn outline" id="statusBtn">☑ &nbsp;Update Status</button><button class="btn outline" id="downloadBtn">⇩ &nbsp;Download</button></div>
+        </aside>
+      </div><div class="toast" id="toast" role="status"></div>
+    </section>
+  </main>
+</div><script src="{{ url_for('static', filename='js/history.js') }}"></script>
+</body></html>

@@ -1,578 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Henxs AI Vision | Intelligent Surveillance</title>
-
-    <link rel="stylesheet" href="static/css/style.css">
-
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Task Management | Bhubaneswar Smart City</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-
 <body>
-
-<div class="app">
-
-    <!-- ================= SIDEBAR ================= -->
-
-    <aside class="sidebar">
-
-        <div class="brand">
-            <img class="brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Henxs AI Vision">
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">▤</div><div><strong>Bhubaneswar</strong><b>Smart City</b></div><button class="hamburger" id="menuToggle" aria-label="Toggle menu">☰</button></div>
+    <nav class="nav">
+      <a href="#"><span>⌂</span>Dashboard</a>
+      <a href="#"><span class="teal">●</span>Live Map</a>
+      <a href="/garbage-detection"><span class="green">▤</span>Garbage Detection</a>
+      <a href="/pothole-detection"><span class="red">▲</span>Pothole Detection</a>
+      <a href="/analytics"><span class="purple">▥</span>Analytics &amp; Report</a>
+      <a class="active" href="/"><span>▤</span>Task Management</a>
+      <a href="/historic-events"><span class="pink">◷</span>Historic Events</a>
+      <a href="#"><span class="violet">♟</span>User Management</a>
+      <a href="#"><span class="lavender">▣</span>Device Management</a>
+      <a href="#"><span>⚙</span>Setting &amp; Configuration</a>
+      <a href="#"><span>☏</span>HelpDesk</a>
+      <a href="#"><span class="red">⇥</span>Logout</a>
+    </nav>
+    <div class="sidebar-bottom">☏ &nbsp; Help &amp; Support</div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="crumb">Home <span>›</span> Task Management</div>
+      <div class="top-actions"><label class="global-search">⌕ <input placeholder="Search..." id="globalSearch"></label><button class="bell" title="Notifications">♧<i>5</i></button><div class="avatar">AD</div><div class="admin"><b>Admin</b><small>Administrator</small></div><span>⌄</span></div>
+    </header>
+    <section class="content">
+      <div class="page-heading">
+        <div class="heading-icon">▤</div><div class="heading-copy"><h1>Task Management</h1><p>Manage, assign and track pothole and garbage inspection tasks.</p></div>
+        <div class="filters-top">
+          <label class="date-filter">▦ <span>01 Oct 2026&nbsp; – &nbsp;13 Oct 2026</span>⌃</label>
+          <select id="zoneFilter"><option>All Zones</option><option>North Zone</option><option>East Zone</option><option>South Zone</option><option>West Zone</option></select>
+          <select id="moduleFilter"><option>All Modules</option><option>Pothole</option><option>Garbage</option></select>
+          <button class="btn primary" id="applyFilters">Apply</button><button class="btn" id="resetFilters">Reset</button>
         </div>
-
-        <div class="menu-title">MAIN MENU</div>
-
-        <nav class="sidebar-nav">
-
-            <a href="{{ url_for('home') }}" class="nav-link active">
-                <i class="fa-solid fa-chart-pie"></i>
-                <span>Dashboard</span>
-            </a>
-
-            <a href="{{ url_for('camera_overview') }}" class="nav-link">
-                <i class="fa-solid fa-video"></i>
-                <span>Surveillance</span>
-                <span class="live-dot"></span>
-            </a>
-
-            <a href="{{ url_for('events_page') }}" class="nav-link">
-                <i class="fa-solid fa-bell"></i>
-                <span>Incidents</span>
-                <span class="badge">4</span>
-            </a>
-
-        </nav>
-
-        <div class="menu-title">SYSTEM</div>
-
-        <nav class="sidebar-nav">
-
-            <a href="{{ url_for('settings_page') }}" class="nav-link">
-                <i class="fa-solid fa-sliders"></i>
-                <span>Settings</span>
-            </a>
-
-            <a href="#" class="nav-link">
-                <i class="fa-solid fa-circle-question"></i>
-                <span>Help Center</span>
-            </a>
-
-        </nav>
-
-        <div class="sidebar-bottom">
-
-            <div class="system-status">
-                <span class="status-circle"></span>
-
-                <div>
-                    <strong>System Online</strong>
-                    <small>All systems operational</small>
-                </div>
+      </div>
+      <div class="stats">
+        <div class="stat-card"><div class="stat-icon blue">▤</div><div><strong>286</strong><span>Total Tasks</span><small class="up">↑ 12% <em>vs previous period</em></small></div></div>
+        <div class="stat-card"><div class="stat-icon orange">◷</div><div><strong>174</strong><span>Pending Tasks</span><small class="up">↑ 8% <em>vs previous period</em></small></div></div>
+        <div class="stat-card"><div class="stat-icon green-bg">✓</div><div><strong>88</strong><span>In Progress Tasks</span><small class="up">↑ 15% <em>vs previous period</em></small></div></div>
+        <div class="stat-card"><div class="stat-icon cyan">☑</div><div><strong>24</strong><span>Completed Tasks</span><small class="up">↑ 22% <em>vs previous period</em></small></div></div>
+        <div class="stat-card"><div class="stat-icon red-bg">⚠</div><div><strong>12</strong><span>Overdue Tasks</span><small class="down">↑ 6% <em>vs previous period</em></small></div></div>
+      </div>
+      <div class="workspace">
+        <section class="task-panel">
+          <div class="task-toolbar">
+            <div class="tabs" id="statusTabs">
+              <button class="tab selected" data-status="All Tasks">All Tasks</button><button class="tab" data-status="Pending">Pending</button><button class="tab" data-status="In Progress">In Progress</button><button class="tab" data-status="Completed">Completed</button><button class="tab" data-status="Overdue">Overdue</button>
             </div>
-
-            <a href="{{ url_for('logout') }}" class="logout">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                Logout
-            </a>
-
-        </div>
-
-    </aside>
-
-
-    <!-- ================= MAIN ================= -->
-
-    <main class="main">
-
-        <!-- TOP BAR -->
-
-        <header class="topbar">
-
-            <div class="mobile-brand">
-                <img class="mobile-brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Henxs AI Vision">
-            </div>
-
-            <div class="topbar-left">
-                <h2>AI Surveillance Dashboard</h2>
-                <p>AI Video Analytics • FRS • ANPR • Community CCTV Integration</p>
-            </div>
-
-            <div class="topbar-right">
-
-                <a href="{{ url_for('events_page') }}" class="icon-button" aria-label="View incidents">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="notification-dot"></span>
-                </a>
-
-                <div class="profile-menu">
-                    <button class="profile" id="profile-toggle" type="button" aria-expanded="false" aria-controls="account-menu">
-                        <span class="avatar">A</span>
-                        <span class="profile-info">
-                            <strong>Administrator</strong>
-                            <span>System Admin</span>
-                        </span>
-                        <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-                    </button>
-
-                    <div class="account-menu" id="account-menu" hidden>
-                        <a href="{{ url_for('settings_page') }}" class="account-menu-item">
-                            <i class="fa-solid fa-sliders"></i>
-                            Settings
-                        </a>
-                        <a href="{{ url_for('logout') }}" class="account-menu-item account-logout">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            Logout
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <!-- ================= CONTENT ================= -->
-
-        <section class="content">
-
-            <!-- WELCOME -->
-
-            <div class="welcome">
-
-                <div>
-                    <h1 id="greeting">Good afternoon, Command Center</h1>
-                </div>
-
-                <a href="{{ url_for('add_camera') }}" class="primary-button" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
-                    <i class="fa-solid fa-plus"></i>
-                    Add CCTV Feed
-                </a>
-
-            </div>
-
-
-            <!-- ================= STAT CARDS ================= -->
-
-            <div class="stats-grid">
-
-                <div class="stat-card">
-
-                    <div class="stat-top">
-                        <span>Connected Cameras</span>
-
-                        <div class="stat-icon pink">
-                            <i class="fa-solid fa-video"></i>
-                        </div>
-                    </div>
-
-                    <div class="stat-value">{{ camera_stats.total }}</div>
-
-                    <div class="stat-footer">
-                        <span class="positive">
-                            <i class="fa-solid fa-arrow-up"></i> {{ camera_stats.total }}
-                        </span>
-                        <span>configured</span>
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-top">
-                        <span>Live Streams</span>
-
-                        <div class="stat-icon green">
-                            <i class="fa-solid fa-signal"></i>
-                        </div>
-                    </div>
-
-                    <div class="stat-value">{{ camera_stats.active }}</div>
-
-                    <div class="stat-footer">
-                        <span class="positive">
-                            <i class="fa-solid fa-check"></i> Online
-                        </span>
-                        <span>{{ camera_stats.active }} active</span>
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-top">
-                        <span>AI Events Logged</span>
-
-                        <div class="stat-icon purple">
-                            <i class="fa-solid fa-cube"></i>
-                        </div>
-                    </div>
-
-                    <div class="stat-value">1,284</div>
-
-                    <div class="stat-footer">
-                        <span class="positive">
-                            <i class="fa-solid fa-arrow-up"></i> 18.4%
-                        </span>
-                        <span>today</span>
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-top">
-                        <span>Incident Alerts</span>
-
-                        <div class="stat-icon orange">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </div>
-                    </div>
-
-                    <div class="stat-value">04</div>
-
-                    <div class="stat-footer">
-                        <span class="warning">
-                            Requires attention
-                        </span>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- ================= MAIN GRID ================= -->
-
-            <div class="dashboard-grid">
-
-
-                <!-- LIVE CAMERA -->
-
-                <div class="card camera-card">
-
-                    <div class="card-header">
-
-                        <div>
-                            <h3>Live Surveillance</h3>
-                            <p>Camera 01 • Main Entrance • FRS / ANPR</p>
-                        </div>
-
-                        <div class="camera-status">
-                            <span></span>
-                            LIVE
-                        </div>
-
-                    </div>
-
-
-                    <div class="camera-view">
-
-                        <div class="camera-overlay">
-
-                            <div class="camera-time" id="camera-time">
-                                <i class="fa-regular fa-clock"></i>
-                                <span>--:--:--</span>
-                            </div>
-
-                            <div class="recording">
-                                <span></span>
-                                REC
-                            </div>
-
-                        </div>
-
-
-                        {% if camera_stream_available and primary_camera %}
-                            <img class="camera-stream" src="{{ url_for('video_feed', camera_id=primary_camera.id) }}" alt="Live feed from {{ primary_camera.name }}">
-                        {% else %}
-                            <div class="camera-placeholder">
-                                <i class="fa-solid fa-video"></i>
-                                <h4>Live Camera Feed</h4>
-                                <p>Add a camera in Settings to start streaming</p>
-                            </div>
-                        {% endif %}
-
-                    </div>
-
-
-                    <div class="camera-controls">
-
-                        <button>
-                            <i class="fa-solid fa-expand"></i>
-                        </button>
-
-                        <button>
-                            <i class="fa-solid fa-camera"></i>
-                        </button>
-
-                        <button>
-                            <i class="fa-solid fa-volume-high"></i>
-                        </button>
-
-                        <button class="control-end">
-                            <i class="fa-solid fa-gear"></i>
-                            Camera Settings
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <!-- RECENT ALERTS -->
-
-                <div class="card alerts-card">
-
-                    <div class="card-header">
-
-                        <div>
-                            <h3>Recent Incidents</h3>
-                            <p>Latest detection and response events</p>
-                        </div>
-
-                        <a href="#">View All</a>
-
-                    </div>
-
-
-                    <div class="alerts-list">
-
-                        <div class="alert-item">
-
-                            <div class="alert-icon danger">
-                                <i class="fa-solid fa-users"></i>
-                            </div>
-
-                            <div class="alert-content">
-                                <strong>Crowd Detection: Crowd Alert</strong>
-                                <span>Exit Gate • 1 minute ago</span>
-                            </div>
-
-                            <i class="fa-solid fa-chevron-right alert-arrow"></i>
-
-                        </div>
-
-
-                        <div class="alert-item">
-
-                            <div class="alert-icon warning">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </div>
-
-                            <div class="alert-content">
-                                <strong>Garbage Detection: Waste Found</strong>
-                                <span>Garbage Inspector • 5 minutes ago</span>
-                            </div>
-
-                            <i class="fa-solid fa-chevron-right alert-arrow"></i>
-
-                        </div>
-
-                        <div class="alert-item">
-
-                            <div class="alert-icon danger">
-                                <i class="fa-solid fa-person"></i>
-                            </div>
-
-                            <div class="alert-content">
-                                <strong>FRS: Unauthorised Face Match</strong>
-                                <span>Lobby Entry • 2 minutes ago</span>
-                            </div>
-
-                            <i class="fa-solid fa-chevron-right alert-arrow"></i>
-
-                        </div>
-
-
-                        <div class="alert-item">
-
-                            <div class="alert-icon warning">
-                                <i class="fa-solid fa-car"></i>
-                            </div>
-
-                            <div class="alert-content">
-                                <strong>ANPR: Blacklisted Vehicle Detected</strong>
-                                <span>Main Gate • 8 minutes ago</span>
-                            </div>
-
-                            <i class="fa-solid fa-chevron-right alert-arrow"></i>
-
-                        </div>
-
-
-                        <div class="alert-item">
-
-                            <div class="alert-icon info">
-                                <i class="fa-solid fa-video"></i>
-                            </div>
-
-                            <div class="alert-content">
-                                <strong>AI Video Analytics: Suspicious Movement</strong>
-                                <span>Rear Corridor • 14 minutes ago</span>
-                            </div>
-
-                            <i class="fa-solid fa-chevron-right alert-arrow"></i>
-
-                        </div>
-
-
-                        <div class="alert-item">
-
-                            <div class="alert-icon success">
-                                <i class="fa-solid fa-shield-halved"></i>
-                            </div>
-
-                            <div class="alert-content">
-                                <strong>Response Automation: Incident Escalated</strong>
-                                <span>Security Center • 22 minutes ago</span>
-                            </div>
-
-                            <i class="fa-solid fa-chevron-right alert-arrow"></i>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- ================= BOTTOM GRID ================= -->
-
-            <div class="bottom-grid">
-
-                <!-- CAMERA STATUS -->
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h3>CCTV Coverage</h3>
-                            <p>Overview of connected surveillance devices</p>
-                        </div>
-                        <button class="more-button">
-                            <i class="fa-solid fa-ellipsis"></i>
-                        </button>
-                    </div>
-
-                    <div class="camera-list">
-                        {% if cameras %}
-                            {% for camera in cameras %}
-                                <div class="camera-row">
-                                    <div class="camera-name">
-                                        <div class="mini-camera {% if loop.index is even %}red-bg{% else %}green-bg{% endif %}">
-                                            <i class="fa-solid fa-video"></i>
-                                        </div>
-                                        <div>
-                                            <strong>{{ camera.name }}</strong>
-                                            <span>{{ camera.rtsp_url }}</span>
-                                        </div>
-                                    </div>
-                                    <a href="{{ url_for('camera_detail', camera_id=camera.id) }}" class="online">Open</a>
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="camera-row">
-                                <div class="camera-name">
-                                    <div class="mini-camera red-bg">
-                                        <i class="fa-solid fa-video-slash"></i>
-                                    </div>
-                                    <div>
-                                        <strong>No camera saved</strong>
-                                        <span>Add a camera to start monitoring</span>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- AI DETECTION -->
-                <div class="card detection-card">
-                    <div class="card-header">
-                        <div>
-                            <h3>FRS & ANPR Detection</h3>
-                            <p>Today's recognition summary</p>
-                        </div>
-                        <button class="more-button">
-                            <i class="fa-solid fa-ellipsis"></i>
-                        </button>
-                    </div>
-
-                    <div class="detection-content">
-
-                        <div class="donut">
-
-                            <div class="donut-inner">
-                                <strong>1,284</strong>
-                                <span>Total</span>
-                            </div>
-
-                        </div>
-
-
-                        <div class="detection-legend">
-
-                            <div>
-                                <span class="legend-dot pink-dot"></span>
-                                <span>Faces</span>
-                                <strong>624</strong>
-                            </div>
-
-                            <div>
-                                <span class="legend-dot purple-dot"></span>
-                                <span>Plates</span>
-                                <strong>382</strong>
-                            </div>
-
-                            <div>
-                                <span class="legend-dot blue-dot"></span>
-                                <span>Alerts</span>
-                                <strong>278</strong>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-            </div>
-
-
-            <!-- FOOTER -->
-
-            <footer>
-
-                <span>© 2026 Henxs AI Vision</span>
-
-                <div>
-                    <a href="#">Privacy</a>
-                    <a href="#">Terms</a>
-                    <a href="#">Support</a>
-                </div>
-
-            </footer>
-
+            <div class="table-tools"><label class="table-search">⌕ <input id="taskSearch" placeholder="Search tasks..."></label><button class="btn filter-btn" id="showFilters">▽ &nbsp;Filters</button></div>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th><input type="checkbox" id="selectAll"></th><th>TASK ID</th><th>MODULE</th><th>ISSUE ID</th><th>LOCATION</th><th>ZONE</th><th>STATUS</th><th>ASSIGNED TO</th><th>DUE DATE</th><th>ACTIONS</th></tr></thead>
+            <tbody id="taskRows">
+            {% for task in tasks %}
+            <tr data-id="{{ task.id }}">
+              <td><input type="checkbox" class="row-check"></td><td class="task-id">{{ task.id }}</td>
+              <td><span class="module-icon {{ 'pothole' if task.module == 'Pothole' else 'garbage' }}">{{ '▲' if task.module == 'Pothole' else '▤' }}</span>{{ task.module }}</td>
+              <td class="issue-id">{{ task.issue }}</td><td>{{ task.location }}</td><td><span class="zone {{ task.zone|lower|replace(' zone','') }}">{{ task.zone }}</span></td>
+              <td><span class="status {{ task.status|lower|replace(' ','-') }}">{{ task.status }}</span></td><td>{{ task.assigned }}</td><td>{{ task.due }}</td>
+              <td class="actions"><button class="view-btn" data-view="{{ task.id }}" title="View task">◎</button><button class="more-btn" data-more="{{ task.id }}" title="Mark in progress">⋮</button></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table></div>
+          <div class="table-footer"><span id="showingText">Showing 1 to 10 of 286 tasks</span><div class="pagination"><button>«</button><button>‹</button><button class="page-current">1</button><button>2</button><button>3</button><button>4</button><button>5</button><span>…</span><button>29</button><button>›</button><button>»</button></div></div>
         </section>
-
-    </main>
-
+        <aside class="detail-panel" id="detailPanel">
+          <button class="close-detail" id="closeDetail" aria-label="Close details">×</button>
+          <div class="detail-head"><h2>Task Details</h2><span class="status pending" id="detailStatus">Pending</span></div>
+          <dl class="details">
+            <dt>Task ID</dt><dd id="dId">TK-2026-1084</dd><dt>Module</dt><dd id="dModule"><span class="module-icon pothole">▲</span> Pothole Detection</dd>
+            <dt>Issue ID</dt><dd id="dIssue">PH-2026-1045</dd><dt>Location</dt><dd id="dLocation">Chandrasekharpur</dd><dt>Zone</dt><dd><span class="zone north" id="dZone">North Zone</span></dd>
+            <dt>Created On</dt><dd id="dCreated">13 Oct 2026, 10:24 AM</dd><dt>Due Date</dt><dd id="dDue">14 Oct 2026</dd><dt>Assigned To</dt><dd id="dAssigned">R. Das</dd><dt>Status</dt><dd><span class="status pending" id="detailStatus2">Pending</span></dd>
+          </dl>
+          <div class="detail-section"><div class="section-title"><b>Issue Images</b><a href="#" id="viewImages">View All</a></div>
+            <div class="image-grid"><div class="main-issue-image"><div class="road-art"><div class="road-line"></div><div class="pothole-shape"></div><span>Pothole 0.92</span></div></div><div class="thumbs"><div class="road-art small"><div class="pothole-shape"></div></div><div class="road-art small second"><div class="pothole-shape"></div></div></div></div>
+          </div>
+          <div class="detail-section remarks"><b>Task Remarks</b><p id="dRemarks">Inspection and repair required. Large pothole near signal.</p></div>
+          <div class="detail-actions"><button class="btn outline" id="reassignBtn">Reassign</button><button class="btn primary" id="progressBtn">Mark In Progress</button><button class="btn success" id="completeBtn">Mark Completed</button></div>
+        </aside>
+      </div>
+      <div class="toast" id="toast" role="status"></div>
+    </section>
+  </main>
 </div>
-
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+window.taskDetails = {
+  {% for task in tasks %}
+  "{{ task.id }}": {created: {{ task.created|tojson }}, remarks: {{ task.remarks|tojson }}},
+  {% endfor %}
+};
+</script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
