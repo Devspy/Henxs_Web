@@ -1,5 +1,19 @@
 const password=document.querySelector('#password');
 const message=document.querySelector('#formMessage');
+const readableError=value=>{
+  if(typeof value==='string'&&value.trim())return value;
+  if(Array.isArray(value)){
+    const messages=value.map(item=>readableError(item?.msg??item?.message??item?.detail??item)).filter(Boolean);
+    if(messages.length)return messages.join(' ');
+  }
+  if(value&&typeof value==='object'){
+    for(const key of ['message','msg','detail','error']){
+      const text=readableError(value[key]);
+      if(text)return text;
+    }
+  }
+  return '';
+};
 const setMessage=(text,state='')=>{
   message.textContent=text;
   message.className=`form-message${state?` ${state}`:''}`;
@@ -34,7 +48,7 @@ form.addEventListener('submit',async event=>{
     const result=await response.json();
 
     if(!response.ok||result.success!==true||!result.access_token){
-      setMessage(result.detail||result.message||'Login failed. Check your email and password.','error');
+      setMessage(readableError(result.detail??result.message??result.error)||'Login failed. Check your email and password.','error');
       return;
     }
 
