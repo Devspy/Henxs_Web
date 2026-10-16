@@ -8,7 +8,10 @@ from urllib.request import Request, urlopen
 from flask import Flask, render_template, jsonify, request, redirect, session, url_for
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
+secret_key = os.environ.get("FLASK_SECRET_KEY")
+if not secret_key and os.environ.get("VERCEL"):
+    raise RuntimeError("Set the FLASK_SECRET_KEY environment variable in Vercel to keep login sessions stable.")
+app.secret_key = secret_key or secrets.token_hex(32)
 AUTH_LOGIN_URL = "https://fastapi-redis-api.onrender.com/api/v1/auth/login"
 
 
