@@ -41,7 +41,7 @@ form.addEventListener('submit',async event=>{
       method:'POST',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify({
-        email:document.querySelector('#username').value.trim(),
+        identifier:document.querySelector('#username').value.trim(),
         password:password.value
       })
     });

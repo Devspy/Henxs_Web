@@ -54,12 +54,12 @@ def login():
 @app.route("/api/auth/login", methods=["POST"])
 def api_login():
     credentials = request.get_json(silent=True) or {}
-    email = str(credentials.get("email", "")).strip()
+    identifier = str(credentials.get("identifier", "")).strip()
     password = credentials.get("password", "")
-    if not email or not isinstance(password, str) or not password:
-        return jsonify({"detail": "Email and password are required."}), 400
+    if not identifier or not isinstance(password, str) or not password:
+        return jsonify({"detail": "ID and password are required."}), 400
 
-    payload = json.dumps({"email": email, "password": password}).encode("utf-8")
+    payload = json.dumps({"identifier": identifier, "password": password}).encode("utf-8")
     upstream_request = Request(
         AUTH_LOGIN_URL,
         data=payload,
