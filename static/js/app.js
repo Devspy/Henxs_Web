@@ -1,5 +1,9 @@
 const $ = (s, root=document) => root.querySelector(s);
 const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+const authHeaders = headers => {
+  const token = sessionStorage.getItem('access_token');
+  return token ? {...headers, Authorization:`Bearer ${token}`} : headers;
+};
 let activeStatus = "All Tasks";
 let selectedTask = "TK-2026-1084";
 const tasks = [...$$('#taskRows tr')].map(row => {
@@ -37,7 +41,7 @@ function setStatus(status){
   updateStatusBadge($('#detailStatus'),status);updateStatusBadge($('#detailStatus2'),status);
   const next=status==='Pending'?'Mark In Progress':status==='In Progress'?'Mark Completed':'Mark In Progress';
   $('#progressBtn').textContent=next;
-  fetch(`/api/tasks/${encodeURIComponent(selectedTask)}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})}).catch(()=>{});
+  fetch(`/api/tasks/${encodeURIComponent(selectedTask)}`,{method:'PATCH',headers:authHeaders({'Content-Type':'application/json'}),body:JSON.stringify({status})}).catch(()=>{});
   renderRows();notify(`${selectedTask} updated to ${status}`);
 }
 $$('.tab').forEach(btn=>btn.addEventListener('click',()=>{$$('.tab').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');activeStatus=btn.dataset.status;renderRows()}));
@@ -50,7 +54,7 @@ $$('[data-view]').forEach(b=>b.addEventListener('click',()=>showTask(b.dataset.v
 $$('[data-more]').forEach(b=>b.addEventListener('click',()=>{showTask(b.dataset.more);setStatus('In Progress')}));
 $('#progressBtn').addEventListener('click',()=>setStatus(tasks.find(t=>t.id===selectedTask)?.status==='In Progress'?'Completed':'In Progress'));
 $('#completeBtn').addEventListener('click',()=>setStatus('Completed'));
-$('#reassignBtn').addEventListener('click',()=>{const name=prompt('Enter assignee name:',tasks.find(t=>t.id===selectedTask)?.assigned||'');if(name&&name.trim()){const t=tasks.find(x=>x.id===selectedTask);t.assigned=name.trim();$('#dAssigned').textContent=t.assigned;fetch(`/api/tasks/${encodeURIComponent(selectedTask)}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({assigned:t.assigned})}).catch(()=>{});notify('Task reassigned')}})
+$('#reassignBtn').addEventListener('click',()=>{const name=prompt('Enter assignee name:',tasks.find(t=>t.id===selectedTask)?.assigned||'');if(name&&name.trim()){const t=tasks.find(x=>x.id===selectedTask);t.assigned=name.trim();$('#dAssigned').textContent=t.assigned;fetch(`/api/tasks/${encodeURIComponent(selectedTask)}`,{method:'PATCH',headers:authHeaders({'Content-Type':'application/json'}),body:JSON.stringify({assigned:t.assigned})}).catch(()=>{});notify('Task reassigned')}})
 $('#closeDetail').addEventListener('click',()=>{detailPanel.classList.add('hidden');$('.workspace').classList.add('detail-hidden')});
 $('#showFilters').addEventListener('click',()=>{$('#zoneFilter').focus();notify('Choose zone or module above, then click Apply')});
 $('#viewImages').addEventListener('click',e=>{e.preventDefault();notify('Issue image gallery is a demo placeholder')});

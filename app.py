@@ -1,6 +1,26 @@
-from flask import Flask, render_template, jsonify, request
+import json
+import os
+import secrets
+from functools import wraps
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
+from flask import Flask, render_template, jsonify, request, redirect, session, url_for
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
+AUTH_LOGIN_URL = "https://fastapi-redis-api.onrender.com/api/v1/auth/login"
+
+
+def login_required(view):
+    @wraps(view)
+    def wrapped_view(*args, **kwargs):
+        if not session.get("authenticated"):
+            if request.path.startswith("/api/"):
+                return jsonify({"detail": "Authentication required."}), 401
+            return redirect(url_for("index"))
+        return view(*args, **kwargs)
+    return wrapped_view
 
 TASKS = [
     {"id":"TK-2026-1084","module":"Pothole","issue":"PH-2026-1045","location":"Chandrasekharpur","zone":"North Zone","status":"Pending","assigned":"R. Das","due":"14 Oct 2026","created":"13 Oct 2026, 10:24 AM","remarks":"Inspection and repair required. Large pothole near signal.","score":"0.92"},
@@ -16,33 +36,74 @@ TASKS = [
 ]
 @app.route("/")
 def index():
-    return render_template("index.html", tasks=TASKS)
+    return render_template("login.html")
 
 @app.route("/dashboard")
+@login_required
 def dashboard():
-    return render_template("dashboard.html")
+    return render_template("index.html", tasks=TASKS)
 
 @app.route("/login")
 def login():
     return render_template("login.html")
 
+@app.route("/api/auth/login", methods=["POST"])
+def api_login():
+    credentials = request.get_json(silent=True) or {}
+    email = str(credentials.get("email", "")).strip()
+    password = credentials.get("password", "")
+    if not email or not isinstance(password, str) or not password:
+        return jsonify({"detail": "Email and password are required."}), 400
+
+    payload = json.dumps({"email": email, "password": password}).encode("utf-8")
+    upstream_request = Request(
+        AUTH_LOGIN_URL,
+        data=payload,
+        headers={"Content-Type": "application/json", "Accept": "application/json"},
+        method="POST",
+    )
+    try:
+        with urlopen(upstream_request, timeout=20) as response:
+            result = json.loads(response.read().decode("utf-8"))
+            if result.get("success") is True and result.get("access_token"):
+                session["authenticated"] = True
+            return jsonify(result), response.status
+    except HTTPError as error:
+        try:
+            result = json.loads(error.read().decode("utf-8"))
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            result = {"detail": "Login failed. Check your email and password."}
+        return jsonify(result), error.code
+    except (URLError, TimeoutError, json.JSONDecodeError):
+        return jsonify({"detail": "Unable to reach the login service. Please try again."}), 502
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("index"))
+
 @app.route("/historic-events")
+@login_required
 def historic_events():
     return render_template("historic_events.html")
 
 @app.route("/pothole-detection")
+@login_required
 def pothole_detection():
     return render_template("pothole_detection.html")
 
 @app.route("/analytics")
+@login_required
 def analytics():
     return render_template("analytics.html")
 
 @app.route("/garbage-detection")
+@login_required
 def garbage_detection():
     return render_template("garbage_detection.html")
 
 @app.route("/api/tasks", methods=["GET"])
+@login_required
 def api_tasks():
     status = request.args.get("status", "All Tasks")
     query = request.args.get("q", "").strip().lower()
@@ -60,6 +121,7 @@ def api_tasks():
     return jsonify(tasks)
 
 @app.route("/api/tasks/<task_id>", methods=["PATCH"])
+@login_required
 def update_task(task_id):
     data = request.get_json(silent=True) or {}
     task = next((t for t in TASKS if t["id"] == task_id), None)
