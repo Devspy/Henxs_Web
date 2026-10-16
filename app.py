@@ -7,7 +7,7 @@ from urllib.request import Request, urlopen
 from flask import Flask, render_template, jsonify, request, redirect, session, url_for
 
 app = Flask(__name__)
-app.secret_key = "086572984a483fa35d308c32dbad584c9dd21cbc726a7f8a0a049cb4da7b55bc"
+app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 AUTH_LOGIN_URL = "https://fastapi-redis-api.onrender.com/api/v1/auth/login"
 
 
