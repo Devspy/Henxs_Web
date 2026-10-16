@@ -38,8 +38,13 @@ def index():
     return render_template("login.html")
 
 @app.route("/dashboard")
-@login_required
+#@login_required
 def dashboard():
+    return render_template("dashboard.html", tasks=TASKS)
+
+@app.route("/tasks")
+@login_required
+def task_management():
     return render_template("index.html", tasks=TASKS)
 
 @app.route("/login")
