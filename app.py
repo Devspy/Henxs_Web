@@ -7,7 +7,7 @@ from urllib.request import Request, urlopen
 from flask import Flask, render_template, jsonify, request, redirect, session, url_for
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY")
+app.secret_key = os.environ.get("FLASK_SECRET_KEY") or "086572984a483fa35d308c32dbad584c9dd21cbc726a7f8a0a049cb4da7b55bc"
 AUTH_LOGIN_URL = "https://fastapi-redis-api.onrender.com/api/v1/auth/login"
 
 
@@ -38,7 +38,7 @@ def index():
     return render_template("login.html")
 
 @app.route("/dashboard")
-#@login_required
+@login_required
 def dashboard():
     return render_template("dashboard.html", tasks=TASKS)
 
@@ -46,6 +46,30 @@ def dashboard():
 @login_required
 def task_management():
     return render_template("index.html", tasks=TASKS)
+
+@app.route("/users")
+@app.route("/user-management")
+@login_required
+def user_management():
+    return render_template("users.html")
+
+@app.route("/devices")
+@app.route("/device-management")
+@login_required
+def device_management():
+    return render_template("devices.html")
+
+@app.route("/settings")
+@app.route("/setting-configuration")
+@login_required
+def settings():
+    return render_template("settings.html")
+
+@app.route("/helpdesk")
+@app.route("/help-desk")
+@login_required
+def helpdesk():
+    return render_template("helpdesk.html")
 
 @app.route("/login")
 def login():
