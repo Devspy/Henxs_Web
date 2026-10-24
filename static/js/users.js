@@ -1,43 +1,108 @@
-const users = [
-  {name:'Admin',email:'admin@smartcity.gov.in',role:'Super Admin',department:'Administration',status:'Active',login:'13 Oct 2026, 02:15 PM',phone:'+91 98765 43210',designation:'System Administrator',joined:'01 Jan 2025',initials:'AD'},
-  {name:'Ramesh Das',email:'ramesh.das@smartcity.gov.in',role:'Operator',department:'Operations',status:'Active',login:'13 Oct 2026, 11:48 AM',phone:'+91 98765 43211',designation:'Operations Officer',joined:'12 Feb 2025',initials:'RD'},
-  {name:'Sita Mohanty',email:'sita.mohanty@smartcity.gov.in',role:'Viewer',department:'Monitoring',status:'Active',login:'12 Oct 2026, 06:25 PM',phone:'+91 98765 43212',designation:'Monitoring Analyst',joined:'18 Feb 2025',initials:'SM',color:'purple'},
-  {name:'Prakash Behera',email:'prakash.behera@smartcity.gov.in',role:'Maintenance',department:'Field Operations',status:'Active',login:'13 Oct 2026, 09:12 AM',phone:'+91 98765 43213',designation:'Field Supervisor',joined:'04 Mar 2025',initials:'PB',color:'pink'},
-  {name:'Kumar Sahu',email:'kumar.sahu@smartcity.gov.in',role:'Operator',department:'Operations',status:'Active',login:'12 Oct 2026, 04:20 PM',phone:'+91 98765 43214',designation:'Operations Officer',joined:'20 Mar 2025',initials:'KS'},
-  {name:'Manoj Pattnaik',email:'manoj.pattnaik@smartcity.gov.in',role:'Operator',department:'Garbage',status:'Inactive',login:'10 Oct 2026, 11:32 AM',phone:'+91 98765 43215',designation:'Collection Coordinator',joined:'03 Apr 2025',initials:'MP',color:'pink'},
-  {name:'Anil Pradhan',email:'anil.pradhan@smartcity.gov.in',role:'Viewer',department:'Monitoring',status:'Active',login:'13 Oct 2026, 10:05 AM',phone:'+91 98765 43216',designation:'Monitoring Analyst',joined:'11 Apr 2025',initials:'AR',color:'purple'},
-  {name:'Laxmi Kanta',email:'laxmikanta@smartcity.gov.in',role:'Auditor',department:'Audit & Compliance',status:'Active',login:'12 Oct 2026, 03:40 PM',phone:'+91 98765 43217',designation:'Compliance Auditor',joined:'22 Apr 2025',initials:'LK',color:'orange'},
-  {name:'Sunita Rao',email:'sunita.rao@smartcity.gov.in',role:'Operator',department:'Pothole Detection',status:'Active',login:'13 Oct 2026, 08:18 AM',phone:'+91 98765 43218',designation:'Inspection Officer',joined:'09 May 2025',initials:'SR'},
-  {name:'Debasis Kumar',email:'debasis.kumar@smartcity.gov.in',role:'Maintenance',department:'Manhole Detection',status:'Inactive',login:'09 Oct 2026, 05:10 PM',phone:'+91 98765 43219',designation:'Maintenance Supervisor',joined:'16 May 2025',initials:'DK',color:'pink'},
-  {name:'Madhuri Nayak',email:'madhuri.nayak@smartcity.gov.in',role:'Operator',department:'Operations',status:'Active',login:'13 Oct 2026, 07:55 AM',phone:'+91 98765 43220',designation:'Operations Officer',joined:'01 Jun 2025',initials:'MN'},
-  {name:'Sanjay Mishra',email:'sanjay.mishra@smartcity.gov.in',role:'Viewer',department:'Monitoring',status:'Active',login:'12 Oct 2026, 06:40 PM',phone:'+91 98765 43221',designation:'Monitoring Analyst',joined:'14 Jun 2025',initials:'SM',color:'purple'},
-  {name:'Puja Das',email:'puja.das@smartcity.gov.in',role:'Auditor',department:'Audit & Compliance',status:'Active',login:'12 Oct 2026, 04:32 PM',phone:'+91 98765 43222',designation:'Compliance Auditor',joined:'21 Jun 2025',initials:'PD',color:'pink'},
-  {name:'Rita Swain',email:'rita.swain@smartcity.gov.in',role:'Operator',department:'Garbage',status:'Active',login:'12 Oct 2026, 02:12 PM',phone:'+91 98765 43223',designation:'Collection Coordinator',joined:'02 Jul 2025',initials:'RS'},
-  {name:'Bikash Rout',email:'bikash.rout@smartcity.gov.in',role:'Maintenance',department:'Field Operations',status:'Active',login:'11 Oct 2026, 05:20 PM',phone:'+91 98765 43224',designation:'Field Technician',joined:'12 Jul 2025',initials:'BR',color:'orange'},
-  {name:'Niranjan Jena',email:'niranjan.jena@smartcity.gov.in',role:'Operator',department:'Pothole Detection',status:'Active',login:'11 Oct 2026, 03:02 PM',phone:'+91 98765 43225',designation:'Inspection Officer',joined:'19 Jul 2025',initials:'NJ'},
-  {name:'Aruna Patra',email:'aruna.patra@smartcity.gov.in',role:'Viewer',department:'Monitoring',status:'Inactive',login:'08 Oct 2026, 11:22 AM',phone:'+91 98765 43226',designation:'Monitoring Analyst',joined:'28 Jul 2025',initials:'AP',color:'pink'},
-  {name:'Subash Lenka',email:'subash.lenka@smartcity.gov.in',role:'Operator',department:'Operations',status:'Active',login:'10 Oct 2026, 01:45 PM',phone:'+91 98765 43227',designation:'Operations Officer',joined:'05 Aug 2025',initials:'SL'},
-  {name:'Geeta Sethi',email:'geeta.sethi@smartcity.gov.in',role:'Auditor',department:'Audit & Compliance',status:'Active',login:'10 Oct 2026, 10:34 AM',phone:'+91 98765 43228',designation:'Compliance Auditor',joined:'15 Aug 2025',initials:'GS',color:'purple'},
-  {name:'Raju Barik',email:'raju.barik@smartcity.gov.in',role:'Maintenance',department:'Field Operations',status:'Inactive',login:'07 Oct 2026, 08:17 AM',phone:'+91 98765 43229',designation:'Field Technician',joined:'25 Aug 2025',initials:'RB',color:'pink'},
-  {name:'Tapan Sahu',email:'tapan.sahu@smartcity.gov.in',role:'Operator',department:'Manhole Detection',status:'Active',login:'09 Oct 2026, 03:27 PM',phone:'+91 98765 43230',designation:'Inspection Officer',joined:'02 Sep 2025',initials:'TS'},
-  {name:'Mina Pati',email:'mina.pati@smartcity.gov.in',role:'Viewer',department:'Monitoring',status:'Active',login:'09 Oct 2026, 11:03 AM',phone:'+91 98765 43231',designation:'Monitoring Analyst',joined:'09 Sep 2025',initials:'MP',color:'purple'},
-  {name:'Amit Mohanty',email:'amit.mohanty@smartcity.gov.in',role:'Operator',department:'Garbage',status:'Active',login:'08 Oct 2026, 04:51 PM',phone:'+91 98765 43232',designation:'Collection Coordinator',joined:'19 Sep 2025',initials:'AM'},
-  {name:'Suresh Nayak',email:'suresh.nayak@smartcity.gov.in',role:'Maintenance',department:'Field Operations',status:'Active',login:'08 Oct 2026, 09:30 AM',phone:'+91 98765 43233',designation:'Field Technician',joined:'27 Sep 2025',initials:'SN',color:'orange'}
-];
-const pageSize=10; let page=1; let selected=users[0]; let tab='Details'; let activeTab='All';
+let users=[];
+const pageSize=10; let page=1; let selected=null; let tab='Details'; let activeTab='All';
 const rows=document.querySelector('#userRows'), pagination=document.querySelector('#userPagination'), detail=document.querySelector('#userDetail'), toast=document.querySelector('#userToast');
+detail.classList.add('hidden');document.querySelector('.users-workspace').classList.add('detail-hidden');
+const getField=(user,...keys)=>{for(const key of keys){const value=user?.[key];if(value!==undefined&&value!==null&&value!=='')return value;}return '';};
+const displayValue=value=>typeof value==='string'?value:value==null?'':String(value);
+function normalizeUser(user){
+ const name=displayValue(getField(user,'name','full_name','fullName','username'))||'Unnamed User';
+ const roleRaw=displayValue(getField(user,'role','user_role','userRole'))||'Unknown';
+ const role=roleRaw.replaceAll('_',' ').replace(/\b\w/g,char=>char.toUpperCase());
+ const roleDepartments={'super admin':'Administration','admin':'Administration','operator':'Operations','viewer':'Monitoring','maintenance':'Field Operations','auditor':'Audit & Compliance'};
+ const department=displayValue(getField(user,'department','team'))||roleDepartments[roleRaw.toLowerCase().replaceAll('_',' ')]||'—';
+ const active=getField(user,'is_active','isActive','active');
+ const statusRaw=displayValue(getField(user,'status','account_status','accountStatus'));
+ const status=statusRaw?(/inactive|disabled|suspended/i.test(statusRaw)?'Inactive':'Active'):((active===false||active===0||active==='false')?'Inactive':'Active');
+ const initials=name.split(/\s+/).filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase()||'?';
+ return {id:displayValue(getField(user,'id','_id','user_id','userId'))||'—',username:displayValue(getField(user,'username','user_name','userName'))||'—',name,email:displayValue(getField(user,'email','email_address','emailAddress'))||'—',role,status,department,login:displayValue(getField(user,'last_login','lastLogin','last_login_at','lastLoginAt'))||'—',phone:displayValue(getField(user,'phone','phone_number','phoneNumber','contact_number'))||'—',designation:displayValue(getField(user,'designation','title','job_title'))||'—',joined:displayValue(getField(user,'created_at','createdAt','date_joined','dateJoined'))||'—',initials,color:'',raw:user};
+}
+function extractUsers(payload){if(Array.isArray(payload))return payload;if(!payload||typeof payload!=='object')return [];for(const key of ['users','data','items','results']){if(Array.isArray(payload[key]))return payload[key];if(payload[key]&&typeof payload[key]==='object'){const nested=extractUsers(payload[key]);if(nested.length)return nested;}}return [];}
+function updateUserCounts(){const active=users.filter(user=>user.status==='Active').length;const inactive=users.length-active;const roles=new Set(users.map(user=>user.role));document.querySelector('#totalUsersCount').textContent=users.length;document.querySelector('#activeUsersCount').textContent=active;document.querySelector('#inactiveUsersCount').textContent=inactive;document.querySelector('#userRolesCount').textContent=roles.size;document.querySelector('#roleNames').textContent=[...roles].join(', ')||'—';document.querySelector('#allUsersTabCount').textContent=users.length;document.querySelector('#activeUsersTabCount').textContent=active;document.querySelector('#inactiveUsersTabCount').textContent=inactive;const roleFilter=document.querySelector('#roleFilter'),selectedRole=roleFilter.value;roleFilter.innerHTML='<option value="All">All Roles</option>';for(const role of roles){const option=document.createElement('option');option.value=role;option.textContent=role;roleFilter.append(option);}roleFilter.value=roles.has(selectedRole)?selectedRole:'All';}
+async function loadUsers(){
+ const token=sessionStorage.getItem('access_token');
+ if(!token){rows.innerHTML='<tr><td colspan="8">Sign in again to load users.</td></tr>';document.querySelector('#showingUsers').textContent='Unable to load users';return;}
+ rows.innerHTML='<tr><td colspan="8">Loading users…</td></tr>';
+ const controller=new AbortController();
+ const timeout=setTimeout(()=>controller.abort(),30000);
+ try{
+  const response=await fetch('/api/users',{headers:{'Accept':'application/json','Authorization':`Bearer ${token}`},signal:controller.signal});
+  const payload=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(readableApiMessage(payload.detail??payload.message??payload.error)||'Unable to load users.');
+  users=extractUsers(payload).map(normalizeUser);updateUserCounts();
+  selected=null;page=1;render();renderDetail();
+ }catch(error){users=[];selected=null;updateUserCounts();const message=error.name==='AbortError'?'Loading users timed out. Please retry.':error.message||'Unable to load users.';rows.innerHTML=`<tr><td colspan="8">${escapeHtml(message)}</td></tr>`;document.querySelector('#showingUsers').textContent='Unable to load users';renderDetail();}
+ finally{clearTimeout(timeout);}
+}
 function filteredUsers(){const q=document.querySelector('#userSearch').value.trim().toLowerCase();const role=document.querySelector('#roleFilter').value;const status=document.querySelector('#statusFilter').value;return users.filter(u=>(activeTab==='All'||u.status===activeTab)&&(role==='All'||u.role===role)&&(status==='All'||u.status===status)&&(!q||`${u.name} ${u.email} ${u.role} ${u.department}`.toLowerCase().includes(q)));}
 function render(){const filtered=filteredUsers();const pageCount=Math.max(1,Math.ceil(filtered.length/pageSize));page=Math.min(page,pageCount);const shown=filtered.slice((page-1)*pageSize,page*pageSize);
- rows.innerHTML=shown.map((u,i)=>`<tr data-user="${users.indexOf(u)}"><td><input type="checkbox" aria-label="Select ${u.name}"></td><td>${(page-1)*pageSize+i+1}</td><td><div class="user-cell"><span class="user-avatar ${u.color||''}">${u.initials}</span><div><span class="user-name">${u.name}</span><span class="user-email">${u.email}</span></div></div></td><td><span class="role-badge ${u.role.toLowerCase().replaceAll(' ','-')}">${u.role}</span></td><td>${u.department}</td><td><span class="user-status ${u.status.toLowerCase()}">${u.status}</span></td><td class="user-login">${u.login.replace(', ', '<br>')}</td><td><div class="row-actions"><button class="edit-row" aria-label="Edit ${u.name}">✎</button><button class="more-row" aria-label="More actions for ${u.name}">⋮</button></div></td></tr>`).join('');
- rows.querySelectorAll('tr').forEach(tr=>tr.addEventListener('click',e=>{if(e.target.closest('button')||e.target.type==='checkbox')return;selected=users[Number(tr.dataset.user)];tab='Details';renderDetail();}));
- rows.querySelectorAll('.edit-row').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();selected=users[Number(b.closest('tr').dataset.user)];showToast(`Edit user: ${selected.name}`);}));
+ rows.innerHTML=shown.length?shown.map((u,i)=>{const roleClass=u.role.toLowerCase().replace(/[^a-z0-9]+/g,'-');return `<tr data-user="${users.indexOf(u)}"><td><input type="checkbox" aria-label="Select ${escapeHtml(u.name)}"></td><td>${(page-1)*pageSize+i+1}</td><td><div class="user-cell"><span class="user-avatar">${escapeHtml(u.initials)}</span><div><span class="user-name">${escapeHtml(u.name)}</span><span class="user-email">${escapeHtml(u.email)}</span></div></div></td><td><span class="role-badge ${roleClass}">${escapeHtml(u.role)}</span></td><td>${escapeHtml(u.department)}</td><td><span class="user-status ${u.status.toLowerCase()}">${escapeHtml(u.status)}</span></td><td class="user-login">${escapeHtml(u.login)}</td><td><div class="row-actions"><button class="edit-row" aria-label="Edit ${escapeHtml(u.name)}" title="Edit user">✎</button></div></td></tr>`}).join(''):`<tr><td colspan="8">${users.length?'No users match these filters.':'No users found.'}</td></tr>`;
+ rows.querySelectorAll('.edit-row').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();showUserDetails(Number(b.closest('tr').dataset.user));}));
  rows.querySelectorAll('.more-row').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();selected=users[Number(b.closest('tr').dataset.user)];selected.status=selected.status==='Active'?'Inactive':'Active';render();renderDetail();showToast(`${selected.name} is now ${selected.status.toLowerCase()}.`);}));
- document.querySelector('#showingUsers').textContent=filtered.length?`Showing ${(page-1)*pageSize+1} to ${Math.min(page*pageSize,filtered.length)} of ${filtered.length} users`:'No users match these filters';
+ document.querySelector('#showingUsers').textContent=filtered.length?`Showing ${(page-1)*pageSize+1} to ${Math.min(page*pageSize,filtered.length)} of ${filtered.length} users`:(users.length?'No users match these filters':'No users found');
  pagination.innerHTML=`<button data-page="1" aria-label="First page">«</button><button data-page="${page-1}" aria-label="Previous page">‹</button>${Array.from({length:pageCount},(_,i)=>`<button data-page="${i+1}" class="${page===i+1?'current':''}">${i+1}</button>`).join('')}<button data-page="${page+1}" aria-label="Next page">›</button>`;pagination.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{page=Math.max(1,Math.min(pageCount,Number(b.dataset.page)));render();}));
  document.querySelector('#selectAll').checked=false;
 }
-function renderDetail(){if(!selected)return;const badge=`<span class="user-status ${selected.status.toLowerCase()}">${selected.status}</span>`;const head=`<div class="user-summary"><span class="detail-avatar">${selected.initials}</span><div><div class="user-topline"><h2>${selected.name}</h2>${badge}</div><p>${selected.email}</p></div></div><div class="user-detail-tabs">${['Details','Roles & Permissions','Activity Log'].map(t=>`<button class="${tab===t?'selected':''}" data-tab="${t}">${t}</button>`).join('')}</div>`;let body='';if(tab==='Details')body=`<dl class="detail-fields"><span class="field-icon">♙</span><dt>Full Name</dt><span>:</span><dd>${selected.name}</dd><span class="field-icon">✉</span><dt>Email Address</dt><span>:</span><dd>${selected.email}</dd><span class="field-icon">♧</span><dt>Contact Number</dt><span>:</span><dd>${selected.phone}</dd><span class="field-icon">♙</span><dt>Department</dt><span>:</span><dd>${selected.department}</dd><span class="field-icon">▣</span><dt>Designation</dt><span>:</span><dd>${selected.designation}</dd><span class="field-icon">▦</span><dt>Date of Joining</dt><span>:</span><dd>${selected.joined}</dd><span class="field-icon">◷</span><dt>Last Login</dt><span>:</span><dd>${selected.login}</dd><span class="field-icon">♢</span><dt>Status</dt><span>:</span><dd>${badge}</dd></dl><div class="user-actions"><button class="edit-user">✎ &nbsp; Edit User</button><button id="resetPassword">⊙ &nbsp; Reset Password</button><button class="deactivate-user">◴ &nbsp; ${selected.status==='Active'?'Deactivate':'Activate'}</button></div>`;else if(tab==='Roles & Permissions')body=`<dl class="detail-fields"><span class="field-icon">♢</span><dt>Assigned Role</dt><span>:</span><dd>${selected.role}</dd><span class="field-icon">▣</span><dt>Department</dt><span>:</span><dd>${selected.department}</dd><span class="field-icon">✓</span><dt>Access</dt><span>:</span><dd>${selected.role==='Super Admin'?'Full system access':selected.role==='Viewer'?'View dashboards and events':'Manage assigned operations'}</dd></dl>`;else body=`<dl class="detail-fields"><span class="field-icon">◷</span><dt>Last Sign In</dt><span>:</span><dd>${selected.login}</dd><span class="field-icon">✓</span><dt>Account Created</dt><span>:</span><dd>${selected.joined}</dd><span class="field-icon">●</span><dt>Recent Activity</dt><span>:</span><dd>Viewed operations dashboard</dd></dl>`;document.querySelector('#detailContent').innerHTML=head+body;document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.tab;renderDetail();}));document.querySelector('.edit-user')?.addEventListener('click',()=>showToast(`Edit user: ${selected.name}`));document.querySelector('#resetPassword')?.addEventListener('click',()=>showToast(`Password reset link prepared for ${selected.email}.`));document.querySelector('.deactivate-user')?.addEventListener('click',()=>{selected.status=selected.status==='Active'?'Inactive':'Active';render();renderDetail();showToast(`${selected.name} is now ${selected.status.toLowerCase()}.`);});}
+function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+function formatUserValue(value){if(value===null||value===undefined||value==='')return '—';return typeof value==='object'?JSON.stringify(value):String(value);}
+function showUserDetails(index){selected=users[index];if(!selected)return;tab='Details';detail.classList.remove('hidden');document.querySelector('.users-workspace').classList.remove('detail-hidden');renderDetail();}
+function renderDetail(){
+ const container=document.querySelector('#detailContent');
+ if(!selected){container.innerHTML='';return;}
+ const badge=`<span class="user-status ${selected.status.toLowerCase()}">${escapeHtml(selected.status)}</span>`;
+ const head=`<div class="user-summary"><span class="detail-avatar">${escapeHtml(selected.initials)}</span><div><div class="user-topline"><h2>${escapeHtml(selected.name)}</h2>${badge}</div><p>${escapeHtml(selected.email)}</p></div></div><div class="user-detail-tabs">${['Details','Roles & Permissions','Activity Log'].map(name=>`<button class="${tab===name?'selected':''}" data-tab="${name}">${name}</button>`).join('')}</div>`;
+ const raw=selected.raw||{};
+ let entries=[];
+ if(tab==='Details')entries=Object.entries(raw).filter(([key,value])=>!/(password|token|secret|credential|hash)/i.test(key)&&value!==null&&value!==undefined);
+ else if(tab==='Roles & Permissions')entries=Object.entries(raw).filter(([key])=>/(role|permission|scope|access)/i.test(key));
+ else entries=Object.entries(raw).filter(([key])=>/(activity|login|sign.?in|created|updated)/i.test(key));
+ const body=entries.length?`<dl class="detail-fields">${entries.map(([key,value])=>`<dt>${escapeHtml(key.replace(/[_-]/g,' ').replace(/\b\w/g,char=>char.toUpperCase()))}</dt><span>:</span><dd>${escapeHtml(formatUserValue(value))}</dd>`).join('')}</dl>`:`<p class="empty-detail">No ${tab.toLowerCase()} details are available from the user service.</p>`;
+ const actions=tab==='Details'?`<div class="user-actions"><button type="button" class="edit-user" id="detailEditUser">✎ &nbsp; Edit User</button><button type="button" id="resetPassword">⊙ &nbsp; Reset Password</button><button type="button" class="deactivate-user">⊗ &nbsp; ${selected.status==='Active'?'Deactivate':'Activate'}</button></div>`:'';
+ container.innerHTML=head+body+actions;
+ container.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>{tab=button.dataset.tab;renderDetail();}));
+ container.querySelector('#detailEditUser')?.addEventListener('click',()=>showToast(`Editing ${selected.name} is not connected to the user API yet.`));
+ container.querySelector('#resetPassword')?.addEventListener('click',()=>showToast('Password reset is not connected to the user API yet.'));
+ container.querySelector('.deactivate-user')?.addEventListener('click',()=>showToast('Account status updates are not connected to the user API yet.'));
+}
 function showToast(message){toast.textContent=message;toast.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove('show'),2600);}
 document.querySelectorAll('.user-tabs button').forEach(b=>b.addEventListener('click',()=>{activeTab=b.dataset.status;document.querySelectorAll('.user-tabs button').forEach(x=>x.classList.toggle('selected',x===b));page=1;render();}));
-document.querySelector('#applyUsers').addEventListener('click',()=>{page=1;render();});document.querySelector('#userSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){page=1;render();}});document.querySelector('#resetUsers').addEventListener('click',()=>{document.querySelector('#userSearch').value='';document.querySelector('#roleFilter').value='All';document.querySelector('#statusFilter').value='All';activeTab='All';page=1;document.querySelectorAll('.user-tabs button').forEach((b,i)=>b.classList.toggle('selected',i===0));render();});document.querySelector('#selectAll').addEventListener('change',e=>rows.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=e.target.checked));document.querySelector('#closeDetail').addEventListener('click',()=>{detail.classList.add('hidden');document.querySelector('.users-workspace').classList.add('detail-hidden');});document.querySelector('#addUser').addEventListener('click',()=>showToast('Add User form is ready to connect to the user service.'));document.querySelector('#menuToggle')?.addEventListener('click',()=>document.querySelector('#sidebar').classList.toggle('open'));
-render();renderDetail();
+document.querySelector('#applyUsers').addEventListener('click',()=>{page=1;render();});document.querySelector('#userSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){page=1;render();}});document.querySelector('#resetUsers').addEventListener('click',()=>{document.querySelector('#userSearch').value='';document.querySelector('#roleFilter').value='All';document.querySelector('#statusFilter').value='All';activeTab='All';page=1;document.querySelectorAll('.user-tabs button').forEach((b,i)=>b.classList.toggle('selected',i===0));render();});document.querySelector('#selectAll').addEventListener('change',e=>rows.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=e.target.checked));document.querySelector('#closeDetail').addEventListener('click',()=>{detail.classList.add('hidden');document.querySelector('.users-workspace').classList.add('detail-hidden');});const addUserModal=document.querySelector('#addUserModal');
+const addUserForm=document.querySelector('#addUserForm');
+const addUserMessage=document.querySelector('#addUserMessage');
+const submitAddUser=document.querySelector('#submitAddUser');
+function closeAddUserModal(){addUserModal.classList.remove('open');addUserModal.setAttribute('aria-hidden','true');}
+function readableApiMessage(value){
+ if(typeof value==='string')return value.trim();
+ if(typeof value==='number'||typeof value==='boolean')return String(value);
+ if(Array.isArray(value))return value.map(readableApiMessage).filter(Boolean).join(' ');
+ if(value&&typeof value==='object'){
+  for(const key of ['message','msg','detail','error','description']){
+   if(value[key]!==undefined){const message=readableApiMessage(value[key]);if(message)return message;}
+  }
+ }
+ return '';
+}
+document.querySelector('#addUser').addEventListener('click',()=>{addUserMessage.textContent='';addUserMessage.className='add-user-message';addUserModal.classList.add('open');addUserModal.setAttribute('aria-hidden','false');addUserForm.elements.name.focus();});
+document.querySelector('#closeAddUser').addEventListener('click',closeAddUserModal);
+document.querySelector('#cancelAddUser').addEventListener('click',closeAddUserModal);
+addUserModal.addEventListener('click',event=>{if(event.target===addUserModal)closeAddUserModal();});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&addUserModal.classList.contains('open'))closeAddUserModal();});
+addUserForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ const token=sessionStorage.getItem('access_token');
+ if(!token){addUserMessage.textContent='Your session has expired. Please sign in again.';return;}
+ const formData=new FormData(addUserForm);
+ const payload={name:formData.get('name').trim(),username:formData.get('username').trim(),email:formData.get('email').trim(),password:formData.get('password'),role:formData.get('role')};
+ submitAddUser.disabled=true;submitAddUser.textContent='Creating…';addUserMessage.textContent='';addUserMessage.className='add-user-message';
+ try{
+  const response=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(payload)});
+  const result=await response.json().catch(()=>({}));
+  const detail=readableApiMessage(result.message??result.detail??result.error);
+  if(!response.ok||result.success===false){addUserMessage.textContent=detail||'User creation failed. Please check the submitted details.';return;}
+  addUserMessage.textContent=detail||'User created successfully.';addUserMessage.classList.add('success');addUserForm.reset();await loadUsers();
+ }catch{
+  addUserMessage.textContent='User creation failed. Unable to reach the user service.';
+ }finally{
+  submitAddUser.disabled=false;submitAddUser.textContent='Create User';
+ }
+});document.querySelector('#menuToggle')?.addEventListener('click',()=>document.querySelector('#sidebar').classList.toggle('open'));
+loadUsers();

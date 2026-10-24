@@ -9,6 +9,7 @@ from flask import Flask, render_template, jsonify, request, redirect, session, u
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY") or "086572984a483fa35d308c32dbad584c9dd21cbc726a7f8a0a049cb4da7b55bc"
 AUTH_LOGIN_URL = "https://fastapi-redis-api.onrender.com/api/v1/auth/login"
+USERS_API_URL = "https://fastapi-redis-api.onrender.com/api/v1/users"
 
 
 def login_required(view):
@@ -152,6 +153,70 @@ def api_tasks():
     if module != "All Modules":
         tasks = [t for t in tasks if t["module"] == module]
     return jsonify(tasks)
+
+@app.route("/api/users", methods=["POST"])
+@login_required
+def create_user():
+    authorization = request.headers.get("Authorization", "")
+    if not authorization.startswith("Bearer "):
+        return jsonify({"detail": "A bearer access token is required."}), 401
+
+    payload = json.dumps(request.get_json(silent=True) or {}).encode("utf-8")
+    upstream_request = Request(
+        USERS_API_URL,
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": authorization,
+        },
+        method="POST",
+    )
+    try:
+        with urlopen(upstream_request, timeout=20) as response:
+            body = response.read().decode("utf-8")
+            try:
+                result = json.loads(body)
+            except json.JSONDecodeError:
+                result = {"message": body or "User created successfully."}
+            return jsonify(result), response.status
+    except HTTPError as error:
+        try:
+            result = json.loads(error.read().decode("utf-8"))
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            result = {"detail": "User creation failed."}
+        return jsonify(result), error.code
+    except (URLError, TimeoutError):
+        return jsonify({"detail": "Unable to reach the user service. Please try again."}), 502
+
+@app.route("/api/users", methods=["GET"])
+@login_required
+def list_users():
+    authorization = request.headers.get("Authorization", "")
+    if not authorization.startswith("Bearer "):
+        return jsonify({"detail": "A bearer access token is required."}), 401
+
+    upstream_request = Request(
+        USERS_API_URL,
+        headers={"Accept": "application/json", "Authorization": authorization},
+        method="GET",
+    )
+    try:
+        with urlopen(upstream_request, timeout=20) as response:
+            body = response.read().decode("utf-8")
+            try:
+                result = json.loads(body)
+            except json.JSONDecodeError:
+                return jsonify({"detail": "The user service returned an invalid response."}), 502
+            return jsonify(result), response.status
+    except HTTPError as error:
+        try:
+            result = json.loads(error.read().decode("utf-8"))
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            result = {"detail": "Unable to load users."}
+        return jsonify(result), error.code
+    except (URLError, TimeoutError):
+        return jsonify({"detail": "Unable to reach the user service. Please try again."}), 502
 
 @app.route("/api/tasks/<task_id>", methods=["PATCH"])
 @login_required
