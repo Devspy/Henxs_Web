@@ -1,39 +1,26 @@
-const searchInput=document.querySelector('#globalSearch');
-const zoneFilter=document.querySelector('#zoneFilter');
-const moduleFilter=document.querySelector('#moduleFilter');
-const activityRows=[...document.querySelectorAll('.activity-table tbody tr')];
+const $=s=>document.querySelector(s);
+const apiFetch=url=>{const token=sessionStorage.getItem('access_token');return fetch(url,{headers:token?{Authorization:`Bearer ${token}`}:{}})};
+const val=(...xs)=>xs.find(x=>x!==undefined&&x!==null&&x!=='')??'—';
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eventType=e=>String(val(e.event_type,e.type,e.module,e.eventType));
+let events=[];
 
-function filterDashboard(){
-  const query=(searchInput?.value||'').trim().toLowerCase();
-  const zone=zoneFilter?.value||'All Zones';
-  const module=moduleFilter?.value||'All Modules';
-  activityRows.forEach(row=>{
-    const matchesQuery=!query||row.innerText.toLowerCase().includes(query);
-    const matchesZone=zone==='All Zones'||row.dataset.zone===zone;
-    const matchesModule=module==='All Modules'||row.dataset.module===module;
-    row.hidden=!(matchesQuery&&matchesZone&&matchesModule);
-  });
-  document.querySelectorAll('.district').forEach(district=>{
-    district.hidden=zone!=='All Zones'&&!district.innerText.includes(zone.replace(' Zone',''));
-  });
+function normalized(e){return {raw:e,id:String(val(e.id,e.event_id,e.eventId)),module:eventType(e),time:val(e.event_time,e.detected_at,e.created_at,e.timestamp,e.time),location:val(e.location,e.address,e.place),zone:val(e.zone,e.zone_name),status:val(e.status),severity:val(e.severity,e.level),confidence:Number.parseFloat(val(e.confidence,e.score))||0,assigned:val(e.assigned_to,e.assignee,e.assigned),vehicle:val(e.vehicle_no,e.vehicle_number,e.vehicle)}}
+function imageData(e){let image=val(e.image_base64,e.base64_image,e.image,e.image_data,e.photo);if(typeof image!=='string'||image==='—')return '';if(/^(data:image\/|https?:\/\/)/i.test(image))return image;const mime=val(e.image_mime_type,e.mime_type);return `data:${String(mime).startsWith('image/')?mime:'image/jpeg'};base64,${image}`}
+function isResolved(e){return /resolved|complete/i.test(e.status)}
+function moduleClass(module){return module.toLowerCase()==='pothole'?'module-pothole':module.toLowerCase()==='garbage'?'module-garbage':'module-manhole'}
+function renderRows(){const body=$('#dashboardEventRows');const rows=events.map(e=>`<tr data-zone="${esc(e.zone)}" data-module="${esc(e.module)}"><td>${esc(e.time)}</td><td><span class="module-symbol ${moduleClass(e.module)}">${e.module.toLowerCase()==='pothole'?'▲':e.module.toLowerCase()==='garbage'?'▣':'◉'}</span>${esc(e.module)}</td><td class="event-id">${esc(e.id)}</td><td>${esc(e.location)}</td><td><span class="zone-badge">${esc(e.zone)}</span></td><td><span class="severity ${e.severity.toLowerCase()==='high'||e.confidence>=.9?'high':'medium'}">${esc(e.severity)}</span></td><td><span class="status-badge ${esc(e.status.toLowerCase().replaceAll(' ','-'))}">${esc(e.status)}</span></td><td>${esc(e.assigned)}</td><td><a class="view-event" href="/historic-events">View</a></td></tr>`).join('');body.innerHTML=rows||'<tr><td colspan="9">No events found.</td></tr>';filterDashboard()}
+function updateSummary(){const types=['Pothole','Manhole','Garbage'];const counts=types.map(type=>events.filter(e=>e.module.toLowerCase()===type.toLowerCase()).length);const metrics=document.querySelectorAll('.metric-card .metric-copy strong');if(metrics.length>=4){metrics[0].textContent=counts[0];metrics[1].textContent=counts[1];metrics[2].textContent=counts[2];metrics[3].textContent=events.filter(isResolved).length;metrics[4]?.replaceChildren(document.createTextNode('—'))}
+ const dist=$$('.distribution-legend > div');const total=events.length,resolved=events.filter(isResolved).length;const distCounts=[counts[0],counts[1],counts[2],resolved];const donut=$('.distribution-content .donut b');if(donut)donut.textContent=total.toLocaleString();dist.forEach((row,i)=>{const count=row.querySelector('b'),pct=row.querySelector('span');if(count)count.textContent=distCounts[i]??0;if(pct)pct.textContent=`${total?((distCounts[i]||0)*100/total).toFixed(1):'0.0'}%`});
+ const zones=['North Zone','East Zone','South Zone','West Zone'];document.querySelectorAll('.district').forEach(d=>{const zone=zones.find(z=>d.classList.contains(z.split(' ')[0].toLowerCase()));if(zone){const n=events.filter(e=>e.zone.toLowerCase()===zone.toLowerCase()).length;const span=d.querySelector('span');if(span)span.textContent=`${n} events`}});document.querySelectorAll('.zone-summary span').forEach(row=>{const zone=zones.find(z=>row.textContent.includes(z));const count=row.querySelector('strong');if(zone&&count)count.textContent=events.filter(e=>e.zone.toLowerCase()===zone.toLowerCase()).length});
+ const moduleColors=[['Pothole','red-bar'],['Manhole','orange-bar'],['Garbage','blue-bar']];const zoneGroups=$$('.bar-group');const max=Math.max(1,...zones.flatMap(zone=>moduleColors.map(([module])=>events.filter(e=>e.zone.toLowerCase()===zone.toLowerCase()&&e.module.toLowerCase()===module.toLowerCase()).length)));zoneGroups.forEach((group,i)=>{const zone=zones[i];if(!zone)return;moduleColors.forEach(([module,cls])=>{const bar=group.querySelector(`.${cls}`);if(!bar)return;const count=events.filter(e=>e.zone.toLowerCase()===zone.toLowerCase()&&e.module.toLowerCase()===module.toLowerCase()).length;bar.style.setProperty('--height',`${count/max*100}%`);bar.querySelector('b').textContent=count})});document.querySelectorAll('.map-pin').forEach(pin=>pin.remove());
 }
+function $$(selector){return [...document.querySelectorAll(selector)]}
+async function renderEventImages(){const target=$('#dashboardEventImages');const recent=events.slice(0,4);if(!recent.length){target.innerHTML='<p>No recent events.</p>';return}const entries=await Promise.all(recent.map(async e=>{let detail=e.raw;try{const r=await apiFetch(`/api/events/${encodeURIComponent(e.id)}`);if(r.ok){detail=await r.json();if(detail?.data&&!Array.isArray(detail.data))detail=detail.data}}catch{}return {event:e,image:imageData(detail)}}));target.innerHTML=entries.map(({event:e,image})=>`<article class="camera-card dashboard-event-card"><div class="camera-scene">${image?`<img src="${esc(image)}" alt="${esc(e.module)} event ${esc(e.id)}">`:'<span class="dashboard-no-image">No event image</span>'}</div><span class="detection-tag ${e.module.toLowerCase()==='pothole'?'pothole-tag':e.module.toLowerCase()==='garbage'?'garbage-tag':'manhole-tag'}">${esc(e.module)}${e.confidence?` ${Math.round(e.confidence*100)}%`:''}</span><span class="camera-name">${esc(e.id)} | ${esc(e.location)} <b>${esc(e.status)}</b></span></article>`).join('')}
+function filterDashboard(){const query=($('#globalSearch')?.value||'').trim().toLowerCase(),zone=$('#zoneFilter')?.value||'All Zones',module=$('#moduleFilter')?.value||'All Modules';document.querySelectorAll('.activity-table tbody tr[data-zone]').forEach(row=>{row.hidden=!!((query&&!row.innerText.toLowerCase().includes(query))||(zone!=='All Zones'&&row.dataset.zone!==zone)||(module!=='All Modules'&&row.dataset.module.toLowerCase()!==module.toLowerCase()))});document.querySelectorAll('.district').forEach(d=>{d.hidden=zone!=='All Zones'&&!d.innerText.includes(zone.replace(' Zone',''))})}
+async function loadEvents(){try{const response=await apiFetch('/api/events');if(!response.ok)throw new Error(`Unable to load events (${response.status}).`);const data=await response.json();const list=Array.isArray(data)?data:(data.events||data.items||data.results||(Array.isArray(data.data)?data.data:[]));events=list.map(normalized);updateSummary();renderRows();renderEventImages()}catch(error){$('#dashboardEventRows').innerHTML=`<tr><td colspan="9">${esc(error.message)}</td></tr>`;$('#dashboardEventImages').innerHTML=`<p>${esc(error.message)}</p>`}}
 
-document.querySelector('#applyFilters')?.addEventListener('click',filterDashboard);
-document.querySelector('#resetFilters')?.addEventListener('click',()=>{
-  zoneFilter.value='All Zones';
-  moduleFilter.value='All Modules';
-  searchInput.value='';
-  filterDashboard();
-});
-searchInput?.addEventListener('input',filterDashboard);
-document.querySelector('#menuToggle')?.addEventListener('click',()=>document.querySelector('#sidebar')?.classList.toggle('open'));
-document.querySelectorAll('.range-tabs button').forEach(button=>button.addEventListener('click',()=>{
-  document.querySelectorAll('.range-tabs button').forEach(item=>item.classList.toggle('selected',item===button));
-}));
-document.querySelectorAll('.map-zoom button').forEach((button,index)=>button.addEventListener('click',()=>{
-  const map=document.querySelector('.city-map');
-  const current=Number(map.dataset.zoom||1);
-  const next=index===0?Math.min(1.3,current+.1):index===1?Math.max(.9,current-.1):1;
-  map.dataset.zoom=next;
-  map.querySelectorAll('.district,.map-pin,.map-label').forEach(item=>item.style.scale=String(next));
-}));
+$('#applyFilters')?.addEventListener('click',filterDashboard);$('#resetFilters')?.addEventListener('click',()=>{$('#zoneFilter').value='All Zones';$('#moduleFilter').value='All Modules';$('#globalSearch').value='';filterDashboard()});$('#globalSearch')?.addEventListener('input',filterDashboard);$('#menuToggle')?.addEventListener('click',()=>$('#sidebar')?.classList.toggle('open'));
+document.querySelectorAll('.range-tabs button').forEach(button=>button.addEventListener('click',()=>document.querySelectorAll('.range-tabs button').forEach(item=>item.classList.toggle('selected',item===button))));
+document.querySelectorAll('.map-zoom button').forEach((button,index)=>button.addEventListener('click',()=>{const map=$('.city-map'),current=Number(map.dataset.zoom||1),next=index===0?Math.min(1.3,current+.1):index===1?Math.max(.9,current-.1):1;map.dataset.zoom=next;map.querySelectorAll('.district,.map-label').forEach(item=>item.style.scale=String(next))}));
+loadEvents();

@@ -10,6 +10,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY") or "086572984a483fa35d308c32dbad584c9dd21cbc726a7f8a0a049cb4da7b55bc"
 AUTH_LOGIN_URL = "https://fastapi-redis-api.onrender.com/api/v1/auth/login"
 USERS_API_URL = "https://fastapi-redis-api.onrender.com/api/v1/users"
+EVENTS_API_URL = "https://fastapi-redis-api.onrender.com/api/v1/events"
 
 
 def login_required(view):
@@ -41,7 +42,7 @@ def index():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html", tasks=TASKS)
+    return render_template("dashboard.html")
 
 @app.route("/tasks")
 @login_required
@@ -217,6 +218,54 @@ def list_users():
         return jsonify(result), error.code
     except (URLError, TimeoutError):
         return jsonify({"detail": "Unable to reach the user service. Please try again."}), 502
+
+
+def proxy_events_api(url, method="GET", payload=None):
+    headers = {"Accept": "application/json"}
+    authorization = request.headers.get("Authorization", "")
+    if authorization.startswith("Bearer "):
+        headers["Authorization"] = authorization
+    body = None
+    if payload is not None:
+        body = json.dumps(payload).encode("utf-8")
+        headers["Content-Type"] = "application/json"
+    upstream_request = Request(url, data=body, headers=headers, method=method)
+    try:
+        with urlopen(upstream_request, timeout=30) as response:
+            response_body = response.read()
+            if not response_body:
+                return jsonify({}), response.status
+            try:
+                result = json.loads(response_body.decode("utf-8"))
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                return jsonify({"detail": "The event service returned an invalid response."}), 502
+            return jsonify(result), response.status
+    except HTTPError as error:
+        try:
+            result = json.loads(error.read().decode("utf-8"))
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            result = {"detail": "Unable to load events."}
+        return jsonify(result), error.code
+    except (URLError, TimeoutError):
+        return jsonify({"detail": "Unable to reach the event service. Please try again."}), 502
+
+
+@app.route("/api/events", methods=["GET"])
+@login_required
+def list_events():
+    return proxy_events_api(EVENTS_API_URL)
+
+
+@app.route("/api/events/<event_id>", methods=["GET", "PATCH"])
+@login_required
+def get_event(event_id):
+    if not event_id or "/" in event_id:
+        return jsonify({"detail": "Invalid event ID."}), 400
+    if request.method == "PATCH":
+        if not request.headers.get("Authorization", "").startswith("Bearer "):
+            return jsonify({"detail": "A bearer access token is required."}), 401
+        return proxy_events_api(f"{EVENTS_API_URL}/{event_id}", "PATCH", request.get_json(silent=True) or {})
+    return proxy_events_api(f"{EVENTS_API_URL}/{event_id}")
 
 @app.route("/api/tasks/<task_id>", methods=["PATCH"])
 @login_required

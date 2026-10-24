@@ -49,7 +49,7 @@ function openLogoutDialog(link) {
       <button class="logout-close" type="button" aria-label="Close">×</button>
       <div class="logout-symbol" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 8H10a3 3 0 0 0-3 3v26a3 3 0 0 0 3 3h10"/><path d="M27 15l10 9-10 9M15 24h22"/></svg></div>
       <h2 id="logout-title">Confirm Logout</h2>
-      <p id="logout-description">Are you sure you want to logout from Bhubaneswar Smart City?</p>
+      <p id="logout-description">Are you sure you want to logout from SMART CITY SURVEILLANCE?</p>
       <div class="logout-actions"><button class="logout-cancel" type="button">Cancel</button><button class="logout-confirm" type="button">Logout</button></div>
     </section>`;
   document.body.append(activeDialog);

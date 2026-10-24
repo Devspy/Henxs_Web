@@ -15,3 +15,5 @@
 .sidebar .hamburger{margin-left:auto;border:0;background:none;color:#179aff;font-size:20px;cursor:pointer}
 .sidebar .sidebar-bottom{margin-top:auto;padding:18px 25px;border-top:1px solid #183753;font-size:13px;text-align:left}
 
+.dashboard-event-card .camera-scene>img{width:100%;height:100%;object-fit:cover;display:block}.dashboard-event-card .dashboard-no-image{width:100%;height:100%;display:grid;place-items:center;color:#dbe5ef;background:#27323b;font-size:12px}.dashboard-event-card .camera-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dashboard-event-card .camera-name b{float:right}
+.metric-card .spark{display:none}
