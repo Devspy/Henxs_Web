@@ -120,6 +120,11 @@ def historic_events():
 def pothole_detection():
     return render_template("pothole_detection.html")
 
+@app.route("/manhole-detection")
+@login_required
+def manhole_detection():
+    return render_template("manhole_detection.html")
+
 @app.route("/analytics")
 @login_required
 def analytics():
