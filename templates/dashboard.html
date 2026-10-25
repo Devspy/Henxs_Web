@@ -6,6 +6,9 @@
   <title>Dashboard | SMART CITY SURVEILLANCE</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://www.google.com">
+  <link rel="preconnect" href="https://maps.googleapis.com">
+  <link rel="preconnect" href="https://maps.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 </head>
@@ -62,12 +65,8 @@
       <div class="overview-grid">
         <section class="panel map-panel" id="city-overview">
         <div class="panel-heading"><h2>City Overview - Detected Issues</h2><div class="legend"><span><i class="legend-dot red-dot"></i>Potholes</span><span><i class="legend-dot orange-dot"></i>Manholes</span><span><i class="legend-dot blue-dot"></i>Garbage</span></div><div class="map-filters"><select id="mapZoneFilter"><option>All Zones</option><option>North Zone</option><option>East Zone</option><option>South Zone</option><option>West Zone</option></select><select id="mapStatusFilter"><option>All Status</option><option>Pending</option><option>In Progress</option><option>Completed</option></select></div></div>
-          <div class="city-map">
-            <div class="map-grid"></div><div class="map-roads road-one"></div><div class="map-roads road-two"></div><div class="map-roads road-three"></div><div class="map-roads road-four"></div>
-            <div class="district north"><b>North Zone</b><span>— events</span></div><div class="district east"><b>East Zone</b><span>— events</span></div><div class="district west"><b>West Zone</b><span>— events</span></div><div class="district south"><b>South Zone</b><span>— events</span></div>
-            <span class="map-label label-city">Bhubaneswar</span><span class="map-label label-park">Nandankanan<br>Zoological Park</span><span class="map-label label-temple">Khandagiri<br>Temple</span><span class="map-label label-airport">Biju Patnaik<br>International Airport</span>
-            
-            <div class="map-zoom"><button aria-label="Zoom in">+</button><button aria-label="Zoom out">−</button><button aria-label="Locate">◎</button></div>
+          <div class="city-map city-map-google">
+            <iframe title="Google Map of Bhubaneswar, Odisha" src="https://www.google.com/maps?q=Bhubaneswar%2C%20Odisha%2C%20India&amp;z=12&amp;output=embed" loading="eager" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
             <aside class="zone-summary"><b>Zone-wise Summary</b><span><i class="summary-pin red-fill">●</i>North Zone <strong>—</strong></span><span><i class="summary-pin orange-fill">●</i>East Zone <strong>—</strong></span><span><i class="summary-pin blue-fill">●</i>South Zone <strong>—</strong></span><span><i class="summary-pin purple-fill">●</i>West Zone <strong>—</strong></span></aside>
           </div>
         </section>
