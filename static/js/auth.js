@@ -59,6 +59,7 @@ function openLogoutDialog(link) {
   activeDialog.querySelector('.logout-confirm').addEventListener('click', () => {
     sessionStorage.removeItem('access_token');
     sessionStorage.removeItem('auth_user');
+    sessionStorage.removeItem('auth_username');
     window.location.assign(link.href);
   });
   document.addEventListener('keydown', handleDialogKeydown);
@@ -71,3 +72,16 @@ document.querySelectorAll('a[href="/logout"]').forEach(link => {
     openLogoutDialog(link);
   });
 });
+
+function updateSignedInProfile(){
+  let user={};
+  try{user=JSON.parse(sessionStorage.getItem('auth_user')||'{}')||{}}catch{}
+  const username=String(user.username||user.user_name||user.userName||user.login||user.identifier||user.email||sessionStorage.getItem('auth_username')||'User');
+  const rawRole=user.role||user.user_role||user.userRole||(Array.isArray(user.roles)?user.roles[0]:'')||'User';
+  const role=String(rawRole).replaceAll('_',' ').replace(/\b\w/g,letter=>letter.toUpperCase());
+  const initials=username.split(/[\s._-]+/).filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase()||'U';
+  document.querySelectorAll('.profile-name b,.admin b').forEach(node=>node.textContent=username);
+  document.querySelectorAll('.profile-name small,.admin small').forEach(node=>node.textContent=role);
+  document.querySelectorAll('.profile-avatar,.avatar').forEach(node=>node.textContent=initials);
+}
+updateSignedInProfile();

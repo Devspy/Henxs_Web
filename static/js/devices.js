@@ -7,7 +7,7 @@ const seedDevices=[
   {name:'CAM-06',label:'Airport Road',id:'OD01CAM006',type:'IP Camera',location:'Airport Road',zone:'East Zone',ip:'192.168.1.106',status:'Maintenance',model:'Dahua IPC-HDW2431T',mac:'00:1A:2B:3C:4D:63',last:'12 Oct 2026, 08:12 PM',uptime:'6 Days 1 Hour'},
   {name:'CAM-07',label:'Power House',id:'OD01CAM007',type:'PTZ Camera',location:'Power House Road',zone:'North Zone',ip:'192.168.1.107',status:'Online',model:'Hikvision DS-2DE4A425',mac:'00:1A:2B:3C:4D:64',last:'13 Oct 2026, 11:51 AM',uptime:'10 Days 7 Hours'},
   {name:'CAM-08',label:'Jayadev Vihar',id:'OD01CAM008',type:'IP Camera',location:'Jayadev Vihar',zone:'East Zone',ip:'192.168.1.108',status:'Online',model:'Hikvision DS-2CD2047G2',mac:'00:1A:2B:3C:4D:65',last:'13 Oct 2026, 10:18 AM',uptime:'7 Days 4 Hours'},
-  {name:'SENSOR-01',label:'Manhole Sensor',id:'OD01SEN001',type:'IoT Sensor',location:'Unit-3 Area',zone:'West Zone',ip:'192.168.1.201',status:'Online',model:'Bosch IoT Gateway 2.0',mac:'00:1A:2B:3C:4D:66',last:'13 Oct 2026, 02:08 PM',uptime:'30 Days 6 Hours'},
+  {name:'SENSOR-01',label:'Open Manhole Sensor',id:'OD01SEN001',type:'IoT Sensor',location:'Unit-3 Area',zone:'West Zone',ip:'192.168.1.201',status:'Online',model:'Bosch IoT Gateway 2.0',mac:'00:1A:2B:3C:4D:66',last:'13 Oct 2026, 02:08 PM',uptime:'30 Days 6 Hours'},
   {name:'SENSOR-02',label:'Environmental',id:'OD01SEN002',type:'IoT Sensor',location:'Nandankanan',zone:'North Zone',ip:'192.168.1.202',status:'Offline',model:'Bosch IoT Gateway 2.0',mac:'00:1A:2B:3C:4D:67',last:'12 Oct 2026, 09:38 PM',uptime:'2 Days 8 Hours'}
 ];
 const devices=[...seedDevices];

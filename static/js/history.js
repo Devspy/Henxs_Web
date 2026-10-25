@@ -7,6 +7,7 @@ const value = (...values) => values.find(v => v !== undefined && v !== null && v
 const get = (obj, ...keys) => value(...keys.map(key => obj?.[key]));
 const eventId = e => String(get(e, 'id', 'event_id', 'eventId'));
 const eventType = e => String(get(e, 'event_type', 'type', 'module', 'eventType'));
+const eventTypeLabel = e => eventType(e).toLowerCase() === 'manhole' ? 'Open Manhole' : eventType(e);
 const isPothole = e => eventType(e).toLowerCase() === 'pothole';
 const listFrom = data => Array.isArray(data) ? data : (data?.events || data?.items || data?.results || (Array.isArray(data?.data) ? data.data : []));
 const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -43,7 +44,7 @@ function render() {
   const shown = events.filter(e => (!q || Object.values(e).join(' ').toLowerCase().includes(q)) &&
     (module === 'All Modules' || (module === 'Pothole' ? isPothole(e.raw) : eventType(e.raw).toLowerCase() === module.toLowerCase())) &&
     (zone === 'All Zones' || e.zone === zone) && (status === 'All Status' || e.status === status));
-  $('#eventRows').innerHTML = shown.map(e => `<tr class="event-row ${e.id===selected?.id?'chosen':''}" data-id="${escapeHtml(e.id)}"><td><input type="checkbox" class="row-check"></td><td class="task-id">${escapeHtml(e.id)}</td><td><div class="event-image">${e.image ? `<img src="${escapeHtml(e.image)}" alt="Event ${escapeHtml(e.id)}">` : '<span>—</span>'}</div></td><td class="event-module">${escapeHtml(eventType(e.raw))}</td><td>${escapeHtml(e.vehicle)}</td><td>${escapeHtml(e.location)}</td><td>${escapeHtml(e.zone)}</td><td>${escapeHtml(e.time)}</td><td><span class="status ${badgeClass(e.status)}">${escapeHtml(e.status)}</span></td><td class="actions"><button class="view-btn" data-view="${escapeHtml(e.id)}" title="View">View</button></td></tr>`).join('');
+  $('#eventRows').innerHTML = shown.map(e => `<tr class="event-row ${e.id===selected?.id?'chosen':''}" data-id="${escapeHtml(e.id)}"><td><input type="checkbox" class="row-check"></td><td class="task-id">${escapeHtml(e.id)}</td><td><div class="event-image">${e.image ? `<img src="${escapeHtml(e.image)}" alt="Event ${escapeHtml(e.id)}">` : '<span>—</span>'}</div></td><td class="event-module">${escapeHtml(eventTypeLabel(e.raw))}</td><td>${escapeHtml(e.vehicle)}</td><td>${escapeHtml(e.location)}</td><td>${escapeHtml(e.zone)}</td><td>${escapeHtml(e.time)}</td><td><span class="status ${badgeClass(e.status)}">${escapeHtml(e.status)}</span></td><td class="actions"><button class="view-btn" data-view="${escapeHtml(e.id)}" title="View">View</button></td></tr>`).join('');
   $('#eventCount').textContent = shown.length;
   $('#showingText').textContent = `Showing ${shown.length ? 1 : 0} to ${shown.length} of ${shown.length} events`;
   document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => show(b.dataset.view));
@@ -54,7 +55,7 @@ async function show(id) {
   selected = entry;
   try { await loadDetails(entry); } catch (err) { detail = entry.raw; toast(err.message); }
   const d = normalize(detail || entry.raw);
-  $('#dId').textContent=d.id; $('#dModule').textContent=`${d.module} Detection`; $('#dVehicle').textContent=d.vehicle;
+  $('#dId').textContent=d.id; $('#dModule').textContent=`${eventTypeLabel(detail || entry.raw)} Detection`; $('#dVehicle').textContent=d.vehicle;
   $('#dLocation').textContent=d.location; $('#dZone').textContent=d.zone; $('#dZone').className='zone';
   $('#dTime').textContent=d.time; $('#dStatus').textContent=d.status; $('#dStatus').className=`status ${badgeClass(d.status)}`;
   $('#dAssigned').textContent=d.assigned; $('#dResolved').textContent=d.resolved; $('#dCamera').textContent=d.camera; $('#dConfidence').textContent=d.confidence;

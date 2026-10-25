@@ -1,94 +1,94 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard | SMART CITY SURVEILLANCE</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://www.google.com">
-  <link rel="preconnect" href="https://maps.googleapis.com">
-  <link rel="preconnect" href="https://maps.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard | SMART CITY SURVEILLANCE</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://www.google.com">
+<link rel="preconnect" href="https://maps.googleapis.com">
+<link rel="preconnect" href="https://maps.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 </head>
 <body>
 <div class="dashboard-shell">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand"><div class="brand-mark">♙</div><div><strong>SMART CITY</strong><b>SURVEILLANCE</b></div><button class="hamburger" id="menuToggle" aria-label="Toggle menu">☰</button></div>
-    <nav class="nav">
-      <a class="active" href="/dashboard"><span>⌂</span>Dashboard</a>
-      <a href="#city-overview"><span class="teal">●</span>Live Map</a>
-      <a href="/garbage-detection"><span class="green">▤</span>Garbage Detection</a>
-      <a href="/pothole-detection"><span class="red">▲</span>Pothole Detection</a><a href="/manhole-detection"><span class="red">◉</span>Manhole Detection</a>
-      <a href="/analytics"><span class="purple">▥</span>Analytics &amp; Report</a>
-      <a href="/tasks"><span>▤</span>Task Management</a>
-      <a href="/historic-events"><span class="pink">◷</span>Historic Events</a>
-      <a href="/user-management"><span class="violet">♟</span>User Management</a>
-      <a href="/device-management"><span class="lavender">▣</span>Device Management</a>
-      <a href="/setting-configuration"><span>&#9881;</span>Setting &amp; Configuration</a>
-      <a href="/helpdesk"><span>&#9742;</span>HelpDesk</a>
-      <a href="/logout"><span class="red">⇥</span>Logout</a>
-    </nav>
-    <div class="sidebar-bottom">☏ &nbsp; Help &amp; Support</div>
-  </aside>
+<aside class="sidebar" id="sidebar">
+<div class="brand"><div class="brand-mark">♙</div><div><strong>SMART CITY</strong><b>SURVEILLANCE</b></div><button class="hamburger" id="menuToggle" aria-label="Toggle menu">☰</button></div>
+<nav class="nav">
+<a class="active" href="/dashboard"><span>⌂</span>Dashboard</a>
+<a href="#city-overview"><span class="teal">●</span>Live Map</a>
+<a href="/garbage-detection"><span class="green">▤</span>Garbage Detection</a>
+<a href="/pothole-detection"><span class="red">▲</span>Pothole Detection</a><a href="/manhole-detection"><span class="red">◉</span>Open Manhole Detection</a>
+<a href="/analytics"><span class="purple">▥</span>Analytics &amp; Report</a>
+<a href="/tasks"><span>▤</span>Task Management</a>
+<a href="/historic-events"><span class="pink">◷</span>Historic Events</a>
+<a href="/user-management"><span class="violet">♟</span>User Management</a>
+<a href="/device-management"><span class="lavender">▣</span>Device Management</a>
+<a href="/setting-configuration"><span>&#9881;</span>Setting &amp; Configuration</a>
+<a href="/helpdesk"><span>&#9742;</span>HelpDesk</a>
+<a href="/logout"><span class="red">⇥</span>Logout</a>
+</nav>
 
-  <main class="dashboard-main">
-    <header class="topbar">
-      <div class="breadcrumb">Home <span>›</span> Dashboard</div>
-      <div class="top-tools">
-        <label class="top-search"><span>⌕</span><input id="globalSearch" placeholder="Search..."></label>
-        <button class="notification" aria-label="Notifications">♧<i>5</i></button>
-        <div class="profile-avatar">AD</div><div class="profile-name"><b>Admin</b><small>Administrator</small></div><span class="chevron">⌄</span>
-      </div>
-    </header>
+</aside>
 
-    <section class="dashboard-content">
-      <div class="heading-row">
-        <div class="title-group"><div class="title-icon">▥</div><div><h1>Dashboard</h1><p>Real-time overview of infrastructure issue detection across SMART CITY SURVEILLANCE.</p></div></div>
-        <div class="filter-bar">
-          <label class="date-control">▦ <span>01 Oct 2026&nbsp; - &nbsp;13 Oct 2026</span>⌃</label>
-          <select id="zoneFilter"><option>All Zones</option><option>North Zone</option><option>East Zone</option><option>South Zone</option><option>West Zone</option></select>
-          <select id="moduleFilter"><option>All Modules</option><option>Pothole</option><option>Garbage</option><option>Manhole</option></select>
-          <button class="button primary" id="applyFilters">Apply</button><button class="button" id="resetFilters">Reset</button>
-        </div>
-      </div>
+<main class="dashboard-main">
+<header class="topbar">
+<div class="breadcrumb">Home <span>›</span> Dashboard</div>
+<div class="top-tools">
+<label class="top-search"><span>⌕</span><input id="globalSearch" placeholder="Search..."></label>
+<button class="notification" aria-label="Notifications">♧<i>5</i></button>
+<div class="profile-avatar">AD</div><div class="profile-name"><b>Admin</b><small>Administrator</small></div>
+</div>
+</header>
 
-      <div class="metric-grid">
-        <article class="metric-card"><div class="metric-icon danger">⚠</div><div class="metric-copy"><strong>—</strong><span>Potholes Detected</span><small class="good"><em>Live event count</em></small></div><svg class="spark red-line" viewBox="0 0 90 34" aria-hidden="true"><polyline points="1,29 14,25 24,28 36,19 48,22 59,12 72,17 89,2"/></svg></article>
-        <article class="metric-card"><div class="metric-icon orange-bg">▦</div><div class="metric-copy"><strong>—</strong><span>Manholes Detected</span><small class="bad"><em>Live event count</em></small></div><svg class="spark orange-line" viewBox="0 0 90 34" aria-hidden="true"><polyline points="1,29 14,25 24,28 36,19 48,22 59,12 72,17 89,2"/></svg></article>
-        <article class="metric-card"><div class="metric-icon green-bg">▤</div><div class="metric-copy"><strong>—</strong><span>Garbage Detected</span><small class="bad"><em>Live event count</em></small></div><svg class="spark teal-line" viewBox="0 0 90 34" aria-hidden="true"><polyline points="1,29 14,25 24,28 36,19 48,22 59,12 72,17 89,2"/></svg></article>
-        <article class="metric-card"><div class="metric-icon blue-bg">✓</div><div class="metric-copy"><strong>—</strong><span>Resolved Issues</span><small class="good"><em>Live event count</em></small></div><svg class="spark blue-line" viewBox="0 0 90 34" aria-hidden="true"><polyline points="1,29 14,25 24,28 36,19 48,22 59,12 72,17 89,2"/></svg></article>
-        <article class="metric-card"><div class="metric-icon purple-bg">◷</div><div class="metric-copy"><strong>—</strong><span>Avg. Resolution Time</span><small class="good"><em>Not available</em></small></div><svg class="spark violet-line" viewBox="0 0 90 34" aria-hidden="true"><polyline points="1,29 14,25 24,28 36,19 48,22 59,12 72,17 89,2"/></svg></article>
-      </div>
+<section class="dashboard-content">
+<div class="heading-row">
+<div class="title-group"><div class="title-icon">▥</div><div><h1>Dashboard</h1><p>Real-time overview of infrastructure issue detection across SMART CITY SURVEILLANCE.</p></div></div>
+<div class="filter-bar">
+<label class="date-control">▦ <span>01 Oct 2026&nbsp; - &nbsp;13 Oct 2026</span>⌃</label>
+<select id="zoneFilter"><option>All Zones</option><option>North Zone</option><option>East Zone</option><option>South Zone</option><option>West Zone</option></select>
+<select id="moduleFilter"><option>All Modules</option><option>Pothole</option><option>Garbage</option><option value="Manhole">Open Manhole</option></select>
+<button class="button primary" id="applyFilters">Apply</button><button class="button" id="resetFilters">Reset</button>
+</div>
+</div>
 
-      <div class="overview-grid">
-        <section class="panel map-panel" id="city-overview">
-        <div class="panel-heading"><h2>City Overview - Detected Issues</h2><div class="legend"><span><i class="legend-dot red-dot"></i>Potholes</span><span><i class="legend-dot orange-dot"></i>Manholes</span><span><i class="legend-dot blue-dot"></i>Garbage</span></div><div class="map-filters"><select id="mapZoneFilter"><option>All Zones</option><option>North Zone</option><option>East Zone</option><option>South Zone</option><option>West Zone</option></select><select id="mapStatusFilter"><option>All Status</option><option>Pending</option><option>In Progress</option><option>Completed</option></select></div></div>
-          <div class="city-map city-map-google">
-            <iframe title="Google Map of Bhubaneswar, Odisha" src="https://www.google.com/maps?q=Bhubaneswar%2C%20Odisha%2C%20India&amp;z=12&amp;output=embed" loading="eager" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-            <aside class="zone-summary"><b>Zone-wise Summary</b><span><i class="summary-pin red-fill">●</i>North Zone <strong>—</strong></span><span><i class="summary-pin orange-fill">●</i>East Zone <strong>—</strong></span><span><i class="summary-pin blue-fill">●</i>South Zone <strong>—</strong></span><span><i class="summary-pin purple-fill">●</i>West Zone <strong>—</strong></span></aside>
-          </div>
-        </section>
+<div class="metric-grid">
+<article class="metric-card"><div class="metric-icon danger">⚠</div><div class="metric-copy"><strong>—</strong><span>Potholes Detected</span><small class="good"><em>Live event count</em></small></div><svg class="spark red-line" viewBox="0 0 90 34" aria-hidden="true"><polyline points="1,29 14,25 24,28 36,19 48,22 59,12 72,17 89,2"/></svg></article>
+<article class="metric-card"><div class="metric-icon orange-bg">▦</div><div class="metric-copy"><strong>—</strong><span>Open Manholes Detected</span><small class="bad"><em>Live event count</em></small></div><svg class="spark orange-line" viewBox="0 0 90 34" aria-hidden="true"><polyline points="1,29 14,25 24,28 36,19 48,22 59,12 72,17 89,2"/></svg></article>
+<article class="metric-card"><div class="metric-icon green-bg">▤</div><div class="metric-copy"><strong>—</strong><span>Garbage Detected</span><small class="bad"><em>Live event count</em></small></div><svg class="spark teal-line" viewBox="0 0 90 34" aria-hidden="true"><polyline points="1,29 14,25 24,28 36,19 48,22 59,12 72,17 89,2"/></svg></article>
+<article class="metric-card"><div class="metric-icon blue-bg">✓</div><div class="metric-copy"><strong>—</strong><span>Resolved Issues</span><small class="good"><em>Live event count</em></small></div><svg class="spark blue-line" viewBox="0 0 90 34" aria-hidden="true"><polyline points="1,29 14,25 24,28 36,19 48,22 59,12 72,17 89,2"/></svg></article>
+<article class="metric-card"><div class="metric-icon purple-bg">◷</div><div class="metric-copy"><strong>—</strong><span>Avg. Resolution Time</span><small class="good"><em>Not available</em></small></div><svg class="spark violet-line" viewBox="0 0 90 34" aria-hidden="true"><polyline points="1,29 14,25 24,28 36,19 48,22 59,12 72,17 89,2"/></svg></article>
+</div>
 
-        <section class="panel camera-panel">
-          <div class="panel-heading"><h2>Recent Event Images</h2><a href="/historic-events">View All →</a></div>
-          <div class="camera-grid" id="dashboardEventImages"><p>Loading event images...</p></div></section>
-      </div>
+<div class="overview-grid">
+<section class="panel map-panel" id="city-overview">
+<div class="panel-heading"><h2>City Overview - Detected Issues</h2><div class="legend"><span><i class="legend-dot red-dot"></i>Potholes</span><span><i class="legend-dot orange-dot"></i>Open Manholes</span><span><i class="legend-dot blue-dot"></i>Garbage</span></div><div class="map-filters"><select id="mapZoneFilter"><option>All Zones</option><option>North Zone</option><option>East Zone</option><option>South Zone</option><option>West Zone</option></select><select id="mapStatusFilter"><option>All Status</option><option>Pending</option><option>In Progress</option><option>Completed</option></select></div></div>
+<div class="city-map city-map-google">
+<iframe title="Google Map of Bhubaneswar, Odisha" src="https://www.google.com/maps?q=Bhubaneswar%2C%20Odisha%2C%20India&amp;z=12&amp;output=embed" loading="eager" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+<aside class="zone-summary"><b>Zone-wise Summary</b><span><i class="summary-pin red-fill">●</i>North Zone <strong>—</strong></span><span><i class="summary-pin orange-fill">●</i>East Zone <strong>—</strong></span><span><i class="summary-pin blue-fill">●</i>South Zone <strong>—</strong></span><span><i class="summary-pin purple-fill">●</i>West Zone <strong>—</strong></span></aside>
+</div>
+</section>
 
-      <div class="chart-grid">
-        <section class="panel trend-panel"><div class="panel-heading"><h2>Detection Trends</h2><div class="legend"><span><i class="legend-dot red-dot"></i>Potholes</span><span><i class="legend-dot orange-dot"></i>Manholes</span><span><i class="legend-dot blue-dot"></i>Garbage</span></div><div class="range-tabs"><button class="selected">Daily</button><button>Weekly</button><button>Monthly</button></div></div>
-          <div class="trend-chart"><div class="y-labels"><span>100</span><span>80</span><span>60</span><span>40</span><span>20</span><span>0</span></div><svg viewBox="0 0 700 180" preserveAspectRatio="none" aria-label="Daily detection trend chart"><defs><linearGradient id="trendFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#3685ff" stop-opacity=".22"/><stop offset="1" stop-color="#3685ff" stop-opacity="0"/></linearGradient></defs><path class="area-fill" d="M0 85 L45 122 L95 74 L145 105 L190 68 L235 85 L280 123 L325 92 L370 109 L415 66 L460 89 L505 54 L550 82 L595 45 L640 75 L700 94 L700 180 L0 180Z"/><polyline class="trend-line red-trend" points="0,102 45,83 95,110 145,72 190,96 235,105 280,74 325,114 370,79 415,105 460,67 505,92 550,57 595,88 640,72 700,109"/><polyline class="trend-line orange-trend" points="0,114 45,126 95,113 145,134 190,117 235,129 280,112 325,133 370,111 415,95 460,115 505,103 550,127 595,107 640,121 700,132"/><polyline class="trend-line blue-trend" points="0,76 45,100 95,91 145,113 190,71 235,87 280,108 325,98 370,115 415,70 460,92 505,61 550,88 595,42 640,77 700,96"/></svg></div><div class="x-labels"><span>01 Oct</span><span>02 Oct</span><span>03 Oct</span><span>04 Oct</span><span>05 Oct</span><span>06 Oct</span><span>07 Oct</span><span>08 Oct</span><span>09 Oct</span><span>10 Oct</span><span>11 Oct</span><span>12 Oct</span><span>13 Oct</span></div>
-        </section>
-        <section class="panel distribution-panel"><div class="panel-heading"><h2>Issue Type Distribution</h2></div><div class="distribution-content"><div class="donut"><div><b>—</b><span>Total Issues</span></div></div><div class="distribution-legend"><div><i class="red-fill"></i>Potholes <b>—</b><span>—</span></div><div><i class="orange-fill"></i>Manholes <b>—</b><span>—</span></div><div><i class="blue-fill"></i>Garbage <b>—</b><span>—</span></div><div><i class="teal-fill"></i>Resolved <b>—</b><span>—</span></div></div></div></section>
-        <section class="panel zone-chart-panel"><div class="panel-heading"><h2>Zone-wise Issues</h2><div class="legend"><span><i class="legend-dot red-dot"></i>Potholes</span><span><i class="legend-dot orange-dot"></i>Manholes</span><span><i class="legend-dot blue-dot"></i>Garbage</span></div></div><div class="zone-chart"><div class="bar-y"><span>100</span><span>80</span><span>60</span><span>40</span><span>20</span><span>0</span></div><div class="bar-groups"><div class="bar-group"><i class="bar red-bar" style="--height:0%"><b>—</b></i><i class="bar orange-bar" style="--height:0%"><b>—</b></i><i class="bar blue-bar" style="--height:0%"><b>—</b></i><span>North<br>Zone</span></div><div class="bar-group"><i class="bar red-bar" style="--height:0%"><b>—</b></i><i class="bar orange-bar" style="--height:0%"><b>—</b></i><i class="bar blue-bar" style="--height:0%"><b>—</b></i><span>East<br>Zone</span></div><div class="bar-group"><i class="bar red-bar" style="--height:0%"><b>—</b></i><i class="bar orange-bar" style="--height:0%"><b>—</b></i><i class="bar blue-bar" style="--height:0%"><b>—</b></i><span>South<br>Zone</span></div><div class="bar-group"><i class="bar red-bar" style="--height:0%"><b>—</b></i><i class="bar orange-bar" style="--height:0%"><b>—</b></i><i class="bar blue-bar" style="--height:0%"><b>—</b></i><span>West<br>Zone</span></div></div></div></section>
-      </div>
+<section class="panel camera-panel">
+<div class="panel-heading"><h2>Recent Event Images</h2><a href="/historic-events">View All →</a></div>
+<div class="camera-grid" id="dashboardEventImages"><p>Loading event images...</p></div></section>
+</div>
 
-      <section class="panel activity-panel"><div class="panel-heading"><h2>Recent Activity &amp; Events</h2><a href="/historic-events" class="outline-link">View All Events →</a></div><div class="activity-table-wrap"><table class="activity-table"><thead><tr><th>TIME</th><th>MODULE</th><th>EVENT ID</th><th>LOCATION</th><th>ZONE</th><th>SEVERITY</th><th>STATUS</th><th>ASSIGNED TO</th><th>ACTION</th></tr></thead><tbody id="dashboardEventRows"><tr><td colspan="9">Loading events...</td></tr></tbody></table></div></section>
-    </section>
-  </main>
+<div class="chart-grid">
+<section class="panel trend-panel"><div class="panel-heading"><h2>Detection Trends</h2><div class="legend"><span><i class="legend-dot red-dot"></i>Potholes</span><span><i class="legend-dot orange-dot"></i>Open Manholes</span><span><i class="legend-dot blue-dot"></i>Garbage</span></div><div class="range-tabs"><button class="selected">Daily</button><button>Weekly</button><button>Monthly</button></div></div>
+<div class="trend-chart"><div class="y-labels"><span>100</span><span>80</span><span>60</span><span>40</span><span>20</span><span>0</span></div><svg viewBox="0 0 700 180" preserveAspectRatio="none" aria-label="Daily detection trend chart"><defs><linearGradient id="trendFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#3685ff" stop-opacity=".22"/><stop offset="1" stop-color="#3685ff" stop-opacity="0"/></linearGradient></defs><path class="area-fill" d="M0 85 L45 122 L95 74 L145 105 L190 68 L235 85 L280 123 L325 92 L370 109 L415 66 L460 89 L505 54 L550 82 L595 45 L640 75 L700 94 L700 180 L0 180Z"/><polyline class="trend-line red-trend" points="0,102 45,83 95,110 145,72 190,96 235,105 280,74 325,114 370,79 415,105 460,67 505,92 550,57 595,88 640,72 700,109"/><polyline class="trend-line orange-trend" points="0,114 45,126 95,113 145,134 190,117 235,129 280,112 325,133 370,111 415,95 460,115 505,103 550,127 595,107 640,121 700,132"/><polyline class="trend-line blue-trend" points="0,76 45,100 95,91 145,113 190,71 235,87 280,108 325,98 370,115 415,70 460,92 505,61 550,88 595,42 640,77 700,96"/></svg></div><div class="x-labels"><span>01 Oct</span><span>02 Oct</span><span>03 Oct</span><span>04 Oct</span><span>05 Oct</span><span>06 Oct</span><span>07 Oct</span><span>08 Oct</span><span>09 Oct</span><span>10 Oct</span><span>11 Oct</span><span>12 Oct</span><span>13 Oct</span></div>
+</section>
+<section class="panel distribution-panel"><div class="panel-heading"><h2>Issue Type Distribution</h2></div><div class="distribution-content"><div class="donut"><div><b>—</b><span>Total Issues</span></div></div><div class="distribution-legend"><div><i class="red-fill"></i>Potholes <b>—</b><span>—</span></div><div><i class="orange-fill"></i>Open Manholes <b>—</b><span>—</span></div><div><i class="blue-fill"></i>Garbage <b>—</b><span>—</span></div><div><i class="teal-fill"></i>Resolved <b>—</b><span>—</span></div></div></div></section>
+<section class="panel zone-chart-panel"><div class="panel-heading"><h2>Zone-wise Issues</h2><div class="legend"><span><i class="legend-dot red-dot"></i>Potholes</span><span><i class="legend-dot orange-dot"></i>Open Manholes</span><span><i class="legend-dot blue-dot"></i>Garbage</span></div></div><div class="zone-chart"><div class="bar-y"><span>100</span><span>80</span><span>60</span><span>40</span><span>20</span><span>0</span></div><div class="bar-groups"><div class="bar-group"><i class="bar red-bar" style="--height:0%"><b>—</b></i><i class="bar orange-bar" style="--height:0%"><b>—</b></i><i class="bar blue-bar" style="--height:0%"><b>—</b></i><span>North<br>Zone</span></div><div class="bar-group"><i class="bar red-bar" style="--height:0%"><b>—</b></i><i class="bar orange-bar" style="--height:0%"><b>—</b></i><i class="bar blue-bar" style="--height:0%"><b>—</b></i><span>East<br>Zone</span></div><div class="bar-group"><i class="bar red-bar" style="--height:0%"><b>—</b></i><i class="bar orange-bar" style="--height:0%"><b>—</b></i><i class="bar blue-bar" style="--height:0%"><b>—</b></i><span>South<br>Zone</span></div><div class="bar-group"><i class="bar red-bar" style="--height:0%"><b>—</b></i><i class="bar orange-bar" style="--height:0%"><b>—</b></i><i class="bar blue-bar" style="--height:0%"><b>—</b></i><span>West<br>Zone</span></div></div></div></section>
+</div>
+
+<section class="panel activity-panel"><div class="panel-heading"><h2>Recent Activity &amp; Events</h2><a href="/historic-events" class="outline-link">View All Events →</a></div><div class="activity-table-wrap"><table class="activity-table"><thead><tr><th>TIME</th><th>MODULE</th><th>EVENT ID</th><th>LOCATION</th><th>ZONE</th><th>SEVERITY</th><th>STATUS</th><th>ASSIGNED TO</th><th>ACTION</th></tr></thead><tbody id="dashboardEventRows"><tr><td colspan="9">Loading events...</td></tr></tbody></table></div></section>
+</section>
+</main>
 </div>
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+<script src="{{ url_for('static', filename='js/auth.js', v='2') }}"></script>
 </body>
 </html>

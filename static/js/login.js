@@ -53,6 +53,7 @@ form.addEventListener('submit',async event=>{
     }
 
     sessionStorage.setItem('access_token',result.access_token);
+    sessionStorage.setItem('auth_username',document.querySelector('#username').value.trim());
     sessionStorage.setItem('auth_user',JSON.stringify(result.user||{}));
     window.location.assign('/dashboard');
   }catch{
