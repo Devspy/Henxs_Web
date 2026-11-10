@@ -3,19 +3,24 @@ const apiFetch = url => { const token=sessionStorage.getItem('access_token'); re
 let events = [];
 let selected = null;
 let detail = null;
+let currentPage = 1;
+const EVENTS_PER_PAGE = 15;
 const value = (...values) => values.find(v => v !== undefined && v !== null && v !== '') ?? '—';
 const get = (obj, ...keys) => value(...keys.map(key => obj?.[key]));
 const eventId = e => String(get(e, 'id', 'event_id', 'eventId'));
 const eventType = e => String(get(e, 'event_type', 'type', 'module', 'eventType'));
-const eventTypeLabel = e => eventType(e).toLowerCase() === 'manhole' ? 'Open Manhole' : eventType(e);
-const isPothole = e => eventType(e).toLowerCase() === 'pothole';
+const moduleKey = e => eventType(e).toLowerCase().replaceAll('_', ' ').replaceAll('-', ' ');
+const eventTypeLabel = e => moduleKey(e).includes('manhole') ? 'Open Manhole' : moduleKey(e).includes('pothole') ? 'Pothole' : moduleKey(e).includes('garbage') ? 'Garbage' : eventType(e);
+const moduleClass = e => moduleKey(e).includes('pothole') ? 'pothole' : moduleKey(e).includes('garbage') ? 'garbage' : moduleKey(e).includes('manhole') ? 'manhole' : 'other';
+const moduleSymbol = e => moduleClass(e) === 'pothole' ? '▲' : moduleClass(e) === 'garbage' ? '▤' : moduleClass(e) === 'manhole' ? '◉' : '•';
+const isPothole = e => moduleKey(e).includes('pothole');
 const listFrom = data => Array.isArray(data) ? data : (data?.events || data?.items || data?.results || (Array.isArray(data?.data) ? data.data : []));
 const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2600); }
 function badgeClass(status) { return String(status).toLowerCase().replaceAll(' ', '-'); }
 function imageData(obj) {
   const raw = get(obj, 'image_base64', 'base64_image', 'image', 'image_data', 'photo');
-  if (typeof raw !== 'string') return '';
+  if (typeof raw !== 'string' || raw === '—') return '';
   if (/^(data:image\/|https?:\/\/)/i.test(raw)) return raw;
   const mime = get(obj, 'image_mime_type', 'mime_type', 'image_type');
   return `data:${String(mime).startsWith('image/') ? mime : 'image/jpeg'};base64,${raw}`;
@@ -29,39 +34,53 @@ function normalize(e) {
 }
 async function loadDetails(e) {
   detail = e.raw;
-  if (!isPothole(e.raw)) return;
+
   const response = await apiFetch(`/api/events/${encodeURIComponent(e.id)}`);
   if (!response.ok) throw new Error(`Unable to load event details (${response.status}).`);
   detail = await response.json();
   if (detail?.data && !Array.isArray(detail.data)) detail = detail.data;
 }
-function setImage(container, src, fallback = 'No event image available') {
-  container.innerHTML = src ? `<img src="${escapeHtml(src)}" alt="Pothole event ${escapeHtml(selected?.id || '')}">` : `<div class="event-image-empty">${fallback}</div>`;
-}
 function render() {
   const q = ($('#eventSearch').value || '').toLowerCase().trim();
   const module = $('#moduleFilter').value, zone = $('#zoneFilter').value, status = $('#statusFilter').value;
-  const shown = events.filter(e => (!q || Object.values(e).join(' ').toLowerCase().includes(q)) &&
+  const filtered = events.filter(e => (!q || Object.values(e).join(' ').toLowerCase().includes(q)) &&
     (module === 'All Modules' || (module === 'Pothole' ? isPothole(e.raw) : eventType(e.raw).toLowerCase() === module.toLowerCase())) &&
     (zone === 'All Zones' || e.zone === zone) && (status === 'All Status' || e.status === status));
-  $('#eventRows').innerHTML = shown.map(e => `<tr class="event-row ${e.id===selected?.id?'chosen':''}" data-id="${escapeHtml(e.id)}"><td><input type="checkbox" class="row-check"></td><td class="task-id">${escapeHtml(e.id)}</td><td><div class="event-image">${e.image ? `<img src="${escapeHtml(e.image)}" alt="Event ${escapeHtml(e.id)}">` : '<span>—</span>'}</div></td><td class="event-module">${escapeHtml(eventTypeLabel(e.raw))}</td><td>${escapeHtml(e.vehicle)}</td><td>${escapeHtml(e.location)}</td><td>${escapeHtml(e.zone)}</td><td>${escapeHtml(e.time)}</td><td><span class="status ${badgeClass(e.status)}">${escapeHtml(e.status)}</span></td><td class="actions"><button class="view-btn" data-view="${escapeHtml(e.id)}" title="View">View</button></td></tr>`).join('');
-  $('#eventCount').textContent = shown.length;
-  $('#showingText').textContent = `Showing ${shown.length ? 1 : 0} to ${shown.length} of ${shown.length} events`;
+  const pageCount = Math.max(1, Math.ceil(filtered.length / EVENTS_PER_PAGE));
+  currentPage = Math.min(currentPage, pageCount);
+  const start = (currentPage - 1) * EVENTS_PER_PAGE;
+  const shown = filtered.slice(start, start + EVENTS_PER_PAGE);
+  $('#eventRows').innerHTML = shown.map(e => `<tr class="event-row ${e.id===selected?.id?'chosen':''}" data-id="${escapeHtml(e.id)}"><td class="task-id">${escapeHtml(e.id)}</td><td class="event-module"><span class="module-icon ${moduleClass(e.raw)}" aria-hidden="true">${moduleSymbol(e.raw)}</span>${escapeHtml(eventTypeLabel(e.raw))}</td><td>${escapeHtml(e.vehicle)}</td><td>${escapeHtml(e.location)}</td><td>${escapeHtml(e.zone)}</td><td>${escapeHtml(e.time)}</td><td><span class="status ${badgeClass(e.status)}">${escapeHtml(e.status)}</span></td><td class="actions"><button class="view-btn" data-view="${escapeHtml(e.id)}" title="View">View</button></td></tr>`).join('');
+  $('#eventCount').textContent = filtered.length;
+  $('#showingText').textContent = `Showing ${filtered.length ? start + 1 : 0} to ${Math.min(start + shown.length, filtered.length)} of ${filtered.length} events`;
+  renderPagination(pageCount);
   document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => show(b.dataset.view));
-  document.querySelectorAll('.event-row').forEach(el => el.onclick = ev => { if (!ev.target.closest('button,input')) show(el.dataset.id); });
+  document.querySelectorAll('.event-row').forEach(el => el.onclick = ev => { if (!ev.target.closest('button')) show(el.dataset.id); });
+}
+function renderPagination(pageCount) {
+  const nav = $('#eventPagination');
+  const pageButtons = [];
+  const first = Math.max(1, Math.min(currentPage - 2, pageCount - 4));
+  const last = Math.min(pageCount, first + 4);
+  for (let page = first; page <= last; page++) pageButtons.push(`<button type="button" class="${page === currentPage ? 'page-current' : ''}" data-page="${page}" aria-current="${page === currentPage ? 'page' : 'false'}">${page}</button>`);
+  nav.innerHTML = `<button type="button" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''} aria-label="Previous page">‹</button><span>Page ${currentPage} of ${pageCount}</span>${pageButtons.join('')}<button type="button" data-page="${currentPage + 1}" ${currentPage === pageCount ? 'disabled' : ''} aria-label="Next page">›</button>`;
+  nav.querySelectorAll('[data-page]').forEach(button => button.addEventListener('click', () => {
+    const page = Number(button.dataset.page);
+    if (page < 1 || page > pageCount || page === currentPage) return;
+    currentPage = page;
+    render();
+  }));
 }
 async function show(id) {
   const entry = events.find(e => e.id === String(id)); if (!entry) return;
   selected = entry;
   try { await loadDetails(entry); } catch (err) { detail = entry.raw; toast(err.message); }
   const d = normalize(detail || entry.raw);
-  $('#dId').textContent=d.id; $('#dModule').textContent=`${eventTypeLabel(detail || entry.raw)} Detection`; $('#dVehicle').textContent=d.vehicle;
+  $('#dId').textContent=d.id; $('#dModule').innerHTML=`<span class="module-icon ${moduleClass(detail || entry.raw)}" aria-hidden="true">${moduleSymbol(detail || entry.raw)}</span> ${escapeHtml(eventTypeLabel(detail || entry.raw))} Detection`; $('#dVehicle').textContent=d.vehicle;
   $('#dLocation').textContent=d.location; $('#dZone').textContent=d.zone; $('#dZone').className='zone';
   $('#dTime').textContent=d.time; $('#dStatus').textContent=d.status; $('#dStatus').className=`status ${badgeClass(d.status)}`;
   $('#dAssigned').textContent=d.assigned; $('#dResolved').textContent=d.resolved; $('#dCamera').textContent=d.camera; $('#dConfidence').textContent=d.confidence;
-  setImage(document.querySelector('.event-preview'), d.image);
-  document.querySelectorAll('.preview-thumbs .road-art, .preview-thumbs .video-thumb').forEach(el => el.remove());
-  if (d.image) document.querySelector('.preview-thumbs').insertAdjacentHTML('afterbegin', `<img class="event-thumb" src="${escapeHtml(d.image)}" alt="Event image">`);
+  $('#dImage').innerHTML = d.image ? `<img src="${escapeHtml(d.image)}" alt="${escapeHtml(eventTypeLabel(detail || entry.raw))} event ${escapeHtml(d.id)}">` : '<div class="history-event-image-empty">No event image available</div>';
   $('#eventDetail').classList.remove('hidden'); document.querySelector('.history-layout').classList.remove('detail-hidden'); render();
 }
 function downloadEvent(id) {
@@ -73,16 +92,21 @@ async function initialize() {
   try {
     const response = await apiFetch('/api/events'); if (!response.ok) throw new Error(`Unable to load events (${response.status}).`);
     events = listFrom(await response.json()).map(normalize);
+    const modules = [...new Set(events.map(e => eventType(e.raw)).filter(Boolean))].sort();
+    const zones = [...new Set(events.map(e => e.zone).filter(v => v && v !== '—'))].sort();
+    const statuses = [...new Set(events.map(e => e.status).filter(v => v && v !== '—'))].sort();
+    $('#moduleFilter').innerHTML = '<option>All Modules</option>' + modules.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(eventTypeLabel({event_type:v}))}</option>`).join('');
+    $('#zoneFilter').innerHTML = '<option>All Zones</option>' + zones.map(v => `<option>${escapeHtml(v)}</option>`).join('');
+    $('#statusFilter').innerHTML = '<option>All Status</option>' + statuses.map(v => `<option>${escapeHtml(v)}</option>`).join('');
     const stats=document.querySelectorAll('.history-stat strong');
-    if(stats.length>=5){stats[0].textContent=events.filter(e=>isPothole(e.raw)).length;stats[1].textContent=events.filter(e=>eventType(e.raw).toLowerCase()==='garbage').length;stats[2].textContent=new Set(events.map(e=>e.vehicle).filter(v=>v!=='—')).size;stats[3].textContent=new Set(events.map(e=>e.camera).filter(v=>v!=='—')).size;stats[4].textContent='—';}
-    render(); if (events.length) await show(events[0].id);
-    else $('#eventRows').innerHTML='<tr><td colspan="10">No events found.</td></tr>';
-  } catch (err) { $('#eventRows').innerHTML=`<tr><td colspan="10">${escapeHtml(err.message)}</td></tr>`; toast(err.message); }
+    if(stats.length>=4){stats[0].textContent=events.filter(e=>isPothole(e.raw)).length;stats[1].textContent=events.filter(e=>moduleKey(e.raw).includes('garbage')).length;stats[2].textContent=events.filter(e=>moduleKey(e.raw).includes('manhole')).length;stats[3].textContent=new Set(events.map(e=>e.camera).filter(v=>v!=='—')).size;}
+    render(); document.querySelector('.history-layout').classList.add('detail-hidden');
+    if (!events.length) $('#eventRows').innerHTML='<tr><td colspan="9">No events found.</td></tr>';
+  } catch (err) { $('#eventRows').innerHTML=`<tr><td colspan="9">${escapeHtml(err.message)}</td></tr>`; toast(err.message); }
 }
-$('#eventSearch').addEventListener('input',render); $('#globalSearch').addEventListener('input',e=>{$('#eventSearch').value=e.target.value;render()});
-$('#applyFilters').onclick=()=>{render();toast('Filters applied')};
-$('#resetFilters').onclick=()=>{$('#eventSearch').value='';$('#globalSearch').value='';$('#moduleFilter').value='All Modules';$('#zoneFilter').value='All Zones';$('#statusFilter').value='All Status';render();toast('Filters reset')};
-$('#selectAll').onchange=e=>document.querySelectorAll('.row-check').forEach(c=>c.checked=e.target.checked);
+$('#eventSearch').addEventListener('input',()=>{currentPage=1;render()}); $('#globalSearch').addEventListener('input',e=>{$('#eventSearch').value=e.target.value;currentPage=1;render()});
+$('#applyFilters').onclick=()=>{currentPage=1;render();toast('Filters applied')};
+$('#resetFilters').onclick=()=>{$('#eventSearch').value='';$('#globalSearch').value='';$('#moduleFilter').value='All Modules';$('#zoneFilter').value='All Zones';$('#statusFilter').value='All Status';currentPage=1;render();toast('Filters reset')};
 $('#showFilters').onclick=()=>$('#statusFilter').focus(); $('#menuToggle').onclick=()=>$('#sidebar').classList.toggle('open');
 $('#closeDetail').onclick=()=>{$('#eventDetail').classList.add('hidden');document.querySelector('.history-layout').classList.add('detail-hidden')};
 $('#assignBtn').onclick=()=>toast('Event assignment is not available from the event service.');

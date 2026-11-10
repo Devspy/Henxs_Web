@@ -267,6 +267,19 @@ def get_event(event_id):
         return proxy_events_api(f"{EVENTS_API_URL}/{event_id}", "PATCH", request.get_json(silent=True) or {})
     return proxy_events_api(f"{EVENTS_API_URL}/{event_id}")
 
+
+@app.route("/api/v1/events/<event_id>/assign", methods=["PATCH"])
+@login_required
+def assign_event(event_id):
+    if not event_id or "/" in event_id:
+        return jsonify({"detail": "Invalid event ID."}), 400
+    if not request.headers.get("Authorization", "").startswith("Bearer "):
+        return jsonify({"detail": "A bearer access token is required."}), 401
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict) or not isinstance(payload.get("assigned_to"), str) or not payload["assigned_to"].strip():
+        return jsonify({"detail": "assigned_to must be a non-empty string."}), 400
+    return proxy_events_api(f"{EVENTS_API_URL}/{event_id}/assign", "PATCH", {"assigned_to": payload["assigned_to"]})
+
 @app.route("/api/tasks/<task_id>", methods=["PATCH"])
 @login_required
 def update_task(task_id):
