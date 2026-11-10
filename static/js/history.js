@@ -30,7 +30,14 @@ function normalize(e) {
     location: get(e,'location','address','place'), zone: get(e,'zone','zone_name'),
     time: get(e,'event_time','detected_at','created_at','timestamp','time'), status: get(e,'status'),
     assigned: get(e,'assigned_to','assignee','assigned'), resolved: get(e,'resolved_at','resolved_on'),
-    camera: get(e,'camera_id','camera'), confidence: get(e,'confidence','score'), image: imageData(e) };
+    camera: get(e,'camera_id','camera'), confidence: get(e,'confidence','score'), image: imageData(e),
+    latitude: Number.parseFloat(get(e,'latitude','lat','langitude','location_latitude')),
+    longitude: Number.parseFloat(get(e,'longitude','lng','lon','longitute','location_longitude')) };
+}
+function hasCoordinates(e) { return Number.isFinite(e.latitude) && Number.isFinite(e.longitude) && Math.abs(e.latitude) <= 90 && Math.abs(e.longitude) <= 180; }
+function mapUrl(e) {
+  const query = hasCoordinates(e) ? `${e.latitude},${e.longitude}` : e.location !== '—' ? e.location : '';
+  return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}` : '';
 }
 async function loadDetails(e) {
   detail = e.raw;
@@ -50,12 +57,12 @@ function render() {
   currentPage = Math.min(currentPage, pageCount);
   const start = (currentPage - 1) * EVENTS_PER_PAGE;
   const shown = filtered.slice(start, start + EVENTS_PER_PAGE);
-  $('#eventRows').innerHTML = shown.map(e => `<tr class="event-row ${e.id===selected?.id?'chosen':''}" data-id="${escapeHtml(e.id)}"><td class="task-id">${escapeHtml(e.id)}</td><td class="event-module"><span class="module-icon ${moduleClass(e.raw)}" aria-hidden="true">${moduleSymbol(e.raw)}</span>${escapeHtml(eventTypeLabel(e.raw))}</td><td>${escapeHtml(e.vehicle)}</td><td>${escapeHtml(e.location)}</td><td>${escapeHtml(e.zone)}</td><td>${escapeHtml(e.time)}</td><td><span class="status ${badgeClass(e.status)}">${escapeHtml(e.status)}</span></td><td class="actions"><button class="view-btn" data-view="${escapeHtml(e.id)}" title="View">View</button></td></tr>`).join('');
+  $('#eventRows').innerHTML = shown.map(e => { const url=mapUrl(e), location=e.location==='—'?'GPS Coordinates':e.location; return `<tr class="event-row ${e.id===selected?.id?'chosen':''}" data-id="${escapeHtml(e.id)}"><td class="task-id">${escapeHtml(e.id)}</td><td class="event-module"><span class="module-icon ${moduleClass(e.raw)}" aria-hidden="true">${moduleSymbol(e.raw)}</span>${escapeHtml(eventTypeLabel(e.raw))}</td><td>${escapeHtml(e.vehicle)}</td><td class="event-location"><span>${escapeHtml(location)}</span>${url?`<a class="event-map-link" href="${url}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(location)} in Google Maps" title="Open location in Google Maps"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 15s5-4.4 5-8A5 5 0 1 0 3 7c0 3.6 5 8 5 8Zm0-6.2A1.8 1.8 0 1 1 8 5.2a1.8 1.8 0 0 1 0 3.6Z"/></svg><span>Map</span></a>`:''}</td><td>${escapeHtml(e.zone)}</td><td>${escapeHtml(e.time)}</td><td><span class="status ${badgeClass(e.status)}">${escapeHtml(e.status)}</span></td><td class="actions"><button class="view-btn" data-view="${escapeHtml(e.id)}" title="View">View</button></td></tr>`; }).join('');
   $('#eventCount').textContent = filtered.length;
   $('#showingText').textContent = `Showing ${filtered.length ? start + 1 : 0} to ${Math.min(start + shown.length, filtered.length)} of ${filtered.length} events`;
   renderPagination(pageCount);
   document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => show(b.dataset.view));
-  document.querySelectorAll('.event-row').forEach(el => el.onclick = ev => { if (!ev.target.closest('button')) show(el.dataset.id); });
+  document.querySelectorAll('.event-row').forEach(el => el.onclick = ev => { if (!ev.target.closest('button,a')) show(el.dataset.id); });
 }
 function renderPagination(pageCount) {
   const nav = $('#eventPagination');
