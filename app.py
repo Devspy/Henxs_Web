@@ -11,6 +11,7 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY") or "086572984a483fa35d308c32
 AUTH_LOGIN_URL = "https://fastapi-redis-api.onrender.com/api/v1/auth/login"
 USERS_API_URL = "https://fastapi-redis-api.onrender.com/api/v1/users"
 EVENTS_API_URL = "https://fastapi-redis-api.onrender.com/api/v1/events"
+LIST_EVENTS_API_URL = "https://fastapi-redis-api.onrender.com/api/v1/events?page=1&page_size=10"
 
 
 def login_required(view):
@@ -253,7 +254,7 @@ def proxy_events_api(url, method="GET", payload=None):
 @app.route("/api/events", methods=["GET"])
 @login_required
 def list_events():
-    return proxy_events_api(EVENTS_API_URL)
+    return proxy_events_api(LIST_EVENTS_API_URL)
 
 
 @app.route("/api/events/<event_id>", methods=["GET", "PATCH"])
