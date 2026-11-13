@@ -52,6 +52,7 @@ function normalize(e) {
     latitude: Number.parseFloat(get(e,'latitude','lat','langitude','location_latitude')),
     longitude: Number.parseFloat(get(e,'longitude','lng','lon','longitute','location_longitude')) };
 }
+function withinDateRange(event,from,to) { if(!from&&!to)return true; const value=String(event.time),date=new Date(value); if(Number.isNaN(date.getTime()))return false; const day=value.match(/^\d{4}-\d{2}-\d{2}/)?.[0]||date.toISOString().slice(0,10); return (!from||day>=from)&&(!to||day<=to); }
 function hasCoordinates(e) { return Number.isFinite(e.latitude) && Number.isFinite(e.longitude) && Math.abs(e.latitude) <= 90 && Math.abs(e.longitude) <= 180; }
 function mapUrl(e) {
   const query = hasCoordinates(e) ? `${e.latitude},${e.longitude}` : e.location !== '—' ? e.location : '';
@@ -67,8 +68,9 @@ async function loadDetails(e) {
 }
 function render() {
   const q = ($('#eventSearch').value || '').toLowerCase().trim();
-  const module = $('#moduleFilter').value, zone = $('#zoneFilter').value, status = $('#statusFilter').value;
+  const module = $('#moduleFilter').value, zone = $('#zoneFilter').value, status = $('#statusFilter').value, from = $('#dateFrom').value, to = $('#dateTo').value;
   const filtered = events.filter(e => (!q || Object.values(e).join(' ').toLowerCase().includes(q)) &&
+    withinDateRange(e, from, to) &&
     (module === 'All Modules' || (module === 'Pothole' ? isPothole(e.raw) : eventType(e.raw).toLowerCase() === module.toLowerCase())) &&
     (zone === 'All Zones' || e.zone === zone) && (status === 'All Status' || e.status === status));
   const pageCount = Math.max(1, Math.ceil(filtered.length / EVENTS_PER_PAGE));
@@ -272,8 +274,10 @@ async function initialize() {
   } catch (err) { $('#eventRows').innerHTML=`<tr><td colspan="9">${escapeHtml(err.message)}</td></tr>`; toast(err.message); }
 }
 $('#eventSearch').addEventListener('input',()=>{currentPage=1;render()}); $('#globalSearch').addEventListener('input',e=>{$('#eventSearch').value=e.target.value;currentPage=1;render()});
+document.querySelectorAll('.history-stat').forEach((card,index)=>{const destination=['/pothole-detection','/garbage-detection','/manhole-detection'][index];if(!destination)return;const label=card.querySelector('span')?.textContent||'View detections';card.setAttribute('role','link');card.setAttribute('tabindex','0');card.setAttribute('aria-label',`Open ${label}`);card.addEventListener('click',()=>{window.location.href=destination});card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href=destination}})});
 $('#applyFilters').onclick=()=>{currentPage=1;render();toast('Filters applied')};
-$('#resetFilters').onclick=()=>{$('#eventSearch').value='';$('#globalSearch').value='';$('#moduleFilter').value='All Modules';$('#zoneFilter').value='All Zones';$('#statusFilter').value='All Status';currentPage=1;render();toast('Filters reset')};
+$('#dateFrom').onchange=()=>{currentPage=1;render()}; $('#dateTo').onchange=()=>{currentPage=1;render()};
+$('#resetFilters').onclick=()=>{$('#eventSearch').value='';$('#globalSearch').value='';$('#dateFrom').value='';$('#dateTo').value='';$('#moduleFilter').value='All Modules';$('#zoneFilter').value='All Zones';$('#statusFilter').value='All Status';currentPage=1;render();toast('Filters reset')};
 $('#showFilters').onclick=()=>$('#statusFilter').focus(); $('#menuToggle').onclick=()=>$('#sidebar').classList.toggle('open');
 $('#closeDetail').onclick=()=>{$('#eventDetail').classList.add('hidden');document.querySelector('.history-layout').classList.add('detail-hidden')};
 $('#assignBtn').onclick=openAssignDialog;
