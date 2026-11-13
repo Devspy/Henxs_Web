@@ -104,13 +104,11 @@ async function initialize() {
     const payload=await response.json(); events=listFrom(payload);
     const zones=[...new Set(events.map(zoneName).filter(v=>v!==missing))].sort();
     $('#zoneFilter').innerHTML='<option>All Zones</option>'+zones.map(z=>`<option>${esc(z)}</option>`).join('');
-    const dates=events.map(eventDate).filter(Boolean).sort((a,b)=>a-b);
-    if(dates.length){$('#dateFrom').value=dates[0].toISOString().slice(0,10);$('#dateTo').value=dates.at(-1).toISOString().slice(0,10);}
     render();
   } catch(error) { document.querySelectorAll('.metric strong').forEach(e=>e.textContent='—'); $('#zoneChart').innerHTML=`<p class="empty-state">${esc(error.message)}</p>`; $('#zoneRankings').innerHTML=''; $('#areaRows').innerHTML=`<tr><td colspan="5">${esc(error.message)}</td></tr>`; }
 }
 $('#applyFilters').onclick=render;
-$('#resetFilters').onclick=()=>{ $('#zoneFilter').value='All Zones';$('#moduleFilter').value='All Modules';$('#globalSearch').value='';const dates=events.map(eventDate).filter(Boolean).sort((a,b)=>a-b);$('#dateFrom').value=dates[0]?.toISOString().slice(0,10)||'';$('#dateTo').value=dates.at(-1)?.toISOString().slice(0,10)||'';render(); };
+$('#resetFilters').onclick=()=>{ $('#zoneFilter').value='All Zones';$('#moduleFilter').value='All Modules';$('#globalSearch').value='';$('#dateFrom').value='';$('#dateTo').value='';render(); };
 $('#moduleFilter').onchange=render; $('#zoneFilter').onchange=render; $('#dateFrom').onchange=render; $('#dateTo').onchange=render;
 $('#globalSearch').oninput=render;
 $('#menuToggle').onclick=()=>$('#sidebar').classList.toggle('open');
