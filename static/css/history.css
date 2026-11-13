@@ -15,3 +15,5 @@
 .pothole-assign-dialog{width:min(640px,100%)}.pothole-assign-dialog .assign-form select{display:block;width:100%;max-width:none;height:46px;padding:0 14px;border-radius:9px;font-size:13px;box-sizing:border-box}
 .history-filters .date-filter{display:flex;align-items:center;gap:8px;min-width:0;padding:4px 7px;border:1px solid #dce7f5;border-radius:7px;background:#fff;color:#557098;font-size:11px;font-weight:600}.history-filters .date-filter label{display:flex;align-items:center;gap:5px;white-space:nowrap}.history-filters .date-filter input{width:132px;min-width:0;height:30px;padding:0 6px;border:1px solid #dfe7f2;border-radius:6px;background:#fff;color:#354a70;font:inherit;font-weight:500}
 .history-stat[role="link"]{cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}.history-stat[role="link"]:hover{transform:translateY(-2px);border-color:#b9cff0;box-shadow:0 5px 14px #224c8318}.history-stat[role="link"]:focus-visible{outline:3px solid #438eff;outline-offset:2px}
+
+.app-shell>.sidebar{scrollbar-width:none;-ms-overflow-style:none}.app-shell>.sidebar::-webkit-scrollbar{display:none}
