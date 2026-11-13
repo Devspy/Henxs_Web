@@ -1,10 +1,117 @@
-const $=s=>document.querySelector(s);
-const zones=[{name:'North Zone',p:68,g:92},{name:'East Zone',p:54,g:76},{name:'South Zone',p:96,g:88},{name:'West Zone',p:94,g:72}];
-const areas=[['Chandrasekharpur',64,88],['Patia Main Road',52,76],['KIIT Road',48,64],['Rasulgarh Square',42,60],['Khandagiri Junction',36,58]];
-const activity=[['13 Oct 2026, 02:15 PM','Garbage','GB-2026-1054','Chandrasekharpur','OD02AB1234','North Zone','Pending','R. Das','—'],['13 Oct 2026, 01:48 PM','Pothole','PH-2026-1048','Patia Main Road','OD02XY7789','East Zone','In Progress','S. Mohanty','—'],['13 Oct 2026, 12:26 PM','Garbage','GB-2026-1053','KIIT Road','OD33CD5678','South Zone','Resolved','P. Behera','A. Pradhan'],['13 Oct 2026, 11:42 AM','Pothole','PH-2026-1047','Rasulgarh Square','OD07KL4455','West Zone','Resolved','K. Sahu','K. Sahu'],['13 Oct 2026, 10:18 AM','Garbage','GB-2026-1052','Khandagiri Junction','OD09GH6677','South Zone','In Progress','M. Pattnaik','—']];
-function makeTrend(){const vals=[[52,69,58,65,48,49,61,51,70,43,56,48,52],[62,74,60,47,65,77,63,79,68,59,70,64,48],[41,55,39,36,43,51,40,56,48,35,50,44,29]],colors=['#ed4059','#367fed','#10a98e'];const chart=$('#trendChart'),w=650,h=145,left=27,top=7,bottom=23,max=100,step=(w-left-10)/13;let svg=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Daily detection bar chart">`;[0,20,40,60,80,100].forEach(v=>{const y=top+(h-top-bottom)*(1-v/max);svg+=`<line x1="${left}" y1="${y}" x2="${w}" y2="${y}" stroke="#eaf0f7"/><text x="${left-5}" y="${y+3}" text-anchor="end" font-size="8" fill="#8493aa">${v}</text>`});for(let i=0;i<13;i++){const x=left+step*i+3;for(let j=0;j<3;j++){const height=vals[j][i]/max*(h-top-bottom),bw=step*.19;svg+=`<rect x="${x+j*(bw+2)}" y="${h-bottom-height}" width="${bw}" height="${height}" rx="1.5" fill="${colors[j]}"/>`}svg+=`<text x="${x+step*.27}" y="${h-6}" text-anchor="middle" font-size="7.5" fill="#74839c">${String(i+1).padStart(2,'0')} Oct</text>`}svg+='</svg>';chart.innerHTML=svg;}
-function renderZoneCharts(){const module=$('#moduleFilter').value;$('#zoneChart').innerHTML=zones.map(z=>{const p=module==='Garbage'?0:z.p,g=module==='Pothole'?0:z.g;const max=100;return `<div class="zone-group"><div class="zone-bar pothole" style="height:${p/max*100}%"><b>${p||''}</b></div><div class="zone-bar garbage" style="height:${g/max*100}%"><b>${g||''}</b></div><span class="zone-label">${z.name.replace(' Zone','<br>Zone')}</span></div>`}).join('');const sorted=[...zones].sort((a,b)=>b.p+b.g-(a.p+a.g));$('#zoneRankings').innerHTML=sorted.map(z=>{const p=module==='Garbage'?0:z.p,g=module==='Pothole'?0:z.g;return `<div class="rank-row"><span>${z.name}</span><div class="rank-bars"><div class="rank-track"><div class="rank-fill red" style="width:${p/96*100}%"></div></div><div class="rank-track"><div class="rank-fill blue" style="width:${g/96*100}%"></div></div></div><span class="rank-values">${p}<br>${g}</span></div>`}).join('')}
-function renderTables(){const zone=$('#zoneFilter').value,module=$('#moduleFilter').value,q=$('#globalSearch').value.toLowerCase().trim();$('#areaRows').innerHTML=areas.map((a,i)=>`<tr><td>${i+1}</td><td>${a[0]}</td><td>${a[1]}</td><td>${a[2]}</td><td>${a[1]+a[2]}</td></tr>`).join('');const rows=activity.filter(r=>(zone==='All Zones'||r[5]===zone)&&(module==='All Modules'||r[1]===module)&&(!q||r.join(' ').toLowerCase().includes(q)));$('#activityRows').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td><span class="module-icon ${r[1]==='Pothole'?'pothole':'garbage'}">${r[1]==='Pothole'?'▲':'▤'}</span>${r[1]}</td><td><b>${r[2]}</b></td><td>${r[3]}</td><td>${r[4]}</td><td><span class="zone ${r[5].toLowerCase().replace(' zone','')}">${r[5]}</span></td><td><span class="status ${r[6].toLowerCase().replaceAll(' ','-')==='resolved'?'completed':r[6].toLowerCase().replaceAll(' ','-')}">${r[6]}</span></td><td>${r[7]}</td><td>${r[8]}</td><td><button class="view-btn" data-activity="${r[2]}">⌕ View</button></td></tr>`).join('');document.querySelectorAll('[data-activity]').forEach(b=>b.onclick=()=>{location.href='/historic-events';});}
-function render(){renderZoneCharts();renderTables()}
-$('#applyFilters').onclick=()=>{render();toast('Analytics filters applied')};$('#resetFilters').onclick=()=>{$('#zoneFilter').value='All Zones';$('#moduleFilter').value='All Modules';$('#globalSearch').value='';$('#trendModule').value='All Modules';render();toast('Filters reset')};$('#globalSearch').addEventListener('input',render);$('#moduleFilter').addEventListener('change',render);$('#trendModule').addEventListener('change',()=>toast('Trend chart updated'));$('#menuToggle').onclick=()=>$('#sidebar').classList.toggle('open');function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
-makeTrend();render();
+const $ = s => document.querySelector(s);
+const apiFetch = (url, options = {}) => {
+  const token = sessionStorage.getItem('access_token');
+  return fetch(url, { ...options, headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(options.headers || {}) } });
+};
+const missing = '—';
+let events = [];
+let filtered = [];
+const areaLookups = new Map();
+let lastAreaLookup = 0;
+const pick = (item, ...keys) => keys.map(k => item?.[k]).find(v => v !== undefined && v !== null && v !== '') ?? missing;
+const listFrom = data => Array.isArray(data) ? data : (data?.events || data?.items || data?.results || (Array.isArray(data?.data) ? data.data : []));
+const moduleName = e => { const v = String(pick(e, 'event_type', 'type', 'module', 'eventType')).toLowerCase(); return v.includes('pothole') ? 'Pothole' : v.includes('garbage') ? 'Garbage' : v.includes('manhole') ? 'Open Manhole' : 'Other'; };
+const zoneName = e => String(pick(e, 'zone', 'zone_name'));
+const locationName = e => String(pick(e, 'location', 'address', 'place'));
+const coordinates = e => {
+  const lat = Number(pick(e, 'latitude', 'lat', 'langitude', 'location_latitude'));
+  const lng = Number(pick(e, 'longitude', 'lng', 'lon', 'longitute', 'location_longitude'));
+  return Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? { lat, lng } : null;
+};
+const statusName = e => String(pick(e, 'status')).toLowerCase();
+const eventDate = e => { const d = new Date(pick(e, 'event_time', 'detected_at', 'created_at', 'timestamp', 'time')); return Number.isNaN(+d) ? null : d; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function metric(i, value) { document.querySelectorAll('.metric strong')[i].textContent = value; }
+function render() {
+  const module = $('#moduleFilter').value, zone = $('#zoneFilter').value;
+  const query = $('#globalSearch').value.trim().toLowerCase();
+  const from = $('#dateFrom').value ? new Date(`${$('#dateFrom').value}T00:00:00`) : null;
+  const to = $('#dateTo').value ? new Date(`${$('#dateTo').value}T23:59:59.999`) : null;
+  filtered = events.filter(e => (!module || module === 'All Modules' || moduleName(e) === module) && (!zone || zone === 'All Zones' || zoneName(e) === zone) && (!from || (eventDate(e) && eventDate(e) >= from)) && (!to || (eventDate(e) && eventDate(e) <= to)) && (!query || JSON.stringify(e).toLowerCase().includes(query)));
+  const potholes = filtered.filter(e => moduleName(e) === 'Pothole').length;
+  const garbage = filtered.filter(e => moduleName(e) === 'Garbage').length;
+  const resolved = filtered.filter(e => /resolved|complete|closed/.test(statusName(e))).length;
+  metric(0, potholes); metric(1, garbage); metric(2, resolved); metric(3, '');
+  const total = filtered.length || 0;
+  const pct = n => total ? (n / total * 100) : 0;
+  document.querySelector('.issue-donut strong').textContent = total;
+  document.querySelector('.issue-donut').style.background = `conic-gradient(#ed3f59 0 ${pct(potholes)}%,#347feb ${pct(potholes)}% 100%)`;
+  document.querySelectorAll('.distribution-key strong').forEach((el,i)=>el.textContent=i===0?potholes:garbage);
+  document.querySelectorAll('.distribution-key small').forEach((el,i)=>el.textContent=`${pct(i===0?potholes:garbage).toFixed(1)}%`);
+  document.querySelector('.resolution-donut strong').textContent = total;
+  document.querySelectorAll('.resolution-key strong').forEach((el,i)=>el.textContent=[resolved, filtered.filter(e=>/assigned|progress/.test(statusName(e))).length, filtered.filter(e=>/pending|open|new/.test(statusName(e))).length][i]);
+  const counts = [resolved, filtered.filter(e=>/assigned|progress/.test(statusName(e))).length, filtered.filter(e=>/pending|open|new/.test(statusName(e))).length];
+  const resolvedEnd=pct(counts[0]), assignedEnd=resolvedEnd+pct(counts[1]);
+  document.querySelector('.resolution-donut').style.background = `conic-gradient(#10a98e 0 ${resolvedEnd}%,#f69b24 ${resolvedEnd}% ${assignedEnd}%,#ed3f59 ${assignedEnd}% 100%)`;
+  document.querySelectorAll('.resolution-key small').forEach((el,i)=>el.textContent=`${pct(counts[i]).toFixed(1)}%`);
+  const zones = new Map();
+  filtered.forEach(e=>{ const z=zoneName(e); if(z===missing)return; const row=zones.get(z)||{p:0,g:0}; if(moduleName(e)==='Pothole')row.p++; if(moduleName(e)==='Garbage')row.g++; zones.set(z,row); });
+  const maxZone=Math.max(1,...[...zones.values()].map(z=>Math.max(z.p,z.g)));
+  $('#zoneChart').innerHTML = [...zones].map(([name,z])=>`<div class="zone-group"><div class="zone-bar pothole" style="height:${z.p/maxZone*100}%"><b>${z.p||''}</b></div><div class="zone-bar garbage" style="height:${z.g/maxZone*100}%"><b>${z.g||''}</b></div><span class="zone-label">${esc(name)}</span></div>`).join('') || '<p class="empty-state">No zone data for this selection.</p>';
+  const sorted=[...zones].sort((a,b)=>(b[1].p+b[1].g)-(a[1].p+a[1].g));
+  const top=sorted.slice(0,5), maxTop=Math.max(1,...top.map(([,z])=>Math.max(z.p,z.g)));
+  $('#zoneRankings').innerHTML=top.map(([name,z])=>`<div class="rank-row"><span>${esc(name)}</span><div class="rank-bars"><div class="rank-track"><div class="rank-fill red" style="width:${z.p/maxTop*100}%"></div></div><div class="rank-track"><div class="rank-fill blue" style="width:${z.g/maxTop*100}%"></div></div></div><span class="rank-values">${z.p}<br>${z.g}</span></div>`).join('') || '<p class="empty-state">No zone data for this selection.</p>';
+  const areas=new Map();
+  filtered.forEach(e=>{
+    const point=coordinates(e);
+    if(!point)return;
+    // Group nearby detections into an area using a ~10 m coordinate grid.
+    const lat=point.lat.toFixed(4),lng=point.lng.toFixed(4),key=`${lat},${lng}`;
+    const row=areas.get(key)||{lat,lng,p:0,g:0};
+    if(moduleName(e)==='Pothole')row.p++;
+    if(moduleName(e)==='Garbage')row.g++;
+    areas.set(key,row);
+  });
+  const topAreas=[...areas].sort((a,b)=>(b[1].p+b[1].g)-(a[1].p+a[1].g)).slice(0,5);
+  $('#areaRows').innerHTML=topAreas.map(([key,z],i)=>`<tr><td>${i+1}</td><td data-area-key="${key}">${esc(areaLookups.get(key)||'Loading area name…')}</td><td>${z.p}</td><td>${z.g}</td><td>${z.p+z.g}</td></tr>`).join('') || '<tr><td colspan="5">No coordinate data for this selection.</td></tr>';
+  resolveAreaNames(topAreas);
+  const days=new Map(); filtered.forEach(e=>{const d=eventDate(e);if(!d)return; const key=d.toISOString().slice(0,10);const row=days.get(key)||{p:0,g:0,r:0};if(moduleName(e)==='Pothole')row.p++;if(moduleName(e)==='Garbage')row.g++;if(/resolved|complete|closed/.test(statusName(e)))row.r++;days.set(key,row);});
+  renderTrend([...days].sort((a,b)=>a[0].localeCompare(b[0])).slice(-14));
+}
+async function resolveAreaNames(areas) {
+  for (const [key, point] of areas) {
+    if (areaLookups.has(key)) continue;
+    const cached=localStorage.getItem(`analytics-area:${key}`);
+    if(cached){areaLookups.set(key,cached);updateAreaCell(key,cached);continue;}
+    areaLookups.set(key,'Loading area name…');
+    const wait=Math.max(0,1100-(Date.now()-lastAreaLookup));
+    if(wait) await new Promise(resolve=>setTimeout(resolve,wait));
+    lastAreaLookup=Date.now();
+    try {
+      const response=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(point.lat)}&lon=${encodeURIComponent(point.lng)}&zoom=18&addressdetails=1`);
+      if(!response.ok) throw new Error('Reverse geocoding unavailable');
+      const data=await response.json(), address=data.address||{};
+      const name=address.neighbourhood||address.suburb||address.city_district||address.quarter||address.village||address.town||address.city||address.county||address.state||'Area name unavailable';
+      areaLookups.set(key,name);localStorage.setItem(`analytics-area:${key}`,name);updateAreaCell(key,name);
+    } catch { areaLookups.set(key,'Area name unavailable');updateAreaCell(key,'Area name unavailable'); }
+  }
+}
+function updateAreaCell(key,name) {
+  const cell=[...document.querySelectorAll('[data-area-key]')].find(el=>el.dataset.areaKey===key);
+  if(cell)cell.textContent=name;
+}
+function renderTrend(days) {
+  const chart=$('#trendChart'), w=650,h=145,left=27,top=7,bottom=23,max=Math.max(1,...days.flatMap(([,d])=>[d.p,d.g,d.r])), step=(w-left-10)/Math.max(days.length,1);
+  let svg=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Daily event counts">`;
+  [0,.25,.5,.75,1].forEach(v=>{const y=top+(h-top-bottom)*(1-v);svg+=`<line x1="${left}" y1="${y}" x2="${w}" y2="${y}" stroke="#eaf0f7"/><text x="${left-5}" y="${y+3}" text-anchor="end" font-size="8" fill="#8493aa">${Math.round(max*v)}</text>`;});
+  days.forEach(([date,d],i)=>{const x=left+step*i+3,bw=Math.max(2,step*.18);[d.p,d.g,d.r].forEach((v,j)=>{const height=v/max*(h-top-bottom);svg+=`<rect x="${x+j*(bw+2)}" y="${h-bottom-height}" width="${bw}" height="${height}" rx="1.5" fill="${['#ed4059','#367fed','#10a98e'][j]}"/>`;});svg+=`<text x="${x+step*.27}" y="${h-6}" text-anchor="middle" font-size="7.5" fill="#74839c">${date.slice(5)}</text>`;});
+  chart.innerHTML=days.length?svg+'</svg>':'<p class="empty-state">No dated events for this selection.</p>';
+}
+async function initialize() {
+  try {
+    const response=await apiFetch('/api/events?page=1&page_size=100');
+    if(!response.ok) throw new Error(`Unable to load analytics data (${response.status}).`);
+    const payload=await response.json(); events=listFrom(payload);
+    const zones=[...new Set(events.map(zoneName).filter(v=>v!==missing))].sort();
+    $('#zoneFilter').innerHTML='<option>All Zones</option>'+zones.map(z=>`<option>${esc(z)}</option>`).join('');
+    const dates=events.map(eventDate).filter(Boolean).sort((a,b)=>a-b);
+    if(dates.length){$('#dateFrom').value=dates[0].toISOString().slice(0,10);$('#dateTo').value=dates.at(-1).toISOString().slice(0,10);}
+    render();
+  } catch(error) { document.querySelectorAll('.metric strong').forEach(e=>e.textContent='—'); $('#zoneChart').innerHTML=`<p class="empty-state">${esc(error.message)}</p>`; $('#zoneRankings').innerHTML=''; $('#areaRows').innerHTML=`<tr><td colspan="5">${esc(error.message)}</td></tr>`; }
+}
+$('#applyFilters').onclick=render;
+$('#resetFilters').onclick=()=>{ $('#zoneFilter').value='All Zones';$('#moduleFilter').value='All Modules';$('#globalSearch').value='';const dates=events.map(eventDate).filter(Boolean).sort((a,b)=>a-b);$('#dateFrom').value=dates[0]?.toISOString().slice(0,10)||'';$('#dateTo').value=dates.at(-1)?.toISOString().slice(0,10)||'';render(); };
+$('#moduleFilter').onchange=render; $('#zoneFilter').onchange=render; $('#dateFrom').onchange=render; $('#dateTo').onchange=render;
+$('#globalSearch').oninput=render;
+$('#menuToggle').onclick=()=>$('#sidebar').classList.toggle('open');
+initialize();
