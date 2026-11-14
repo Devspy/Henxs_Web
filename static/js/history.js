@@ -26,14 +26,6 @@ const listFrom = data => Array.isArray(data) ? data : (data?.events || data?.ite
 const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2600); }
 function extractOperators(payload) { if(Array.isArray(payload)) return payload; if(!payload||typeof payload!=='object') return []; for(const key of ['users','items','results','data']) { const nested=payload[key]; if(Array.isArray(nested)) return nested; const result=extractOperators(nested); if(result.length) return result; } return []; }
-function setAssignmentActions(assigned,status='') {
-  const value=String(assigned??'').trim().toLowerCase(),state=String(status??'').trim().toLowerCase();
-  const hasAssignee=Boolean(value)&&!['—','-','n/a','none','null','undefined','unassigned','not assigned'].includes(value);
-  const isAssigned=hasAssignee||/assigned|in[ -]?progress|resolved|complete/.test(state);
-  const assignButton=$('#assignBtn'),statusButton=$('#statusBtn');
-  assignButton.hidden=isAssigned; statusButton.hidden=!isAssigned;
-  assignButton.style.display=isAssigned?'none':''; statusButton.style.display=isAssigned?'':'none';
-}
 function badgeClass(status) { return String(status).toLowerCase().replaceAll(' ', '-'); }
 function imageData(obj) {
   const raw = get(obj, 'image_base64', 'base64_image', 'image', 'image_data', 'photo');
@@ -114,7 +106,7 @@ async function show(id) {
     } else $('#dLocation').textContent=d.location;
     $('#dZone').textContent=d.zone; $('#dZone').className='zone';
     $('#dTime').textContent=d.time; $('#dStatus').textContent=d.status; $('#dStatus').className=`status ${badgeClass(d.status)}`;
-    $('#dAssigned').textContent=d.assigned; $('#dResolved').textContent=d.resolved; $('#dCamera').textContent=d.camera; setAssignmentActions(d.assigned,d.status);
+    $('#dAssigned').textContent=d.assigned; $('#dResolved').textContent=d.resolved; $('#dCamera').textContent=d.camera;
     $('#dImage').innerHTML = d.image ? `<img src="${escapeHtml(d.image)}" alt="${escapeHtml(eventTypeLabel(source || entry.raw))} event ${escapeHtml(d.id)}">` : '<div class="history-event-image-empty">No event image available</div>';
   };
   renderDetails(entry.raw);
@@ -137,7 +129,7 @@ function updateSelectedEvent(patch) {
   $('#dAssigned').textContent = d.assigned;
   $('#dStatus').textContent = d.status;
   $('#dStatus').className = `status ${badgeClass(d.status)}`;
-  setAssignmentActions(d.assigned,d.status);
+ 
 }
 async function openAssignDialog() {
   if (!selected) return;
@@ -280,8 +272,6 @@ $('#dateFrom').onchange=()=>{currentPage=1;render()}; $('#dateTo').onchange=()=>
 $('#resetFilters').onclick=()=>{$('#eventSearch').value='';$('#globalSearch').value='';$('#dateFrom').value='';$('#dateTo').value='';$('#moduleFilter').value='All Modules';$('#zoneFilter').value='All Zones';$('#statusFilter').value='All Status';currentPage=1;render();toast('Filters reset')};
 $('#showFilters').onclick=()=>$('#statusFilter').focus(); $('#menuToggle').onclick=()=>$('#sidebar').classList.toggle('open');
 $('#closeDetail').onclick=()=>{$('#eventDetail').classList.add('hidden');document.querySelector('.history-layout').classList.add('detail-hidden')};
-$('#assignBtn').onclick=openAssignDialog;
-$('#statusBtn').onclick=openStatusDialog;
 $('#downloadBtn').onclick=()=>selected&&downloadEvent(selected.id);
 $('#exportReport').onclick=()=>{const rows=[['Event ID','Module','Vehicle','Location','Zone','Time','Status'],...events.map(e=>[e.id,eventType(e.raw),e.vehicle,e.location,e.zone,e.time,e.status])];const csv=rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='historic-events.csv';a.click();URL.revokeObjectURL(a.href)};
 initialize();

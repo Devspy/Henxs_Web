@@ -86,6 +86,18 @@ def api_login():
             result = json.loads(response.read().decode("utf-8"))
             if result.get("success") is True and result.get("access_token"):
                 session["authenticated"] = True
+                user = result.get("user") or {}
+                roles = user.get("roles") if isinstance(user, dict) else None
+                role = (
+                    (user.get("role") or user.get("user_role") or user.get("userRole"))
+                    if isinstance(user, dict)
+                    else None
+                ) or result.get("role") or (roles[0] if isinstance(roles, list) and roles else "")
+                session["user_role"] = str(role).strip().lower().replace(" ", "_")
+                if isinstance(user, dict):
+                    session["user_id"] = str(user.get("id") or user.get("user_id") or user.get("userId") or user.get("_id") or result.get("user_id") or result.get("id") or "")
+                    session["username"] = str(user.get("username") or user.get("user_name") or user.get("userName") or credentials.get("identifier") or "")
+                    session["display_name"] = str(user.get("name") or user.get("full_name") or user.get("fullName") or result.get("name") or "")
             return jsonify(result), response.status
     except HTTPError as error:
         try:
@@ -302,10 +314,56 @@ def get_event(event_id):
     if not event_id or "/" in event_id:
         return jsonify({"detail": "Invalid event ID."}), 400
     if request.method == "PATCH":
-        if not request.headers.get("Authorization", "").startswith("Bearer "):
+        authorization = request.headers.get("Authorization", "")
+        if not authorization.startswith("Bearer "):
             return jsonify({"detail": "A bearer access token is required."}), 401
+        if session.get("user_role") not in {"admin", "super_admin"} and not event_assigned_to_current_user(event_id, authorization):
+            return jsonify({"detail": "You can update only events assigned to your account."}), 403
         return proxy_events_api(f"{EVENTS_API_URL}/{event_id}", "PATCH", request.get_json(silent=True) or {})
     return proxy_events_api(f"{EVENTS_API_URL}/{event_id}")
+
+
+def event_assigned_to_current_user(event_id, authorization):
+    upstream_request = Request(
+        f"{EVENTS_API_URL}/{event_id}",
+        headers={"Accept": "application/json", "Authorization": authorization},
+        method="GET",
+    )
+    try:
+        with urlopen(upstream_request, timeout=20) as response:
+            event = json.loads(response.read().decode("utf-8"))
+    except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, UnicodeDecodeError):
+        return False
+    if isinstance(event, dict) and isinstance(event.get("data"), dict):
+        event = event["data"]
+    if not isinstance(event, dict):
+        return False
+    assigned = event.get("assigned_to") or event.get("assignee") or event.get("assigned")
+    assigned_object = assigned if isinstance(assigned, dict) else {}
+    assigned_names = {
+        str(value).strip().casefold()
+        for value in (
+            event.get("assigned_to_name"), event.get("assigned_user_name"),
+            event.get("assignee_name"), event.get("assigned_username"),
+            assigned_object.get("name"), assigned_object.get("username"),
+            assigned_object.get("user_name"), assigned_object.get("full_name"),
+            assigned if isinstance(assigned, str) else None,
+        )
+        if value not in (None, "")
+    }
+    assigned_ids = {
+        str(value).strip().casefold()
+        for value in (
+            event.get("assigned_to_id"), event.get("assigned_user_id"),
+            assigned_object.get("id"), assigned_object.get("user_id"),
+            assigned_object.get("userId"), assigned_object.get("_id"),
+            assigned if isinstance(assigned, (str, int)) else None,
+        )
+        if value not in (None, "")
+    }
+    current_names = {str(session.get(key, "")).strip().casefold() for key in ("username", "display_name") if session.get(key)}
+    current_ids = {str(session.get("user_id", "")).strip().casefold()} - {""}
+    return bool(assigned_names & current_names or assigned_ids & (current_ids | current_names))
 
 
 @app.route("/api/v1/events/<event_id>/assign", methods=["PATCH"])
@@ -313,6 +371,8 @@ def get_event(event_id):
 def assign_event(event_id):
     if not event_id or "/" in event_id:
         return jsonify({"detail": "Invalid event ID."}), 400
+    if session.get("user_role") not in {"admin", "super_admin"}:
+        return jsonify({"detail": "Only administrators can assign events."}), 403
     if not request.headers.get("Authorization", "").startswith("Bearer "):
         return jsonify({"detail": "A bearer access token is required."}), 401
     payload = request.get_json(silent=True)
