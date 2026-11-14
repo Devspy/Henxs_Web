@@ -94,14 +94,15 @@ const submitResetPassword=document.querySelector('#submitResetPassword');
 function openEditUserModal(){
  if(!selected)return;
  const form=editUserForm.elements,rawRole=displayValue(getField(selected.raw,'role','user_role','userRole'))||'operator',missing=String.fromCharCode(0x2014);
- if(![...form.role.options].some(option=>option.value.toLowerCase()===rawRole.toLowerCase())){const option=document.createElement('option');option.value=rawRole;option.textContent=rawRole;form.role.append(option);}
+ const normalizedRole=rawRole.toLowerCase().replaceAll(' ','_'),unavailableRole=['maintenance','auditor'].includes(normalizedRole);
+ if(!unavailableRole&&![...form.role.options].some(option=>option.value.toLowerCase()===normalizedRole)){const option=document.createElement('option');option.value=normalizedRole;option.textContent=rawRole;form.role.append(option);}
  form.name.value=selected.name===missing?'':selected.name;
  form.username.value=selected.username===missing?'':selected.username;
  form.email.value=selected.email===missing?'':selected.email;
- form.role.value=rawRole;
+ form.role.value=unavailableRole?'':normalizedRole;
  form.is_active.checked=selected.status==='Active';
  form.password.value='';
- editUserMessage.textContent='';editUserMessage.className='add-user-message';
+ editUserMessage.textContent=unavailableRole?`This user's current role (${rawRole}) is no longer available. Choose Admin, Operator, or Viewer before saving.`:'';editUserMessage.className='add-user-message';
  editUserModal.classList.add('open');editUserModal.setAttribute('aria-hidden','false');form.name.focus();
 }
 function closeEditUserModal(){editUserModal.classList.remove('open');editUserModal.setAttribute('aria-hidden','true');}
