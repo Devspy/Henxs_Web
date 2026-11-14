@@ -260,7 +260,7 @@ async function initialize() {
     $('#zoneFilter').innerHTML = '<option>All Zones</option>' + zones.map(v => `<option>${escapeHtml(v)}</option>`).join('');
     $('#statusFilter').innerHTML = '<option>All Status</option>' + statuses.map(v => `<option>${escapeHtml(v)}</option>`).join('');
     const stats=document.querySelectorAll('.history-stat strong');
-    if(stats.length>=4){stats[0].textContent=events.filter(e=>isPothole(e.raw)).length;stats[1].textContent=events.filter(e=>moduleKey(e.raw).includes('garbage')).length;stats[2].textContent=events.filter(e=>moduleKey(e.raw).includes('manhole')).length;stats[3].textContent=new Set(events.map(e=>e.camera).filter(v=>v!=='—')).size;}
+    if(stats.length>=3){stats[0].textContent=events.filter(e=>isPothole(e.raw)).length;stats[1].textContent=events.filter(e=>moduleKey(e.raw).includes('garbage')).length;stats[2].textContent=events.filter(e=>moduleKey(e.raw).includes('manhole')).length;}
     render(); document.querySelector('.history-layout').classList.add('detail-hidden');
     if (!events.length) $('#eventRows').innerHTML='<tr><td colspan="9">No events found.</td></tr>';
   } catch (err) { $('#eventRows').innerHTML=`<tr><td colspan="9">${escapeHtml(err.message)}</td></tr>`; toast(err.message); }

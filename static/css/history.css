@@ -17,3 +17,4 @@
 .history-stat[role="link"]{cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}.history-stat[role="link"]:hover{transform:translateY(-2px);border-color:#b9cff0;box-shadow:0 5px 14px #224c8318}.history-stat[role="link"]:focus-visible{outline:3px solid #438eff;outline-offset:2px}
 
 .app-shell>.sidebar{scrollbar-width:none;-ms-overflow-style:none}.app-shell>.sidebar::-webkit-scrollbar{display:none}
+.history-stats{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:1050px){.history-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}

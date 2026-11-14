@@ -5,7 +5,7 @@
   <title>Historic Events | CIVIC SURVEILLANCE</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css', v='2') }}">
 </head>
 <body>
 <div class="app-shell">
@@ -20,7 +20,7 @@
     <section class="content history-content">
       <div class="history-heading"><div class="heading-icon">◷</div><div class="heading-copy"><h1>Historic Events</h1><p>View and analyze past pothole and garbage detection events.</p></div></div>
       <div class="history-filters"><div class="date-filter"><label>From <input id="dateFrom" type="date" aria-label="Start date"></label><label>To <input id="dateTo" type="date" aria-label="End date"></label></div><select id="moduleFilter"><option>All Modules</option></select><select id="zoneFilter"><option>All Zones</option></select><select id="statusFilter"><option>All Status</option></select><button class="btn primary" id="applyFilters">Apply</button><button class="btn" id="resetFilters">Reset</button><button class="btn outline export-btn" id="exportReport">⇩ &nbsp;Export Report</button></div>
-      <div class="history-stats"><div class="history-stat red-card"><i>▲</i><div><strong>—</strong><span>Pothole Events</span></div></div><div class="history-stat orange-card"><i>▤</i><div><strong>—</strong><span>Garbage Events</span></div></div><div class="history-stat purple-card"><i>◉</i><div><strong>—</strong><span>Open Manhole Events</span></div></div><div class="history-stat teal-card"><i>◉</i><div><strong>—</strong><span>Cameras</span></div></div></div>
+      <div class="history-stats"><div class="history-stat red-card"><i>▲</i><div><strong>—</strong><span>Pothole Events</span></div></div><div class="history-stat orange-card"><i>▤</i><div><strong>—</strong><span>Garbage Events</span></div></div><div class="history-stat purple-card"><i>◉</i><div><strong>—</strong><span>Open Manhole Events</span></div></div></div>
             <div class="history-layout">
         <section class="event-panel"><div class="event-toolbar"><h2>Event List (<span id="eventCount">0</span>)</h2><div class="table-tools"><label class="table-search">⌕ <input id="eventSearch" placeholder="Search by Issue ID, Vehicle No., Location..."></label><button class="btn filter-btn" id="showFilters">▽ &nbsp;Filters</button></div></div>
           <div class="table-wrap"><table class="event-table"><thead><tr><th>EVENT ID</th><th>MODULE</th><th>VEHICLE NO.</th><th>LOCATION</th><th>ZONE</th><th>EVENT TIME⌄</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody id="eventRows"></tbody></table></div>
@@ -33,5 +33,5 @@
       </div><div class="toast" id="toast" role="status"></div>
     </section>
   </main>
-</div><script src="{{ url_for('static', filename='js/history.js', v='3') }}"></script><script src="{{ url_for('static', filename='js/auth.js', v='2') }}"></script>
+</div><script src="{{ url_for('static', filename='js/history.js', v='4') }}"></script><script src="{{ url_for('static', filename='js/auth.js', v='2') }}"></script>
 </body></html>
