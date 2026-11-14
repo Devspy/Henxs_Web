@@ -96,4 +96,30 @@ function updateSignedInProfile(){
   document.querySelectorAll('.profile-name small,.admin small').forEach(node=>node.textContent=role);
   document.querySelectorAll('.profile-avatar,.avatar').forEach(node=>node.textContent=initials);
 }
+function standardizeSidebarIcons(){
+  if(!document.querySelector('#standardSidebarIconStyles')){const style=document.createElement('style');style.id='standardSidebarIconStyles';style.textContent='.nav a>span svg,.side-nav nav a>span svg{display:block;width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}';document.head.append(style);}
+  const icons={
+    '/dashboard':'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
+    '/garbage-detection':'<path d="M4 7h16M9 7V4h6v3m-9 0 1 14h10l1-14M10 11v6m4-6v6"/>',
+    '/pothole-detection':'<path d="M12 3 2.8 20h18.4L12 3Z"/><path d="M12 9v5m0 3h.01"/>',
+    '/manhole-detection':'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 7v10m-5-5h10"/>',
+    '/analytics':'<path d="M4 19V5m0 14h17M8 16v-5m5 5V7m5 9v-8"/>',
+    '/tasks':'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M8 10h8m-8 4h8m-8 4h5"/>',
+    '/historic-events':'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    '/user-management':'<path d="M16 20v-1.5a4.5 4.5 0 0 0-4.5-4.5h-3A4.5 4.5 0 0 0 4 18.5V20m6-10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm5-6.5a3.5 3.5 0 0 1 0 6.8m1 3.3h.5a4.5 4.5 0 0 1 4.5 4.5V20"/>',
+    '/helpdesk':'<path d="M4 13v-2a8 8 0 0 1 16 0v2"/><path d="M4 12h3v7H6a2 2 0 0 1-2-2zm16 0h-3v7h1a2 2 0 0 0 2-2zm0 7a4 4 0 0 1-4 3h-2"/>',
+    '/logout':'<path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5m4-4 4-4-4-4m4 4H9"/>',
+    map:'<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15m6-12v15"/>'
+  };
+  document.querySelectorAll('.nav a').forEach(link=>{
+    const icon=link.href.includes('google.com/maps')?icons.map:icons[new URL(link.href,location.href).pathname];
+    const holder=link.querySelector(':scope > span');
+    if(!icon||!holder)return;
+    holder.replaceChildren();
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');svg.innerHTML=icon;
+    holder.append(svg);
+  });
+}
 updateSignedInProfile();
+standardizeSidebarIcons();
