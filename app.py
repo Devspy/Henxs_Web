@@ -8,9 +8,9 @@ from flask import Flask, render_template, jsonify, request, redirect, session, u
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY") or "086572984a483fa35d308c32dbad584c9dd21cbc726a7f8a0a049cb4da7b55bc"
-AUTH_LOGIN_URL = "https://fastapi-redis-api.onrender.com/api/v1/auth/login"
-USERS_API_URL = "https://fastapi-redis-api.onrender.com/api/v1/users"
-EVENTS_API_URL = "https://fastapi-redis-api.onrender.com/api/v1/events"
+AUTH_LOGIN_URL = "https://api.henxs.tech/api/v1/auth/login"
+USERS_API_URL = "https://api.henxs.tech/api/v1/users"
+EVENTS_API_URL = "https://api.henxs.tech/api/v1/events"
 
 
 def login_required(view):
@@ -256,4 +256,4 @@ def assign_event(event_id):
     return proxy_events_api(f"{EVENTS_API_URL}/{event_id}/assign", "PATCH", {"assigned_to": payload["assigned_to"]})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=8001, debug=True)
