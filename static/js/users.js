@@ -56,12 +56,26 @@ function renderDetail(){
  else if(tab==='Roles & Permissions')entries=Object.entries(raw).filter(([key])=>/(role|permission|scope|access)/i.test(key));
  else entries=Object.entries(raw).filter(([key])=>/(activity|login|sign.?in|created|updated)/i.test(key));
  const body=entries.length?`<dl class="detail-fields">${entries.map(([key,value])=>`<dt>${escapeHtml(key.replace(/[_-]/g,' ').replace(/\b\w/g,char=>char.toUpperCase()))}</dt><span>:</span><dd>${escapeHtml(formatUserValue(value))}</dd>`).join('')}</dl>`:`<p class="empty-detail">No ${tab.toLowerCase()} details are available from the user service.</p>`;
- const actions=tab==='Details'?`<div class="user-actions"><button type="button" class="edit-user" id="detailEditUser">✎ &nbsp; Edit User</button><button type="button" id="resetPassword">⊙ &nbsp; Reset Password</button><button type="button" class="deactivate-user">⊗ &nbsp; ${selected.status==='Active'?'Deactivate':'Activate'}</button></div>`:'';
+ const actions=tab==='Details'?`<div class="user-actions"><button type="button" class="edit-user" id="detailEditUser">✎ &nbsp; Edit User</button><button type="button" id="resetPassword">⊙ &nbsp; Reset Password</button><button type="button" class="deactivate-user">Deactivate User</button></div>`:'';
  container.innerHTML=head+body+actions;
  container.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>{tab=button.dataset.tab;renderDetail();}));
- container.querySelector('#detailEditUser')?.addEventListener('click',()=>showToast(`Editing ${selected.name} is not connected to the user API yet.`));
- container.querySelector('#resetPassword')?.addEventListener('click',()=>showToast('Password reset is not connected to the user API yet.'));
- container.querySelector('.deactivate-user')?.addEventListener('click',()=>showToast('Account status updates are not connected to the user API yet.'));
+ container.querySelector('#detailEditUser')?.addEventListener('click',openEditUserModal);
+ container.querySelector('#resetPassword')?.addEventListener('click',openResetPasswordModal);
+ container.querySelector('.deactivate-user')?.addEventListener('click',deactivateSelectedUser);
+}
+async function deactivateSelectedUser(event){
+ if(!selected?.id||selected.id===String.fromCharCode(0x2014)){showToast('This user does not have an ID and cannot be updated.');return;}
+ if(selected.status==='Inactive'){showToast(`${selected.name} is already inactive.`);return;}
+ const token=sessionStorage.getItem('access_token');
+ if(!token){showToast('Your session has expired. Please sign in again.');return;}
+ const button=event.currentTarget;button.disabled=true;button.textContent='Deactivating...';
+ try{
+  const response=await fetch(`/api/users/${encodeURIComponent(selected.id)}`,{method:'PATCH',headers:{'Content-Type':'application/json','Accept':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({is_active:false})});
+  const result=await response.json().catch(()=>({}));
+  const message=readableApiMessage(result.message??result.detail??result.error);
+  if(!response.ok||result.success===false)throw new Error(message||'User deactivation failed.');
+  selected.raw={...(selected.raw||{}),is_active:false,status:'Inactive'};selected.status='Inactive';updateUserCounts();render();renderDetail();showToast(message||`${selected.name} deactivated successfully.`);
+ }catch(error){showToast(error.message||'User deactivation failed.');button.disabled=false;button.textContent='Deactivate User';}
 }
 function showToast(message){toast.textContent=message;toast.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove('show'),2600);}
 document.querySelectorAll('.user-tabs button').forEach(b=>b.addEventListener('click',()=>{activeTab=b.dataset.status;document.querySelectorAll('.user-tabs button').forEach(x=>x.classList.toggle('selected',x===b));page=1;render();}));
@@ -69,6 +83,34 @@ document.querySelector('#applyUsers').addEventListener('click',()=>{page=1;rende
 const addUserForm=document.querySelector('#addUserForm');
 const addUserMessage=document.querySelector('#addUserMessage');
 const submitAddUser=document.querySelector('#submitAddUser');
+const editUserModal=document.querySelector('#editUserModal');
+const editUserForm=document.querySelector('#editUserForm');
+const editUserMessage=document.querySelector('#editUserMessage');
+const submitEditUser=document.querySelector('#submitEditUser');
+const resetPasswordModal=document.querySelector('#resetPasswordModal');
+const resetPasswordForm=document.querySelector('#resetPasswordForm');
+const resetPasswordMessage=document.querySelector('#resetPasswordMessage');
+const submitResetPassword=document.querySelector('#submitResetPassword');
+function openEditUserModal(){
+ if(!selected)return;
+ const form=editUserForm.elements,rawRole=displayValue(getField(selected.raw,'role','user_role','userRole'))||'operator',missing=String.fromCharCode(0x2014);
+ if(![...form.role.options].some(option=>option.value.toLowerCase()===rawRole.toLowerCase())){const option=document.createElement('option');option.value=rawRole;option.textContent=rawRole;form.role.append(option);}
+ form.name.value=selected.name===missing?'':selected.name;
+ form.username.value=selected.username===missing?'':selected.username;
+ form.email.value=selected.email===missing?'':selected.email;
+ form.role.value=rawRole;
+ form.is_active.checked=selected.status==='Active';
+ form.password.value='';
+ editUserMessage.textContent='';editUserMessage.className='add-user-message';
+ editUserModal.classList.add('open');editUserModal.setAttribute('aria-hidden','false');form.name.focus();
+}
+function closeEditUserModal(){editUserModal.classList.remove('open');editUserModal.setAttribute('aria-hidden','true');}
+function openResetPasswordModal(){
+ if(!selected)return;
+ resetPasswordForm.reset();resetPasswordMessage.textContent='';resetPasswordMessage.className='add-user-message';
+ resetPasswordModal.classList.add('open');resetPasswordModal.setAttribute('aria-hidden','false');resetPasswordForm.elements.password.focus();
+}
+function closeResetPasswordModal(){resetPasswordModal.classList.remove('open');resetPasswordModal.setAttribute('aria-hidden','true');resetPasswordForm.reset();}
 function closeAddUserModal(){addUserModal.classList.remove('open');addUserModal.setAttribute('aria-hidden','true');}
 function readableApiMessage(value){
  if(typeof value==='string')return value.trim();
@@ -81,18 +123,61 @@ function readableApiMessage(value){
  }
  return '';
 }
+document.querySelector('#closeEditUser').addEventListener('click',closeEditUserModal);
+document.querySelector('#cancelEditUser').addEventListener('click',closeEditUserModal);
+editUserModal.addEventListener('click',event=>{if(event.target===editUserModal)closeEditUserModal();});
+document.querySelector('#closeResetPassword').addEventListener('click',closeResetPasswordModal);
+document.querySelector('#cancelResetPassword').addEventListener('click',closeResetPasswordModal);
+resetPasswordModal.addEventListener('click',event=>{if(event.target===resetPasswordModal)closeResetPasswordModal();});
 document.querySelector('#addUser').addEventListener('click',()=>{addUserMessage.textContent='';addUserMessage.className='add-user-message';addUserModal.classList.add('open');addUserModal.setAttribute('aria-hidden','false');addUserForm.elements.name.focus();});
 document.querySelector('#closeAddUser').addEventListener('click',closeAddUserModal);
 document.querySelector('#cancelAddUser').addEventListener('click',closeAddUserModal);
 addUserModal.addEventListener('click',event=>{if(event.target===addUserModal)closeAddUserModal();});
-document.addEventListener('keydown',event=>{if(event.key==='Escape'&&addUserModal.classList.contains('open'))closeAddUserModal();});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'){if(addUserModal.classList.contains('open'))closeAddUserModal();if(editUserModal.classList.contains('open'))closeEditUserModal();if(resetPasswordModal.classList.contains('open'))closeResetPasswordModal();}});
+resetPasswordForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ if(!selected?.id||selected.id===String.fromCharCode(0x2014)){resetPasswordMessage.textContent='This user does not have an ID and cannot be updated.';return;}
+ const token=sessionStorage.getItem('access_token');
+ if(!token){resetPasswordMessage.textContent='Your session has expired. Please sign in again.';return;}
+ const password=resetPasswordForm.elements.password.value,confirmPassword=resetPasswordForm.elements.confirmPassword.value;
+ if(password!==confirmPassword){resetPasswordMessage.textContent='The passwords do not match.';return;}
+ const payload={name:selected.name,username:selected.username,email:selected.email,role:getField(selected.raw,'role','user_role','userRole')||'operator',is_active:selected.status==='Active',password};
+ submitResetPassword.disabled=true;submitResetPassword.textContent='Resetting...';resetPasswordMessage.textContent='';resetPasswordMessage.className='add-user-message';
+ try{
+  const response=await fetch(`/api/users/${encodeURIComponent(selected.id)}`,{method:'PATCH',headers:{'Content-Type':'application/json','Accept':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(payload)});
+  const result=await response.json().catch(()=>({}));
+  const message=readableApiMessage(result.message??result.detail??result.error);
+  if(!response.ok||result.success===false)throw new Error(message||'Password reset failed.');
+  closeResetPasswordModal();showToast(message||`Password reset successfully for ${selected.name}.`);
+ }catch(error){resetPasswordMessage.textContent=error.message||'Password reset failed.';}
+ finally{submitResetPassword.disabled=false;submitResetPassword.textContent='Reset Password';}
+});
+editUserForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ if(!selected?.id||selected.id===String.fromCharCode(0x2014)){editUserMessage.textContent='This user does not have an ID and cannot be updated.';return;}
+ const token=sessionStorage.getItem('access_token');
+ if(!token){editUserMessage.textContent='Your session has expired. Please sign in again.';return;}
+ const form=new FormData(editUserForm),payload={name:String(form.get('name')).trim(),username:String(form.get('username')).trim(),email:String(form.get('email')).trim(),role:form.get('role'),is_active:form.get('is_active')==='on'};
+ const password=String(form.get('password')||'');if(password)payload.password=password;
+ submitEditUser.disabled=true;submitEditUser.textContent='Saving...';editUserMessage.textContent='';editUserMessage.className='add-user-message';
+ try{
+  const response=await fetch(`/api/users/${encodeURIComponent(selected.id)}`,{method:'PATCH',headers:{'Content-Type':'application/json','Accept':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(payload)});
+  const result=await response.json().catch(()=>({}));
+  const message=readableApiMessage(result.message??result.detail??result.error);
+  if(!response.ok||result.success===false)throw new Error(message||'User update failed. Please check the submitted details.');
+  const target=selected,responseUser=result.user??(result.data&&typeof result.data==='object'&&!Array.isArray(result.data)?result.data:null),{password:ignoredPassword,...safePayload}=payload;
+  const updatedRaw={...(target.raw||{}),...safePayload,...(responseUser||{})};delete updatedRaw.password;
+  Object.assign(target,normalizeUser(updatedRaw));selected=target;updateUserCounts();render();renderDetail();closeEditUserModal();showToast(message||`${target.name} updated successfully.`);
+ }catch(error){editUserMessage.textContent=error.message||'User update failed.';}
+ finally{submitEditUser.disabled=false;submitEditUser.textContent='Save Changes';}
+});
 addUserForm.addEventListener('submit',async event=>{
  event.preventDefault();
  const token=sessionStorage.getItem('access_token');
  if(!token){addUserMessage.textContent='Your session has expired. Please sign in again.';return;}
  const formData=new FormData(addUserForm);
  const payload={name:formData.get('name').trim(),username:formData.get('username').trim(),email:formData.get('email').trim(),password:formData.get('password'),role:formData.get('role')};
- submitAddUser.disabled=true;submitAddUser.textContent='Creating…';addUserMessage.textContent='';addUserMessage.className='add-user-message';
+ submitAddUser.disabled=true;submitAddUser.textContent='Creating...';addUserMessage.textContent='';addUserMessage.className='add-user-message';
  try{
   const response=await fetch('/api/users',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify(payload)});
   const result=await response.json().catch(()=>({}));

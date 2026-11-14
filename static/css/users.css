@@ -12,3 +12,9 @@
  .add-user-overlay{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:18px;background:#10244980}.add-user-overlay.open{display:flex}.add-user-dialog{position:relative;width:min(100%,470px);max-height:calc(100vh - 36px);overflow:auto;padding:27px;border:1px solid #dce8f7;border-radius:13px;background:#fff;box-shadow:0 20px 70px #10244935}.add-user-dialog h2{margin:0;color:#122990;font-size:22px}.add-user-dialog>p{margin:6px 0 19px;color:#6780a8;font-size:13px}.add-user-close{position:absolute;top:13px;right:15px;border:0;background:transparent;color:#617895;font-size:25px;cursor:pointer}.add-user-dialog form{display:grid;gap:12px}.add-user-dialog form>label{display:grid;gap:6px;color:#29436e;font-size:12px;font-weight:600}.add-user-dialog input,.add-user-dialog select{width:100%;height:39px;padding:0 11px;border:1px solid #d7e3f1;border-radius:6px;background:#fff;color:#253b5d;font:inherit;font-size:13px}.add-user-dialog input:focus,.add-user-dialog select:focus{outline:2px solid #8bbaff;border-color:#2475eb}.add-user-message{min-height:18px;color:#d83248;font-size:12px}.add-user-message.success{color:#07896e}.add-user-actions{display:flex;justify-content:flex-end;gap:9px}.add-user-actions .btn{min-width:100px;height:37px}.add-user-actions button:disabled{opacity:.65;cursor:wait}
 .detail-fields{grid-template-columns:minmax(90px,1fr) 8px minmax(0,2fr)}.empty-detail{padding:12px;color:#7185aa;font-size:12px;line-height:1.5}
 .role-badge.admin{background:#ffe2e5;color:#d62337}
+
+
+
+.add-user-dialog form>label.edit-active-field{display:flex;align-items:center;gap:10px;color:#29436e}.add-user-dialog form>label.edit-active-field input{width:17px;height:17px;margin:0;accent-color:#0965f4}
+
+.user-actions .deactivate-user{border-color:#ed9aa3;color:#c93649}.user-actions .deactivate-user:hover{background:#fff3f4}.user-actions .deactivate-user:disabled{opacity:.65;cursor:wait}

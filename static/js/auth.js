@@ -56,7 +56,19 @@ function openLogoutDialog(link) {
   activeDialog.querySelector('.logout-close').addEventListener('click', closeLogoutDialog);
   activeDialog.querySelector('.logout-cancel').addEventListener('click', closeLogoutDialog);
   activeDialog.addEventListener('click', event => { if (event.target === activeDialog) closeLogoutDialog(); });
-  activeDialog.querySelector('.logout-confirm').addEventListener('click', () => {
+  activeDialog.querySelector('.logout-confirm').addEventListener('click', async event => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    button.textContent = 'Logging out…';
+    const token = sessionStorage.getItem('access_token');
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+    } catch (error) {
+      console.error('Logout service request failed:', error);
+    }
     sessionStorage.removeItem('access_token');
     sessionStorage.removeItem('auth_user');
     sessionStorage.removeItem('auth_username');
