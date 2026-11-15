@@ -1,5 +1,6 @@
 import json
 import os
+import uuid
 from functools import wraps
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -12,6 +13,7 @@ AUTH_LOGIN_URL = "https://api.henxs.tech/api/v1/auth/login"
 AUTH_LOGOUT_URL = "https://api.henxs.tech/api/v1/auth/logout"
 USERS_API_URL = "https://api.henxs.tech/api/v1/users"
 EVENTS_API_URL = "https://api.henxs.tech/api/v1/events"
+EMAIL_API_URL = "https://api.henxs.tech/api/v1/email/send"
 
 
 def login_required(view):
@@ -412,6 +414,82 @@ def resolve_event(event_id):
         "resolve_latitude": latitude,
         "resolve_longitude": longitude,
     })
+
+
+@app.route("/api/email/send", methods=["POST"])
+@login_required
+def send_assignment_email():
+    authorization = request.headers.get("Authorization", "")
+    if not authorization.startswith("Bearer "):
+        return jsonify({"detail": "A bearer access token is required."}), 401
+    if session.get("user_role") not in {"admin", "super_admin"}:
+        return jsonify({"detail": "Only administrators can send assignment emails."}), 403
+    recipients = request.form.get("recipients", "").strip()
+    subject = request.form.get("subject", "").strip()
+    message = request.form.get("message", "").strip()
+    html = request.form.get("html", "false").lower()
+    files = request.files.getlist("files")
+    if not recipients or not subject or not message:
+        return jsonify({"detail": "recipients, subject, and message are required."}), 400
+    if html not in {"true", "false"}:
+        return jsonify({"detail": "html must be true or false."}), 400
+    files = [file for file in files if file and file.filename]
+    if not files:
+        return jsonify({"detail": "An event PDF attachment is required."}), 400
+
+    boundary = f"----HenxsMail{uuid.uuid4().hex}"
+    chunks = []
+
+    def add_field(name, value):
+        chunks.extend((
+            f"--{boundary}\r\n".encode(),
+            f'Content-Disposition: form-data; name="{name}"\r\n\r\n'.encode(),
+            value.encode("utf-8"),
+            b"\r\n",
+        ))
+
+    add_field("recipients", recipients)
+    add_field("subject", subject)
+    add_field("message", message)
+    add_field("html", html)
+    for uploaded in files:
+        filename = (uploaded.filename or "event-report.pdf").replace("\\", "/").split("/")[-1]
+        filename = filename.replace('"', "_").replace("\r", "_").replace("\n", "_") or "event-report.pdf"
+        chunks.extend((
+            f"--{boundary}\r\n".encode(),
+            f'Content-Disposition: form-data; name="files"; filename="{filename}"\r\n'.encode(),
+            f"Content-Type: {uploaded.mimetype or 'application/pdf'}\r\n\r\n".encode(),
+            uploaded.read(),
+            b"\r\n",
+        ))
+    chunks.append(f"--{boundary}--\r\n".encode())
+    upstream_request = Request(
+        EMAIL_API_URL,
+        data=b"".join(chunks),
+        headers={
+            "Accept": "application/json",
+            "Authorization": authorization,
+            "Content-Type": f"multipart/form-data; boundary={boundary}",
+        },
+        method="POST",
+    )
+    try:
+        with urlopen(upstream_request, timeout=30) as response:
+            response_body = response.read()
+            if not response_body:
+                return jsonify({"detail": "Email service returned an empty response."}), response.status
+            try:
+                return jsonify(json.loads(response_body.decode("utf-8"))), response.status
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                return jsonify({"detail": "Email service returned an invalid response."}), 502
+    except HTTPError as error:
+        try:
+            result = json.loads(error.read().decode("utf-8"))
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            result = {"detail": "Unable to send the assignment email."}
+        return jsonify(result), error.code
+    except (URLError, TimeoutError):
+        return jsonify({"detail": "Unable to reach the email service. Please try again."}), 502
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8001, debug=True)
