@@ -34,9 +34,9 @@ function canViewTask(task){return isAdminUser()||isAssignedToCurrentUser(task)}
 function configurePendingSection(){const admin=isAdminUser(),pendingTab=$('.tab[data-status="Pending"]'),pendingStat=$('[data-task-stat="pending"]')?.closest('.stat-card'),stats=$('.stats');if(pendingTab)pendingTab.hidden=!admin;if(pendingStat)pendingStat.hidden=!admin;if(stats)stats.classList.toggle('operator-view',!admin);if(!admin&&activeStatus==='Pending'){activeStatus='All Tasks';$$('.tab').forEach(tab=>tab.classList.toggle('selected',tab.dataset.status==='All Tasks'));}}
 configurePendingSection();
 
-function statusCategory(value){const status=String(value??'').trim().toLowerCase().replace(/[_-]+/g,' ');if(/resolved|complete|closed|done|finished/.test(status))return 'Completed';if(/progress|assigned|in work|working|processing/.test(status))return 'In Progress';if(/pending|open|new|detected|unassigned/.test(status))return 'Pending';return '';}
+function statusCategory(value){const status=String(value??'').trim().toLowerCase().replace(/[_-]+/g,' ');if(/\backnowledg(?:e|ed|ment|ement)\b/.test(status))return 'Acknowledged';if(/resolved|complete|closed|done|finished/.test(status))return 'Completed';if(/progress|assigned|in work|working|processing/.test(status))return 'In Progress';if(/pending|open|new|detected|unassigned/.test(status))return 'Pending';return '';}
 function statusFor(event,due){
-  const rawStatus=pick(event,'status','state','event_status','task_status','resolution_status'),status=String(rawStatus).trim().toLowerCase().replace(/[_-]+/g,' '),category=statusCategory(status);
+  const rawStatus=pick(event,'status','state','event_status','task_status','resolution_status'),status=String(rawStatus).trim().toLowerCase().replace(/[_-]+/g,' '),acknowledged=event.acknowledged===true||event.is_acknowledged===true||event.isAcknowledged===true||Boolean(event.acknowledged_at||event.acknowledgedAt),category=acknowledged?'Acknowledged':statusCategory(status);
   if(category)return category;
   if(due!==fallback){const date=new Date(due);if(!Number.isNaN(date.getTime())&&date<new Date())return 'Overdue';}
   return status===String(fallback).toLowerCase()?fallback:status.replace(/\b\w/g,letter=>letter.toUpperCase());

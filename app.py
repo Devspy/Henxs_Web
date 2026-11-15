@@ -368,6 +368,18 @@ def event_assigned_to_current_user(event_id, authorization):
     return bool(assigned_names & current_names or assigned_ids & (current_ids | current_names))
 
 
+@app.route("/api/v1/events/<event_id>/acknowledge", methods=["PATCH"])
+@login_required
+def acknowledge_event(event_id):
+    if not event_id or "/" in event_id:
+        return jsonify({"detail": "Invalid event ID."}), 400
+    if session.get("user_role") not in {"admin", "super_admin"}:
+        return jsonify({"detail": "Only administrators can acknowledge events."}), 403
+    if not request.headers.get("Authorization", "").startswith("Bearer "):
+        return jsonify({"detail": "A bearer access token is required."}), 401
+    return proxy_events_api(f"{EVENTS_API_URL}/{event_id}/acknowledge", "PATCH", request.get_json(silent=True) or {})
+
+
 @app.route("/api/v1/events/<event_id>/assign", methods=["PATCH"])
 @login_required
 def assign_event(event_id):

@@ -44,7 +44,7 @@
 </div>
 <div class="workspace task-workspace">
 <section class="task-panel">
-<div class="task-toolbar"><div class="tabs" id="statusTabs"><button class="tab selected" data-status="All Tasks">All Tasks</button><button class="tab" data-status="Pending">Pending</button><button class="tab" data-status="In Progress">In Progress</button><button class="tab" data-status="Completed">Completed</button></div></div>
+<div class="task-toolbar"><div class="tabs" id="statusTabs"><button class="tab selected" data-status="All Tasks">All Tasks</button><button class="tab" data-status="Pending">Pending</button><button class="tab" data-status="In Progress">In Progress</button><button class="tab" data-status="Completed">Completed</button><button class="tab" data-status="Acknowledged">Acknowledge</button></div></div>
 <div class="table-wrap"><table class="task-event-table">
 <thead><tr><th>EVENT ID</th><th>MODULE</th><th>VEHICLE NO.</th><th>LOCATION</th><th>ZONE</th><th>EVENT TIME</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
 <tbody id="taskRows"><tr><td colspan="8">Loading tasks…</td></tr></tbody>
@@ -57,7 +57,7 @@
 </section>
 </main>
 </div>
-<script src="{{ url_for('static', filename='js/app.js', v='13') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js', v='14') }}"></script>
 <script src="{{ url_for('static', filename='js/auth.js', v='3') }}"></script>
 </body>
 </html>
