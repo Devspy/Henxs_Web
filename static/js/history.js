@@ -34,13 +34,21 @@ function imageData(obj) {
   const mime = get(obj, 'image_mime_type', 'mime_type', 'image_type');
   return `data:${String(mime).startsWith('image/') ? mime : 'image/jpeg'};base64,${raw}`;
 }
+function resolutionImageData(obj) {
+  const raw = get(obj, 'resolve_image_base64', 'resolved_image_base64', 'resolution_image_base64', 'resolve_image');
+  if (typeof raw !== 'string' || raw === value()) return '';
+  if (/^(data:image\/|https?:\/\/)/i.test(raw)) return raw;
+  const mime = get(obj, 'resolve_image_mime_type', 'resolved_image_mime_type', 'resolution_image_mime_type');
+  return `data:${String(mime).startsWith('image/') ? mime : 'image/jpeg'};base64,${raw}`;
+}
+function resolutionMessage(obj) { return get(obj, 'resolve_message', 'resolved_message', 'resolution_message'); }
 function normalize(e) {
   const split = vehicleCamera(e);
   return { raw: e, id: eventId(e), module: eventType(e), vehicle: split.vehicle,
     location: get(e,'location','address','place'), zone: get(e,'zone','zone_name'),
     time: get(e,'event_time','detected_at','created_at','timestamp','time'), status: get(e,'status'),
     assigned: get(e,'assigned_to','assignee','assigned'), resolved: get(e,'resolved_at','resolved_on'),
-    camera: split.camera, confidence: get(e,'confidence','score'), image: imageData(e),
+    camera: split.camera, confidence: get(e,'confidence','score'), image: imageData(e), resolutionImage: resolutionImageData(e), resolveMessage: resolutionMessage(e),
     latitude: Number.parseFloat(get(e,'latitude','lat','langitude','location_latitude')),
     longitude: Number.parseFloat(get(e,'longitude','lng','lon','longitute','location_longitude')) };
 }
@@ -107,7 +115,9 @@ async function show(id) {
     $('#dZone').textContent=d.zone; $('#dZone').className='zone';
     $('#dTime').textContent=d.time; $('#dStatus').textContent=d.status; $('#dStatus').className=`status ${badgeClass(d.status)}`;
     $('#dAssigned').textContent=d.assigned; $('#dResolved').textContent=d.resolved; $('#dCamera').textContent=d.camera;
-    $('#dImage').innerHTML = d.image ? `<img src="${escapeHtml(d.image)}" alt="${escapeHtml(eventTypeLabel(source || entry.raw))} event ${escapeHtml(d.id)}">` : '<div class="history-event-image-empty">No event image available</div>';
+    const hasResolution=/resolved|complete|closed/i.test(String(d.status))||Boolean(d.resolutionImage)||d.resolveMessage!==value();
+    $('#dImage').innerHTML = `<section><h3>Event Image</h3>${d.image ? `<img src="${escapeHtml(d.image)}" alt="${escapeHtml(eventTypeLabel(source || entry.raw))} event ${escapeHtml(d.id)}">` : '<div class="history-event-image-empty">No event image available</div>'}</section>${hasResolution?`<section><h3>Resolution Image</h3>${d.resolutionImage?`<img src="${escapeHtml(d.resolutionImage)}" alt="Resolution image for ${escapeHtml(d.id)}">`:'<div class="history-event-image-empty">No resolution image available</div>'}</section>`:''}`;
+    const messageLabel=$('#dResolveMessageLabel'),messageValue=$('#dResolveMessage'),showMessage=hasResolution&&d.resolveMessage!==value();messageLabel.hidden=!showMessage;messageValue.hidden=!showMessage;messageValue.textContent=showMessage?d.resolveMessage:'';
   };
   renderDetails(entry.raw);
   render();
@@ -180,14 +190,13 @@ async function jpegImage(source) {
   for(let i=0;i<encoded.length;i++)bytes[i]=encoded.charCodeAt(i);
   return {bytes,width:canvas.width,height:canvas.height};
 }
-function makeEventPdf(event, photo) {
+function makeEventPdf(event, photo, resolutionPhoto) {
   const encoder=new TextEncoder(), objects=[];
   const add=(value)=>{objects.push(value);return objects.length;};
   const stream=(content)=>{const bytes=encoder.encode(content);return `<< /Length ${bytes.length} >>\nstream\n${content}\nendstream`;};
   const catalog=add(''), pages=add(''), font=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
-  let imageId=0;
-  if(photo) imageId=add([`<< /Type /XObject /Subtype /Image /Width ${photo.width} /Height ${photo.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${photo.bytes.length} >>\nstream\n`,photo.bytes,'\nendstream']);
-  const rows=[['Module',event.module],['Status',event.status],['Vehicle No.',event.vehicle],['Camera ID',event.camera],['Zone',event.zone],['Detected On',event.time],['Assigned To',event.assigned],['Resolved On',event.resolved]];
+  const photos=[photo&&{photo,title:'EVENT PHOTOGRAPH'},resolutionPhoto&&{photo:resolutionPhoto,title:'RESOLUTION PHOTOGRAPH'}].filter(Boolean),imageIds=photos.map(({photo:image})=>add([`<< /Type /XObject /Subtype /Image /Width ${image.width} /Height ${image.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${image.bytes.length} >>\nstream\n`,image.bytes,'\nendstream']));
+  const rows=[['Module',event.module],['Status',event.status],['Vehicle No.',event.vehicle],['Camera ID',event.camera],['Zone',event.zone],['Detected On',event.time],['Assigned To',event.assigned],['Resolved On',event.resolved],...(event.resolveMessage&&event.resolveMessage!==value()?[['Resolution Message',event.resolveMessage]]:[])];
   let content='q 0.96 0.97 0.99 rg 0 0 595 842 re f Q\nq 0.03 0.14 0.29 rg 0 720 595 122 re f Q\n';
   const drawText=(text,x,y,size,color='0.1 0.18 0.3')=>{content+=`BT /F1 ${size} Tf ${color} rg ${x} ${y} Td (${pdfEscape(text)}) Tj ET\n`;};
   drawText('CIVIC SURVEILLANCE',42,806,10,'0.72 0.84 1');
@@ -211,21 +220,23 @@ function makeEventPdf(event, photo) {
   drawText('EVENT REPORT',469,30,8,'0.45 0.5 0.58');
   const contentId=add(stream(content));
   const pageIds=[add('')];
-  if(photo){
+  photos.forEach((photoEntry,index)=>{
+    const currentPhoto=photoEntry.photo,imageName=`Im${index+1}`,photoTitle=photoEntry.title;
     let photoContent='q 0.96 0.97 0.99 rg 0 0 595 842 re f Q\nq 0.03 0.14 0.29 rg 0 720 595 122 re f Q\n';
     const title=(text,x,y,size,color)=>`BT /F1 ${size} Tf ${color} rg ${x} ${y} Td (${pdfEscape(text)}) Tj ET\n`;
     photoContent+=title('CIVIC SURVEILLANCE',42,806,10,'0.72 0.84 1');
-    photoContent+=title('EVENT PHOTOGRAPH',42,772,22,'1 1 1');
-    photoContent+=title(`${event.module}  ·  ${event.id}`,42,746,11,'0.82 0.88 0.96');
+    photoContent+=title(photoTitle,42,772,22,'1 1 1');
+    photoContent+=title(`${event.module} - ${event.id}`,42,746,11,'0.82 0.88 0.96');
     photoContent+='q 1 1 1 rg 37 101 521 578 re f Q q 0.87 0.9 0.94 RG 0.7 w 37 101 521 578 re S Q\n';
-    const maxW=489,maxH=546,ratio=Math.min(maxW/photo.width,maxH/photo.height),w=photo.width*ratio,h=photo.height*ratio,x=(595-w)/2,y=117+(maxH-h)/2;
-    photoContent+=`q ${w.toFixed(2)} 0 0 ${h.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)} cm /Im1 Do Q\n`;
+    const maxW=489,maxH=546,ratio=Math.min(maxW/currentPhoto.width,maxH/currentPhoto.height),w=currentPhoto.width*ratio,h=currentPhoto.height*ratio,x=(595-w)/2,y=117+(maxH-h)/2;
+    photoContent+=`q ${w.toFixed(2)} 0 0 ${h.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)} cm /${imageName} Do Q\n`;
     photoContent+='q 0.85 0.89 0.94 RG 0.7 w 42 48 m 553 48 l S Q\n';
-    photoContent+=title('CIVIC SURVEILLANCE  •  HISTORIC EVENTS',42,30,8,'0.45 0.5 0.58');
-    photoContent+=title('EVENT PHOTO',469,30,8,'0.45 0.5 0.58');
+    photoContent+=title('CIVIC SURVEILLANCE - HISTORIC EVENTS',42,30,8,'0.45 0.5 0.58');
+    photoContent+=title(photoTitle==='EVENT PHOTOGRAPH'?'EVENT PHOTO':'RESOLUTION PHOTO',469,30,8,'0.45 0.5 0.58');
     const photoContentId=add(stream(photoContent)); pageIds.push(add(''));
-    objects[pageIds[1]-1]=`<< /Type /Page /Parent ${pages} 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 ${font} 0 R >> /XObject << /Im1 ${imageId} 0 R >> >> /Contents ${photoContentId} 0 R >>`;
-  }
+    const xObjects=imageIds.map((id,i)=>`/Im${i+1} ${id} 0 R`).join(' ');
+    objects[pageIds[pageIds.length-1]-1]=`<< /Type /Page /Parent ${pages} 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 ${font} 0 R >> /XObject << ${xObjects} >> >> /Contents ${photoContentId} 0 R >>`;
+  });
   objects[pageIds[0]-1]=`<< /Type /Page /Parent ${pages} 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 ${font} 0 R >> >> /Contents ${contentId} 0 R >>`;
   objects[pages-1]=`<< /Type /Pages /Kids [${pageIds.map(id=>`${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`;
   objects[catalog-1]=`<< /Type /Catalog /Pages ${pages} 0 R >>`;
@@ -240,11 +251,12 @@ async function downloadEvent(id) {
   const entry=events.find(x=>x.id===String(id)); if(!entry)return;
   const button=$('#downloadBtn'); button.disabled=true;
   try {
-    if (!detail || String(get(detail,'id','event_id','eventId')) !== entry.id || !normalize(detail).image) await loadDetails(entry);
+    await loadDetails(entry);
     const data=detail||entry.raw, e=normalize(data);
-    let photo=null;
+    let photo=null,resolutionPhoto=null;
     if(e.image){try{photo=await jpegImage(e.image);}catch{toast('The event photo could not be loaded; downloading the report without it.');}}
-    const url=URL.createObjectURL(makeEventPdf({...e,module:eventTypeLabel(data)},photo));
+    if(e.resolutionImage){try{resolutionPhoto=await jpegImage(e.resolutionImage);}catch{toast('The resolution photo could not be loaded; downloading the report without it.');}}
+    const url=URL.createObjectURL(makeEventPdf({...e,module:eventTypeLabel(data)},photo,resolutionPhoto));
     const anchor=document.createElement('a');anchor.href=url;anchor.download=`${entry.id.replace(/[^a-z0-9_-]/gi,'_')}-event-report.pdf`;document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   } catch(err) { toast(err.message||'Unable to create the event PDF.'); }
   finally {button.disabled=false;}

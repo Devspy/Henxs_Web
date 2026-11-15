@@ -62,6 +62,8 @@ function openTaskStatusDialog(task){
 }
 function statusClass(status){return status.toLowerCase().replaceAll(' ','-')}
 function imageSource(task){if(!task||task.image===fallback)return '';if(/^(data:image\/|https?:\/\/)/i.test(task.image))return task.image;const mime=pick(task.raw,'image_mime_type','mime_type');return `data:${mime.startsWith('image/')?mime:'image/jpeg'};base64,${task.image}`}
+function resolutionImageSource(task){const image=pick(task?.raw,'resolve_image_base64','resolved_image_base64','resolution_image_base64','resolve_image');if(image===fallback)return '';if(/^(data:image\/|https?:\/\/)/i.test(image))return image;const mime=pick(task.raw,'resolve_image_mime_type','resolved_image_mime_type','resolution_image_mime_type');return `data:${mime.startsWith('image/')?mime:'image/jpeg'};base64,${image}`}
+function resolutionMessage(task){return pick(task?.raw,'resolve_message','resolved_message','resolution_message')}
 function populateFilters(){
   const zones=[...new Set(tasks.map(task=>task.zone).filter(value=>value!==fallback))].sort();
   const modules=[...new Set(tasks.map(task=>task.module).filter(Boolean))].sort();
@@ -134,9 +136,11 @@ async function showTask(id,button){
   title.textContent=`${titleType} Event Details`;
   const hasCoordinates=Number.isFinite(task.latitude)&&Number.isFinite(task.longitude)&&Math.abs(task.latitude)<=90&&Math.abs(task.longitude)<=180;
   const location=hasCoordinates?`GPS coordinates <a class="event-map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${task.latitude},${task.longitude}`)}" target="_blank" rel="noopener noreferrer" aria-label="Open GPS coordinates in Google Maps" title="Open GPS coordinates in Google Maps"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 15s5-4.4 5-8A5 5 0 1 0 3 7c0 3.6 5 8 5 8Zm0-6.2A1.8 1.8 0 1 1 8 5.2a1.8 1.8 0 0 1 0 3.6Z"/></svg><span>Map</span></a>`:escapeHtml(task.location);
+  const resolutionSrc=resolutionImageSource(task),resolvedMessage=resolutionMessage(task),resolved=statusCategory(task.rawStatus)==='Completed'||statusCategory(task.status)==='Completed'||Boolean(resolutionSrc)||resolvedMessage!==fallback;
   const fields=[['Event ID',task.id],['Event Type',rawType],['Vehicle No.',task.vehicle],['Location',location],['Zone',task.zone],['Severity',task.severity],['Detected On',task.detected],['Status',task.rawStatus],['Assigned To',task.assigned],['Camera Name',task.camera]];
-  const src=imageSource(task);
-  body.innerHTML=`${src?`<img class="dashboard-event-detail-image" src="${escapeHtml(src)}" alt="${escapeHtml(titleType)} event ${escapeHtml(task.id)}">`:'<div class="dashboard-event-detail-no-image">Event image unavailable</div>'}<dl>${fields.map(([label,value])=>`<dt>${escapeHtml(label)}</dt><dd${label==='Location'?' class="detail-location"':''}>${label==='Location'?location:escapeHtml(value)}</dd>`).join('')}</dl>${isAssignedToCurrentUser(task)?'<div class="task-detail-actions"><button type="button" class="btn primary" id="taskUpdateStatus">Update Status</button></div>':''}`;
+  if(resolved&&resolvedMessage!==fallback)fields.push(['Resolution Message',resolvedMessage]);
+  const src=imageSource(task),imageMarkup=`<div class="dashboard-event-detail-images"><section><h3>Event Image</h3>${src?`<img class="dashboard-event-detail-image" src="${escapeHtml(src)}" alt="${escapeHtml(titleType)} event ${escapeHtml(task.id)}">`:'<div class="dashboard-event-detail-no-image">Event image unavailable</div>'}</section>${resolved?`<section><h3>Resolution Image</h3>${resolutionSrc?`<img class="dashboard-event-detail-image" src="${escapeHtml(resolutionSrc)}" alt="Resolution image for ${escapeHtml(task.id)}">`:'<div class="dashboard-event-detail-no-image">Resolution image unavailable</div>'}</section>`:''}</div>`;
+  body.innerHTML=`${imageMarkup}<dl>${fields.map(([label,value])=>`<dt>${escapeHtml(label)}</dt><dd${label==='Location'?' class="detail-location"':label==='Resolution Message'?' class="resolution-message"':''}>${label==='Location'?location:escapeHtml(value)}</dd>`).join('')}</dl>${isAssignedToCurrentUser(task)?'<div class="task-detail-actions"><button type="button" class="btn primary" id="taskUpdateStatus">Update Status</button></div>':''}`;
   $('#taskUpdateStatus')?.addEventListener('click',()=>openTaskStatusDialog(task));
   $$('#taskRows tr[data-id]').forEach(row=>row.classList.toggle('chosen',row.dataset.id===id));
 }

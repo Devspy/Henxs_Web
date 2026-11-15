@@ -380,5 +380,38 @@ def assign_event(event_id):
         return jsonify({"detail": "assigned_to must be a non-empty string."}), 400
     return proxy_events_api(f"{EVENTS_API_URL}/{event_id}/assign", "PATCH", {"assigned_to": payload["assigned_to"]})
 
+
+@app.route("/api/v1/events/<event_id>/resolve", methods=["PATCH"])
+@login_required
+def resolve_event(event_id):
+    if not event_id or "/" in event_id:
+        return jsonify({"detail": "Invalid event ID."}), 400
+    authorization = request.headers.get("Authorization", "")
+    if not authorization.startswith("Bearer "):
+        return jsonify({"detail": "A bearer access token is required."}), 401
+    if session.get("user_role") not in {"admin", "super_admin"} and not event_assigned_to_current_user(event_id, authorization):
+        return jsonify({"detail": "You can resolve only events assigned to your account."}), 403
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict) or not isinstance(payload.get("resolve_message"), str) or not payload["resolve_message"].strip():
+        return jsonify({"detail": "resolve_message must be a non-empty string."}), 400
+    if not isinstance(payload.get("resolve_image_base64"), str) or not payload["resolve_image_base64"].strip():
+        return jsonify({"detail": "A resolution image is required."}), 400
+    mime_type = payload.get("resolve_image_mime_type")
+    if not isinstance(mime_type, str) or not mime_type.startswith("image/"):
+        return jsonify({"detail": "resolve_image_mime_type must be an image MIME type."}), 400
+    latitude = payload.get("resolve_latitude")
+    longitude = payload.get("resolve_longitude")
+    if isinstance(latitude, bool) or not isinstance(latitude, (int, float)) or not -90 <= latitude <= 90:
+        return jsonify({"detail": "resolve_latitude must be a valid latitude."}), 400
+    if isinstance(longitude, bool) or not isinstance(longitude, (int, float)) or not -180 <= longitude <= 180:
+        return jsonify({"detail": "resolve_longitude must be a valid longitude."}), 400
+    return proxy_events_api(f"{EVENTS_API_URL}/{event_id}/resolve", "PATCH", {
+        "resolve_message": payload["resolve_message"].strip(),
+        "resolve_image_base64": payload["resolve_image_base64"],
+        "resolve_image_mime_type": mime_type,
+        "resolve_latitude": latitude,
+        "resolve_longitude": longitude,
+    })
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8001, debug=True)
