@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashboard | CIVIC SURVEILLANCE</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='5') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='7') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://www.google.com">
 <link rel="preconnect" href="https://maps.googleapis.com">
 <link rel="preconnect" href="https://maps.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css', v='4') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css', v='6') }}">
 </head>
 <body>
 <div class="dashboard-shell">
@@ -35,8 +35,7 @@
 <header class="topbar">
 <div class="breadcrumb">Home <span>›</span> Dashboard</div>
 <div class="top-tools">
-<label class="top-search"><span>⌕</span><input id="globalSearch" placeholder="Search..."></label>
-<button class="notification" aria-label="Notifications">♧<i>5</i></button>
+<input id="globalSearch" type="hidden" value="">
 <div class="profile-avatar">AD</div><div class="profile-name"><b>Admin</b><small>Administrator</small></div>
 </div>
 </header>

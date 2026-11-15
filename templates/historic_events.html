@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Historic Events | CIVIC SURVEILLANCE</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='4') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='6') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css', v='4') }}">
 </head>
@@ -16,7 +16,7 @@
     </nav>
   </aside>
   <main class="main">
-    <header class="topbar"><div class="crumb">Home <span>›</span> Historic Events</div><div class="top-actions"><label class="global-search">⌕ <input placeholder="Search..." id="globalSearch"></label><button class="bell" title="Notifications">♧<i>5</i></button><div class="avatar">AD</div><div class="admin"><b>Admin</b><small>Administrator</small></div></div></header>
+    <header class="topbar"><div class="crumb">Home <span>›</span> Historic Events</div><div class="top-actions"><input id="globalSearch" type="hidden" value=""><div class="avatar">AD</div><div class="admin"><b>Admin</b><small>Administrator</small></div></div></header>
     <section class="content history-content">
       <div class="history-heading"><div class="heading-icon">◷</div><div class="heading-copy"><h1>Historic Events</h1><p>View and analyze past pothole and garbage detection events.</p></div></div>
       <div class="history-filters"><div class="date-filter"><label>From <input id="dateFrom" type="date" aria-label="Start date"></label><label>To <input id="dateTo" type="date" aria-label="End date"></label></div><select id="moduleFilter"><option>All Modules</option></select><select id="zoneFilter"><option>All Zones</option></select><select id="statusFilter"><option>All Status</option></select><button class="btn primary" id="applyFilters">Apply</button><button class="btn" id="resetFilters">Reset</button><button class="btn outline export-btn" id="exportReport">⇩ &nbsp;Export Report</button></div>
