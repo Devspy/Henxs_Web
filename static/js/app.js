@@ -75,8 +75,8 @@ function filteredTasks(){
   return tasks.filter(task=>canViewTask(task)&&(activeStatus==='All Tasks'||task.status===activeStatus)&&(!query||[task.id,task.module,task.issue,task.location,task.zone,task.status,task.assigned,task.due].join(' ').toLowerCase().includes(query))&&(zone==='All Zones'||task.zone===zone)&&(module==='All Modules'||task.module===module));
 }
 function renderStats(){
-  const visibleTasks=tasks.filter(canViewTask),counts={total:visibleTasks.length,pending:0,progress:0,completed:0};
-  visibleTasks.forEach(task=>{const category=statusCategory(task.status);if(category==='Pending')counts.pending++;else if(category==='In Progress')counts.progress++;else if(category==='Completed')counts.completed++;});
+  const visibleTasks=tasks.filter(canViewTask),counts={total:visibleTasks.length,pending:0,progress:0,completed:0,acknowledged:0};
+  visibleTasks.forEach(task=>{const category=statusCategory(task.status);if(category==='Pending')counts.pending++;else if(category==='In Progress')counts.progress++;else if(category==='Completed')counts.completed++;else if(category==='Acknowledged')counts.acknowledged++;});
   Object.entries(counts).forEach(([key,count])=>{const node=$(`[data-task-stat="${key}"]`);if(node)node.textContent=count.toLocaleString();});
 }
 function renderPagination(pageCount){
@@ -140,8 +140,7 @@ async function showTask(id,button){
   const fields=[['Event ID',task.id],['Event Type',rawType],['Vehicle No.',task.vehicle],['Location',location],['Zone',task.zone],['Severity',task.severity],['Detected On',task.detected],['Status',task.rawStatus],['Assigned To',task.assigned],['Camera Name',task.camera]];
   if(resolved&&resolvedMessage!==fallback)fields.push(['Resolution Message',resolvedMessage]);
   const src=imageSource(task),imageMarkup=`<div class="dashboard-event-detail-images"><section><h3>Event Image</h3>${src?`<img class="dashboard-event-detail-image" src="${escapeHtml(src)}" alt="${escapeHtml(titleType)} event ${escapeHtml(task.id)}">`:'<div class="dashboard-event-detail-no-image">Event image unavailable</div>'}</section>${resolved?`<section><h3>Resolution Image</h3>${resolutionSrc?`<img class="dashboard-event-detail-image" src="${escapeHtml(resolutionSrc)}" alt="Resolution image for ${escapeHtml(task.id)}">`:'<div class="dashboard-event-detail-no-image">Resolution image unavailable</div>'}</section>`:''}</div>`;
-  body.innerHTML=`${imageMarkup}<dl>${fields.map(([label,value])=>`<dt>${escapeHtml(label)}</dt><dd${label==='Location'?' class="detail-location"':label==='Resolution Message'?' class="resolution-message"':''}>${label==='Location'?location:escapeHtml(value)}</dd>`).join('')}</dl>${isAssignedToCurrentUser(task)?'<div class="task-detail-actions"><button type="button" class="btn primary" id="taskUpdateStatus">Update Status</button></div>':''}`;
-  $('#taskUpdateStatus')?.addEventListener('click',()=>openTaskStatusDialog(task));
+  body.innerHTML=`${imageMarkup}<dl>${fields.map(([label,value])=>`<dt>${escapeHtml(label)}</dt><dd${label==='Location'?' class="detail-location"':label==='Resolution Message'?' class="resolution-message"':''}>${label==='Location'?location:escapeHtml(value)}</dd>`).join('')}</dl>`;
   $$('#taskRows tr[data-id]').forEach(row=>row.classList.toggle('chosen',row.dataset.id===id));
 }
 async function loadTasks(){
@@ -155,7 +154,7 @@ async function loadTasks(){
       const batch=listFrom(nextPayload);all=all.concat(batch);loadingMoreTasks=batch.length===100;allTasks=all.map(normalizeTask).filter(task=>task.id!==fallback&&task.id!=='');tasks=allTasks.filter(canViewTask);populateFilters();renderStats();renderRows();
       try{sessionStorage.setItem(cacheKey,JSON.stringify({savedAt:Date.now(),events:all}));}catch{}
     }
-  }catch(error){loadingMoreTasks=false;renderRows();if(!hasData){$('#taskRows').innerHTML=`<tr><td colspan="8">${escapeHtml(error.message)}</td></tr>`;$('#showingText').textContent='Tasks could not be loaded';['total','pending','progress','completed'].forEach(key=>{const node=$(`[data-task-stat="${key}"]`);if(node)node.textContent=fallback;});toast(error.message);}}
+  }catch(error){loadingMoreTasks=false;renderRows();if(!hasData){$('#taskRows').innerHTML=`<tr><td colspan="8">${escapeHtml(error.message)}</td></tr>`;$('#showingText').textContent='Tasks could not be loaded';['total','pending','progress','completed','acknowledged'].forEach(key=>{const node=$(`[data-task-stat="${key}"]`);if(node)node.textContent=fallback;});toast(error.message);}}
 }
 
 async function loadAssignedUserNames(){

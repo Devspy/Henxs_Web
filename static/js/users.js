@@ -57,7 +57,7 @@ function renderDetail(){
  else entries=Object.entries(raw).filter(([key])=>/(activity|login|sign.?in|created|updated)/i.test(key));
  const body=entries.length?`<dl class="detail-fields">${entries.map(([key,value])=>`<dt>${escapeHtml(key.replace(/[_-]/g,' ').replace(/\b\w/g,char=>char.toUpperCase()))}</dt><span>:</span><dd>${escapeHtml(formatUserValue(value))}</dd>`).join('')}</dl>`:`<p class="empty-detail">No ${tab.toLowerCase()} details are available from the user service.</p>`;
  const actions=tab==='Details'?`<div class="user-actions"><button type="button" class="edit-user" id="detailEditUser">✎ &nbsp; Edit User</button><button type="button" id="resetPassword">⊙ &nbsp; Reset Password</button><button type="button" class="deactivate-user">Deactivate User</button></div>`:'';
- container.innerHTML=head+body+actions;
+ container.innerHTML=head+body+(selected.status==='Active'?actions:actions.replace('<button type="button" class="deactivate-user">Deactivate User</button>',''));
  container.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>{tab=button.dataset.tab;renderDetail();}));
  container.querySelector('#detailEditUser')?.addEventListener('click',openEditUserModal);
  container.querySelector('#resetPassword')?.addEventListener('click',openResetPasswordModal);

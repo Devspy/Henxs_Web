@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Task Management | CIVIC SURVEILLANCE</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='7') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='8') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -41,6 +41,7 @@
 <div class="stat-card"><div class="stat-icon orange">◷</div><div><strong data-task-stat="pending">—</strong><span>Pending Tasks</span></div></div>
 <div class="stat-card"><div class="stat-icon green-bg">✓</div><div><strong data-task-stat="progress">—</strong><span>In Progress Tasks</span></div></div>
 <div class="stat-card"><div class="stat-icon cyan">☑</div><div><strong data-task-stat="completed">—</strong><span>Completed Tasks</span></div></div>
+<div class="stat-card"><div class="stat-icon cyan">✓</div><div><strong data-task-stat="acknowledged">—</strong><span>Acknowledged Tasks</span></div></div>
 </div>
 <div class="workspace task-workspace">
 <section class="task-panel">
@@ -57,7 +58,7 @@
 </section>
 </main>
 </div>
-<script src="{{ url_for('static', filename='js/app.js', v='14') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js', v='16') }}"></script>
 <script src="{{ url_for('static', filename='js/auth.js', v='3') }}"></script>
 </body>
 </html>
