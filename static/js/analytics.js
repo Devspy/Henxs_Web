@@ -19,14 +19,14 @@ const coordinates = e => {
   return Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? { lat, lng } : null;
 };
 const statusName = e => String(pick(e, 'status')).toLowerCase();
-const eventDate = e => { const d = new Date(pick(e, 'event_time', 'detected_at', 'created_at', 'timestamp', 'time')); return Number.isNaN(+d) ? null : d; };
+const eventDate = e => { const d = parseUtcTimestamp(pick(e, 'event_time', 'detected_at', 'created_at', 'timestamp', 'time')); return Number.isNaN(+d) ? null : d; };
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function metric(i, value) { document.querySelectorAll('.metric strong')[i].textContent = value; }
 function render() {
   const module = $('#moduleFilter').value, zone = $('#zoneFilter').value;
   const query = $('#globalSearch').value.trim().toLowerCase();
-  const from = $('#dateFrom').value ? new Date(`${$('#dateFrom').value}T00:00:00`) : null;
-  const to = $('#dateTo').value ? new Date(`${$('#dateTo').value}T23:59:59.999`) : null;
+  const from = $('#dateFrom').value ? parseUtcTimestamp(`${$('#dateFrom').value}T00:00:00+05:30`) : null;
+  const to = $('#dateTo').value ? parseUtcTimestamp(`${$('#dateTo').value}T23:59:59.999+05:30`) : null;
   filtered = events.filter(e => (!module || module === 'All Modules' || moduleName(e) === module) && (!zone || zone === 'All Zones' || zoneName(e) === zone) && (!from || (eventDate(e) && eventDate(e) >= from)) && (!to || (eventDate(e) && eventDate(e) <= to)) && (!query || JSON.stringify(e).toLowerCase().includes(query)));
   const potholes = filtered.filter(e => moduleName(e) === 'Pothole').length;
   const garbage = filtered.filter(e => moduleName(e) === 'Garbage').length;
@@ -65,7 +65,7 @@ function render() {
   const topAreas=[...areas].sort((a,b)=>(b[1].p+b[1].g)-(a[1].p+a[1].g)).slice(0,5);
   $('#areaRows').innerHTML=topAreas.map(([key,z],i)=>`<tr><td>${i+1}</td><td data-area-key="${key}">${esc(areaLookups.get(key)||'Loading area name…')}</td><td>${z.p}</td><td>${z.g}</td><td>${z.p+z.g}</td></tr>`).join('') || '<tr><td colspan="5">No coordinate data for this selection.</td></tr>';
   resolveAreaNames(topAreas);
-  const days=new Map(); filtered.forEach(e=>{const d=eventDate(e);if(!d)return; const key=d.toISOString().slice(0,10);const row=days.get(key)||{p:0,g:0,r:0};if(moduleName(e)==='Pothole')row.p++;if(moduleName(e)==='Garbage')row.g++;if(/resolved|complete|closed/.test(statusName(e)))row.r++;days.set(key,row);});
+  const days=new Map(); filtered.forEach(e=>{const d=eventDate(e);if(!d)return; const key=indianDateKey(d);const row=days.get(key)||{p:0,g:0,r:0};if(moduleName(e)==='Pothole')row.p++;if(moduleName(e)==='Garbage')row.g++;if(/resolved|complete|closed/.test(statusName(e)))row.r++;days.set(key,row);});
   renderTrend([...days].sort((a,b)=>a[0].localeCompare(b[0])).slice(-14));
 }
 async function resolveAreaNames(areas) {
@@ -121,7 +121,7 @@ function reportCanvas(){
   const resolved=filtered.filter(e=>/resolved|complete|closed/.test(statusName(e))).length,assigned=filtered.filter(e=>/assigned|progress/.test(statusName(e))).length,pending=filtered.filter(e=>/pending|open|new/.test(statusName(e))).length;
   ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);text('Analytics & Report',64,70,40,colors.ink,700);
   const dateFrom=$('#dateFrom').value,dateTo=$('#dateTo').value,filterParts=[`Module: ${$('#moduleFilter').value}`,`Zone: ${$('#zoneFilter').value}`],dateRange=dateFrom||dateTo?`Date range: ${dateFrom||'Any'} to ${dateTo||'Any'}`:'Date range: All dates';
-  text(filterParts.join('   •   '),64,108,17,colors.muted,500);text(dateRange,64,136,17,colors.muted,500);text(`Generated ${new Date().toLocaleString()}`,64,164,15,colors.muted,400);
+  text(filterParts.join('   •   '),64,108,17,colors.muted,500);text(dateRange,64,136,17,colors.muted,500);text(`Generated ${formatIndianDateTime(new Date())}`,64,164,15,colors.muted,400);
   const metricData=[['Total Potholes',potholes,colors.red],['Total Garbage',garbage,colors.orange],['Resolved Issues',resolved,colors.blue],['Average Resolution Time','—','#8753e8']];
   metricData.forEach(([label,value,color],i)=>{const x=64+i*370,y=190,w=350,h=98;ctx.fillStyle='#fff';ctx.strokeStyle=colors.line;ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x,y,w,h,14);ctx.fill();ctx.stroke();ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x+16,y+19,58,58,12);ctx.fill();text(label,x+91,y+38,17,colors.muted,500);text(value,x+91,y+72,27,colors.ink,700);});
   const trend={x:64,y:310,w:950,h:400},distribution={x:1034,y:310,w:502,h:400},zoneBox={x:64,y:730,w:950,h:410},resolution={x:1034,y:730,w:502,h:410},topZonesBox={x:64,y:1160,w:720,h:590},areasBox={x:804,y:1160,w:732,h:590};
@@ -131,7 +131,7 @@ function reportCanvas(){
   card(resolution.x,resolution.y,resolution.w,resolution.h,'Issue Resolution Status','Status distribution of recorded events');
   card(topZonesBox.x,topZonesBox.y,topZonesBox.w,topZonesBox.h,'Top 5 Zones by Issues','Highest reporting zones');
   card(areasBox.x,areasBox.y,areasBox.w,areasBox.h,'Top 5 Areas by Issues','Nearby detections grouped by coordinates');
-  const dayMap=new Map();filtered.forEach(e=>{const date=eventDate(e);if(!date)return;const key=date.toISOString().slice(0,10),row=dayMap.get(key)||{p:0,g:0,r:0};if(moduleName(e)==='Pothole')row.p++;if(moduleName(e)==='Garbage')row.g++;if(/resolved|complete|closed/.test(statusName(e)))row.r++;dayMap.set(key,row);});
+  const dayMap=new Map();filtered.forEach(e=>{const date=eventDate(e);if(!date)return;const key=indianDateKey(date),row=dayMap.get(key)||{p:0,g:0,r:0};if(moduleName(e)==='Pothole')row.p++;if(moduleName(e)==='Garbage')row.g++;if(/resolved|complete|closed/.test(statusName(e)))row.r++;dayMap.set(key,row);});
   const days=[...dayMap].sort((a,b)=>a[0].localeCompare(b[0])).slice(-14),plot={x:trend.x+55,y:trend.y+100,w:trend.w-85,h:trend.h-145},maxDaily=Math.max(1,...days.flatMap(([,d])=>[d.p,d.g,d.r]));
   ctx.strokeStyle=colors.line;ctx.lineWidth=1;for(let i=0;i<5;i++){const y=plot.y+plot.h*i/4;ctx.beginPath();ctx.moveTo(plot.x,y);ctx.lineTo(plot.x+plot.w,y);ctx.stroke();text(Math.round(maxDaily*(1-i/4)),trend.x+20,y+5,13,colors.muted,400);}
   const dayStep=plot.w/Math.max(days.length,1),barW=Math.min(13,dayStep*.17);days.forEach(([date,d],i)=>{const base=plot.x+i*dayStep+dayStep*.16;[d.p,d.g,d.r].forEach((value,j)=>{const h=value/maxDaily*(plot.h-5);ctx.fillStyle=[colors.red,colors.blue,colors.teal][j];ctx.fillRect(base+j*(barW+4),plot.y+plot.h-h,barW,h);});text(date.slice(5),base-5,plot.y+plot.h+24,11,colors.muted,400);});
@@ -164,7 +164,7 @@ function pdfFromJpeg(jpeg,width,height){
 }
 async function downloadAnalyticsPdf(){
   const button=$('#downloadReport'),label=button.textContent;button.disabled=true;button.textContent='Preparing PDF...';
-  try{const canvas=reportCanvas(),blob=await new Promise((resolve,reject)=>canvas.toBlob(result=>result?resolve(result):reject(new Error('Could not create the PDF report image.')),'image/jpeg',.94)),jpeg=new Uint8Array(await blob.arrayBuffer()),pdf=pdfFromJpeg(jpeg,canvas.width,canvas.height),url=URL.createObjectURL(new Blob([pdf],{type:'application/pdf'})),link=document.createElement('a'),date=new Date().toISOString().slice(0,10);link.href=url;link.download=`analytics-report-${date}.pdf`;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);$('#toast').textContent='PDF report downloaded.';$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),2400);}catch(error){$('#toast').textContent=error.message||'Could not download the PDF report.';$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),3000);}finally{button.disabled=false;button.textContent=label;}
+  try{const canvas=reportCanvas(),blob=await new Promise((resolve,reject)=>canvas.toBlob(result=>result?resolve(result):reject(new Error('Could not create the PDF report image.')),'image/jpeg',.94)),jpeg=new Uint8Array(await blob.arrayBuffer()),pdf=pdfFromJpeg(jpeg,canvas.width,canvas.height),url=URL.createObjectURL(new Blob([pdf],{type:'application/pdf'})),link=document.createElement('a'),date=indianDateKey(new Date());link.href=url;link.download=`analytics-report-${date}.pdf`;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);$('#toast').textContent='PDF report downloaded.';$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),2400);}catch(error){$('#toast').textContent=error.message||'Could not download the PDF report.';$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),3000);}finally{button.disabled=false;button.textContent=label;}
 }
 $('#downloadReport').addEventListener('click',downloadAnalyticsPdf);
 initialize();

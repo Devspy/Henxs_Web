@@ -7,7 +7,7 @@ const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;'
 const listFrom=data=>Array.isArray(data)?data:(data?.events||data?.items||data?.results||(Array.isArray(data?.data)?data.data:[]));
 function assignedDisplay(event){if(Object.prototype.hasOwnProperty.call(event,'assigned_to')&&(event.assigned_to===null||event.assigned_to===undefined||event.assigned_to===''||['unassigned','none','null','undefined','not assigned'].includes(String(event.assigned_to).trim().toLowerCase())))return fallback;const explicit=event.assigned_to_name||event.assigned_user_name||event.assignee_name||event.assignedToName||event.assigneeName;if(explicit)return explicit;let assigned=event.assigned_to??event.assignee??event.assigned??event.operator_name,object=assigned&&typeof assigned==='object'?assigned:{};const name=object.name||object.username||object.user_name||object.full_name||object.display_name;if(name)return name;assigned=object.id||object.user_id||object.userId||object._id||assigned;let names={};try{names=JSON.parse(sessionStorage.getItem('assigned_user_names')||'{}')||{}}catch{}const id=String(assigned);if(names[id])return names[id];try{const user=JSON.parse(sessionStorage.getItem('auth_user')||'{}')||{},userIds=[user.id,user.user_id,user.userId,user._id].map(value=>String(value??'')),userName=user.name||user.full_name||user.fullName||user.username||user.user_name||user.userName||sessionStorage.getItem('auth_username');if(userName&&userIds.includes(id))return userName}catch{}return assigned||fallback}
 function userListFrom(data){if(Array.isArray(data))return data;if(!data||typeof data!=='object')return[];for(const key of ['users','items','results','data']){const nested=data[key];if(Array.isArray(nested))return nested;const users=userListFrom(nested);if(users.length)return users}return[]}
-const formatDate=value=>{if(!value||value===fallback)return fallback;const date=new Date(value);return Number.isNaN(date.getTime())?String(value):date.toLocaleString();};
+const formatDate=value=>{if(!value||value===fallback)return fallback;const date=new Date(value);return Number.isNaN(date.getTime())?String(value):formatIndianDateTime(date);};
 let tasks=[];
 let allTasks=[];
 let activeStatus='All Tasks';
@@ -38,7 +38,7 @@ function statusCategory(value){const status=String(value??'').trim().toLowerCase
 function statusFor(event,due){
   const rawStatus=pick(event,'status','state','event_status','task_status','resolution_status'),status=String(rawStatus).trim().toLowerCase().replace(/[_-]+/g,' '),acknowledged=event.acknowledged===true||event.is_acknowledged===true||event.isAcknowledged===true||Boolean(event.acknowledged_at||event.acknowledgedAt),category=acknowledged?'Acknowledged':statusCategory(status);
   if(category)return category;
-  if(due!==fallback){const date=new Date(due);if(!Number.isNaN(date.getTime())&&date<new Date())return 'Overdue';}
+  if(due!==fallback){const date=parseUtcTimestamp(due);if(!Number.isNaN(date.getTime())&&date<new Date())return 'Overdue';}
   return status===String(fallback).toLowerCase()?fallback:status.replace(/\b\w/g,letter=>letter.toUpperCase());
 }
 function normalizeTask(event){
@@ -115,7 +115,7 @@ function renderRows(){
     <td class="task-id">${escapeHtml(task.id)}</td>
     <td><span class="module-icon ${task.module==='Pothole'?'pothole':task.module==='Garbage'?'garbage':'manhole'}">${task.module==='Pothole'?'▲':task.module==='Garbage'?'▤':'◉'}</span>${escapeHtml(task.module)}</td>
     <td title="${escapeHtml(task.vehicle)}">${escapeHtml(task.vehicle)}</td><td class="task-location-cell">${taskLocationMarkup(task)}</td><td title="${escapeHtml(task.zone)}">${escapeHtml(task.zone)}</td>
-    <td title="${escapeHtml(task.detected)}">${escapeHtml(task.detected)}</td><td class="task-status-cell">${escapeHtml(task.rawStatus===fallback?task.status:task.rawStatus)}</td>
+    <td title="${escapeHtml(formatIndianDateTime(task.detected))}">${escapeHtml(formatIndianDateTime(task.detected))}</td><td class="task-status-cell">${escapeHtml(task.rawStatus===fallback?task.status:task.rawStatus)}</td>
     <td class="task-actions-cell"><button class="view-btn" data-view="${escapeHtml(task.id)}" title="View task" aria-label="View task ${escapeHtml(task.id)}">View</button></td></tr>`).join(''):`<tr><td colspan="8">${tasks.length?'No tasks match these filters.':'No task data is available.'}</td></tr>`;
   const end=Math.min(start+visible.length,filtered.length);
   $('#showingText').textContent=`Showing ${filtered.length?start+1:0} to ${end} of ${filtered.length} tasks${loadingMoreTasks?' · Loading more…':''}`;
@@ -137,7 +137,7 @@ async function showTask(id,button){
   const hasCoordinates=Number.isFinite(task.latitude)&&Number.isFinite(task.longitude)&&Math.abs(task.latitude)<=90&&Math.abs(task.longitude)<=180;
   const location=hasCoordinates?`GPS coordinates <a class="event-map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${task.latitude},${task.longitude}`)}" target="_blank" rel="noopener noreferrer" aria-label="Open GPS coordinates in Google Maps" title="Open GPS coordinates in Google Maps"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 15s5-4.4 5-8A5 5 0 1 0 3 7c0 3.6 5 8 5 8Zm0-6.2A1.8 1.8 0 1 1 8 5.2a1.8 1.8 0 0 1 0 3.6Z"/></svg><span>Map</span></a>`:escapeHtml(task.location);
   const resolutionSrc=resolutionImageSource(task),resolvedMessage=resolutionMessage(task),resolved=statusCategory(task.rawStatus)==='Completed'||statusCategory(task.status)==='Completed'||Boolean(resolutionSrc)||resolvedMessage!==fallback;
-  const fields=[['Event ID',task.id],['Event Type',rawType],['Vehicle No.',task.vehicle],['Location',location],['Zone',task.zone],['Severity',task.severity],['Detected On',task.detected],['Status',task.rawStatus],['Assigned To',task.assigned],['Camera Name',task.camera]];
+  const fields=[['Event ID',task.id],['Event Type',rawType],['Vehicle No.',task.vehicle],['Location',location],['Zone',task.zone],['Severity',task.severity],['Detected On',formatIndianDateTime(task.detected)],['Status',task.rawStatus],['Assigned To',task.assigned],['Camera Name',task.camera]];
   if(resolved&&resolvedMessage!==fallback)fields.push(['Resolution Message',resolvedMessage]);
   const src=imageSource(task),imageMarkup=`<div class="dashboard-event-detail-images"><section><h3>Event Image</h3>${src?`<img class="dashboard-event-detail-image" src="${escapeHtml(src)}" alt="${escapeHtml(titleType)} event ${escapeHtml(task.id)}">`:'<div class="dashboard-event-detail-no-image">Event image unavailable</div>'}</section>${resolved?`<section><h3>Resolution Image</h3>${resolutionSrc?`<img class="dashboard-event-detail-image" src="${escapeHtml(resolutionSrc)}" alt="Resolution image for ${escapeHtml(task.id)}">`:'<div class="dashboard-event-detail-no-image">Resolution image unavailable</div>'}</section>`:''}</div>`;
   body.innerHTML=`${imageMarkup}<dl>${fields.map(([label,value])=>`<dt>${escapeHtml(label)}</dt><dd${label==='Location'?' class="detail-location"':label==='Resolution Message'?' class="resolution-message"':''}>${label==='Location'?location:escapeHtml(value)}</dd>`).join('')}</dl>`;

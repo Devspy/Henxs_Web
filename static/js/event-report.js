@@ -1,4 +1,4 @@
-﻿(() => {
+(() => {
   const value = (...items) => items.find(item => item !== undefined && item !== null && item !== '') ?? '—';
   const escapeHtml = input => String(input ?? '').replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
   const safeName = input => String(input || 'event').trim().replace(/[^a-z0-9_-]+/gi, '_');
@@ -62,7 +62,7 @@
       const col = index % 2, row = Math.floor(index / 2), x = left + col * (cellW + gap), y = top + row * (cellH + gap);
       context.fillStyle = '#ffffff'; context.fillRect(x, y, cellW, cellH); context.strokeStyle = '#d6e0ed'; context.strokeRect(x, y, cellW, cellH);
       context.fillStyle = '#59718f'; context.font = 'bold 18px Arial'; context.fillText(label.toUpperCase(), x + 22, y + 34);
-      context.fillStyle = '#18345b'; context.font = '23px Arial'; wrapText(context, text, x + 22, y + 72, cellW - 44, 29, 2);
+      context.fillStyle = '#18345b'; context.font = '23px Arial'; wrapText(context, label==='Detected On'?formatIndianDateTime(text):text, x + 22, y + 72, cellW - 44, 29, 2);
     });
     const imageSource = event.image || value(raw.image_base64, raw.base64_image, raw.image, raw.image_data, raw.photo);
     const imageTop = top + Math.ceil(fields.length / 2) * (cellH + gap) + 12;
@@ -98,7 +98,7 @@
       ['Detected', event.detected || value(raw.event_time, raw.detected_at, raw.created_at, raw.timestamp)]
     ];
     if (hasCoordinates) details.push(['Coordinates', `${latitude}, ${longitude}`]);
-    const rows = details.map(([label, text]) => { const content=label==='Location'&&mapUrl?`${escapeHtml(text)}<br><a href="${mapUrl}" style="display:inline-block;margin-top:5px;color:#1765d3;font-weight:700">Open location in Google Maps</a>`:escapeHtml(text); return `<tr><td style="padding:9px 12px;color:#5a6e88;border-bottom:1px solid #e4ebf3;font-weight:600">${escapeHtml(label)}</td><td style="padding:9px 12px;color:#16335d;border-bottom:1px solid #e4ebf3">${content}</td></tr>`; }).join('');
+    const rows = details.map(([label, text]) => { text=label==='Detected'?formatIndianDateTime(text):text; const content=label==='Location'&&mapUrl?`${escapeHtml(text)}<br><a href="${mapUrl}" style="display:inline-block;margin-top:5px;color:#1765d3;font-weight:700">Open location in Google Maps</a>`:escapeHtml(text); return `<tr><td style="padding:9px 12px;color:#5a6e88;border-bottom:1px solid #e4ebf3;font-weight:600">${escapeHtml(label)}</td><td style="padding:9px 12px;color:#16335d;border-bottom:1px solid #e4ebf3">${content}</td></tr>`; }).join('');
     const subject = `New ${category} task assigned - Event ${event.id || value(raw.id, raw.event_id)}`;
     const message = `<div style="font-family:Arial,sans-serif;max-width:640px;color:#19365f;line-height:1.5"><div style="padding:20px 24px;background:#102b55;color:#fff;border-radius:12px 12px 0 0"><div style="font-size:12px;letter-spacing:1px;color:#b8d4fb">CIVIC SURVEILLANCE</div><h2 style="margin:8px 0 0;font-size:22px">A new task has been assigned to you</h2></div><div style="padding:22px 24px;border:1px solid #dce5f0;border-top:0;border-radius:0 0 12px 12px;background:#fff"><p>Hello <strong>${escapeHtml(operator.name || 'there')}</strong>,</p><p>You have been assigned a new <strong>${escapeHtml(category)}</strong> event. Please review the attached event report and follow up on the task.</p><table style="width:100%;border-collapse:collapse;background:#f8fafd">${rows}</table><p style="margin:18px 0 0;color:#64758c;font-size:13px">The event details are attached as a PDF for your reference.</p></div></div>`;
     return { subject, message, filename: `${safeName(event.id || raw.id)}-event-report.pdf` };
