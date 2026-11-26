@@ -9,7 +9,16 @@ let filtered = [];
 const areaLookups = new Map();
 let lastAreaLookup = 0;
 const pick = (item, ...keys) => keys.map(k => item?.[k]).find(v => v !== undefined && v !== null && v !== '') ?? missing;
-const listFrom = data => Array.isArray(data) ? data : (data?.events || data?.items || data?.results || (Array.isArray(data?.data) ? data.data : []));
+const listFrom = data => {
+  if(Array.isArray(data)) return data;
+  if(!data||typeof data!=='object') return [];
+  for(const key of ['events','items','results','data']){
+    const value=data[key];
+    if(Array.isArray(value)) return value;
+    if(value&&typeof value==='object'){const nested=listFrom(value);if(nested.length)return nested;}
+  }
+  return [];
+};
 const moduleName = e => { const v = String(pick(e, 'event_type', 'type', 'module', 'eventType')).toLowerCase(); return v.includes('pothole') ? 'Pothole' : v.includes('garbage') ? 'Garbage' : v.includes('manhole') ? 'Open Manhole' : 'Other'; };
 const zoneName = e => String(pick(e, 'zone', 'zone_name'));
 const locationName = e => String(pick(e, 'location', 'address', 'place'));
@@ -99,9 +108,14 @@ function renderTrend(days) {
 }
 async function initialize() {
   try {
-    const response=await apiFetch('/api/events?page=1&page_size=100');
-    if(!response.ok) throw new Error(`Unable to load analytics data (${response.status}).`);
-    const payload=await response.json(); events=listFrom(payload);
+    events=[];
+    for(let page=1;;page++){
+      const response=await apiFetch(`/api/events?page=${page}&page_size=100`);
+      if(!response.ok) throw new Error(`Unable to load analytics data (${response.status}).`);
+      const batch=listFrom(await response.json());
+      events.push(...batch);
+      if(batch.length<100)break;
+    }
     const zones=[...new Set(events.map(zoneName).filter(v=>v!==missing))].sort();
     $('#zoneFilter').innerHTML='<option>All Zones</option>'+zones.map(z=>`<option>${esc(z)}</option>`).join('');
     render();
